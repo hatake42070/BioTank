@@ -2,7 +2,7 @@ namespace TankControllerScripts
 {
     public class TankStateContext
     {
-        private ITankState _currentState;
+        public ITankState CurrentState { get; private set; }
         private TankController _tankController;
         
         /// <summary>
@@ -13,24 +13,24 @@ namespace TankControllerScripts
         public void Initialize(TankController tankController, ITankState startingState)
         {
             _tankController = tankController;
-            _currentState = startingState;
-            _currentState.EnterState(_tankController);
+            CurrentState = startingState;
+            CurrentState.EnterState(_tankController);
         }
 
         public void ChangeState(ITankState newState)
         {
             // 今の状態の終了処理を呼び出す
-            _currentState.ExitState(_tankController);
+            CurrentState.ExitState(_tankController);
             // 新しい状態に切り替え
-            _currentState = newState;
+            CurrentState = newState;
             // 新しい状態の開始処理を呼び出す
-            _currentState.EnterState(_tankController);
+            CurrentState.EnterState(_tankController);
         }
 
         public void Update()
         {
             // ControllerのUpdateから呼ばれ、現在のステートのUpdateを実行するだけ
-            _currentState.UpdateState(_tankController);
+            CurrentState.UpdateState(_tankController);
         }
     }
 }
