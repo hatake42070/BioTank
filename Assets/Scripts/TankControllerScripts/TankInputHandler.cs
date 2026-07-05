@@ -19,6 +19,8 @@ namespace TankControllerScripts
         {
             // InputSystem側で設定したVector2の値をそのまま取得
             MoveInput = context.ReadValue<Vector2>();
+            
+            Debug.Log($"【{gameObject.name}】が移動を受信！ 値: {MoveInput} / デバイス: {context.control.device.name}");
         }
 
         /// <summary>
