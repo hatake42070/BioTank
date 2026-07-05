@@ -107,3 +107,6 @@ InitTestScene*.unity*
 
 # JetBrains IDE (Rider etc.)
 .idea/
+
+# macOS
+.DS_Store
