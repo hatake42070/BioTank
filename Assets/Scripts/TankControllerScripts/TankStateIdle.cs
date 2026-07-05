@@ -19,6 +19,7 @@ namespace TankControllerScripts
                 player.ChangeState(typeof(TankStateMove));
                 return; // これ以降の処理はしない
             }
+            player.GetMovement().StopMovement();
         }
 
         public void ExitState(TankController player)

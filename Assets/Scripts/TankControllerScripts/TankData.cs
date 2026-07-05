@@ -10,7 +10,10 @@ namespace TankControllerScripts
         public int maxHp = 3;
         public float baseMoveSpeed = 5f;
         
-        // 必要であれば、アニメーションの再生速度倍率や、固有のトリガー名などもここに持たせられます
+        [Header("攻撃設定")]
+        public BulletData currentBullet; // ← この戦車が現在撃つ弾のデータ！
+        public float fireCooldown = 0.5f; // 発射間隔（連射速度）
+        
         [Header("アニメーション設定")]
         public string moveAnimationTrigger = "Move";
     }

@@ -10,10 +10,10 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b1151780787455394c8a1dbe710dd60, type: 3}
-  m_Name: Tank1
+  m_Name: Tank2
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankData
   maxHp: 3
   baseMoveSpeed: 7
-  currentBullet: {fileID: 11400000, guid: 937e318a52d8dc04f89a352b7ff1769b, type: 2}
+  currentBullet: {fileID: 11400000, guid: 3665c9b8d347b2449bece7b2b2e03b24, type: 2}
   fireCooldown: 0.5
   moveAnimationTrigger: Move
