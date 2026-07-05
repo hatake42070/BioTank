@@ -192,9 +192,13 @@ MonoBehaviour:
       m_Calls: []
     m_ActionId: 9caa3d8a-6b2f-4e8e-8bad-6ede561bd9be
     m_ActionName: UI/TrackedDeviceOrientation
+  - m_PersistentCalls:
+      m_Calls: []
+    m_ActionId: 74ede941-917d-4062-a49b-c053818a5ab2
+    m_ActionName: 'UI/Join[/Keyboard/j]'
   m_NeverAutoSwitchControlSchemes: 0
   m_DefaultControlScheme: 
-  m_DefaultActionMap: 
+  m_DefaultActionMap: df70fa95-8a34-4494-b137-73ab6b9c7d37
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
 --- !u!114 &1089720281264810060
@@ -209,7 +213,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3f2e4aa8f8fde043a4b4f444d18906b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankController
-  tankData: {fileID: 0}
+  tankData: {fileID: 11400000, guid: a8e3e04c3667bb8449f70f2e977a2596, type: 2}
   currentHp: 0
 --- !u!114 &-3870382527517006381
 MonoBehaviour:
