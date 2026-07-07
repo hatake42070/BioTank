@@ -495,7 +495,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!4 &578509354
 Transform:
   m_ObjectHideFlags: 0
@@ -877,6 +877,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1211750016}
   - component: {fileID: 1211750015}
+  - component: {fileID: 1211750017}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -918,7 +919,7 @@ MonoBehaviour:
       m_SingletonActionBindings: []
       m_Flags: 0
     m_Reference: {fileID: -2611276996881009055, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_PlayerPrefab: {fileID: 515544002259754787, guid: 0fe1d8537f62b1f449ee6dfaf33619a2, type: 3}
+  m_PlayerPrefab: {fileID: 2129091308735678160, guid: d1baa56b5b4ee43aaa93b38a703d5f3c, type: 3}
   m_SplitScreen: 0
   m_MaintainAspectRatioInSplitScreen: 0
   m_FixedNumberOfSplitScreens: -1
@@ -943,6 +944,20 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1211750017
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1211750014}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c04a4b3351280504d92ce06d4a968f76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameManager
+  mapPrefabs:
+  - {fileID: 731185053163218640, guid: aac938777b81c87479f3176e4e8e4f16, type: 3}
 --- !u!1 &1416798456
 GameObject:
   m_ObjectHideFlags: 0

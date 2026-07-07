@@ -43,7 +43,7 @@ namespace TankControllerScripts
             // 何にも当たらずに飛んでいった場合、寿命（lifeTime）が来たら自動で消滅させる
             Destroy(gameObject, _data.lifeTime);
         }
-        
+
         /// <summary>
         /// センサー（Is TriggerがONのコライダー）に触れた時に自動で呼ばれる
         /// </summary>
@@ -56,7 +56,7 @@ namespace TankControllerScripts
             {
                 // 戦車にダメージを与える
                 hitTank.TakeDamage(_data.damage);
-                
+
                 // ダメージを与えたら、弾自身は消滅する
                 Destroy(gameObject);
             }
@@ -69,7 +69,7 @@ namespace TankControllerScripts
         {
             // 何に当たって消えたかをコンソールに表示する（犯人探し用）
             Debug.Log($"💥 弾が【{collision.gameObject.name}】にぶつかって消滅しました！");
-            
+
             // ぶつかった相手が壁だった場合
             if (collision.gameObject.CompareTag("Wall"))
             {
@@ -77,18 +77,21 @@ namespace TankControllerScripts
                 {
                     foreach (Collider ownerCol in _ownerColliders)
                     {
-                        Physics.IgnoreCollision(_myCollider, ownerCol, false);
+                        if (ownerCol != null)
+                        {
+                            Physics.IgnoreCollision(_myCollider, ownerCol, false);
+                        }
                     }
                 }
 
                 if (_boundCount > 0)
                 {
-                    _boundCount--;
                     // 壁で反射をする処理
-                    
+                    _boundCount--;
+
                     // ぶつかった地点の壁の向き(法線)を取得する
                     Vector3 wallNormal = collision.contacts[0].normal;
-                    // 2. 現在の「弾の進行方向」と「壁の向き」から、反射する方向を計算する
+                    // 現在の「弾の進行方向」と「壁の向き」から、反射する方向を計算する
                     Vector3 reflectDir = Vector3.Reflect(transform.forward, wallNormal);
 
                     // 3. 弾が上にフワッと浮かないよう、Y軸（上下）のズレを強制的に0にする
