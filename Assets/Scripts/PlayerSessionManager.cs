@@ -20,7 +20,8 @@ namespace TankControllerScripts
         // 十字キーでタンクを選ぶテスト（UIなし）
         public void OnNavigate(InputAction.CallbackContext context)
         {
-            if (_isReady || !context.started) return;
+            Debug.Log("onNavigate");
+            if (_isReady || !context.performed) return;
 
             Vector2 navInput = context.ReadValue<Vector2>();
 
@@ -39,6 +40,7 @@ namespace TankControllerScripts
         // 決定ボタンでReady状態にするテスト
         public void OnSubmit(InputAction.CallbackContext context)
         {
+            Debug.Log("onSubmit");
             if (context.started && !_isReady)
             {
                 _isReady = true;

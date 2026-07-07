@@ -9,6 +9,7 @@ namespace TankControllerScripts
         private BulletData _data;
         private Rigidbody _rb;
         private Collider[] _myColliders;
+        private int _boundCount;
         
         // 撃った主のコライダーを覚えておく
         private Collider[] _ownerColliders;
@@ -21,7 +22,9 @@ namespace TankControllerScripts
             _data = bulletData;
             _rb = GetComponent<Rigidbody>();
             
-            // 子オブジェクトにある横倒しのCapsuleColliderを取得する！
+            _boundCount = _data.maxBounces;
+            
+            // 子オブジェクトにある横倒しのCapsuleColliderを取得する
             _myColliders = GetComponentsInChildren<Collider>();
             _ownerColliders = ownerColliders;
             
@@ -40,7 +43,7 @@ namespace TankControllerScripts
             // 前方（transform.forward）に向かって、データで指定された速度で飛ばす
             _rb.linearVelocity = transform.forward * _data.speed;
 
-            // 安全対策：何にも当たらずに飛んでいった場合、寿命（lifeTime）が来たら自動で消滅させる
+            // 何にも当たらずに飛んでいった場合、寿命（lifeTime）が来たら自動で消滅させる
             Destroy(gameObject, _data.lifeTime);
         }
 
@@ -49,26 +52,41 @@ namespace TankControllerScripts
         /// </summary>
         private void OnCollisionEnter(Collision collision)
         {
-            // ▼ 追加：何に当たって消えたかをコンソールに表示する（犯人探し用）
+            // 何に当たって消えたかをコンソールに表示する（犯人探し用）
             Debug.Log($"💥 弾が【{collision.gameObject.name}】にぶつかって消滅しました！");
 
             // ここに「ぶつかった相手が戦車ならダメージを与える」処理を書く
             
-            // 何かに（壁などに）1回でもぶつかったら、自分との衝突無視を「解除（false）」する！
-            if (_ownerColliders != null && _myColliders != null)
+            // ぶつかった相手が壁だった場合
+            if (collision.gameObject.CompareTag("Wall"))
             {
-                foreach (Collider myCol in _myColliders)
+                if (_ownerColliders != null && _myColliders != null)
                 {
-                    foreach (Collider ownerCol in _ownerColliders)
+                    foreach (Collider myCol in _myColliders)
                     {
-                        Physics.IgnoreCollision(myCol, ownerCol, false);
+                        foreach (Collider ownerCol in _ownerColliders)
+                        {
+                            Physics.IgnoreCollision(myCol, ownerCol, false);
+                        }
                     }
                 }
+
+                if (_boundCount > 0)
+                {
+                    _boundCount--;
+                    // （※ここで物理的に弾を跳ね返すための処理が別に必要になります）
+                }
+                else
+                {
+                    Destroy(gameObject);
+                }
+                return;
             }
+            
             // （今はまだ相手のHPを減らす処理がないので省略）
 
             // ぶつかったら自分自身（玉）を消滅させる
-            Destroy(gameObject);
+            //Destroy(gameObject);
         }
     }
 }
