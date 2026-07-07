@@ -12,10 +12,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e8685f7e7d0a4a41a52a1f11f0d65158, type: 3}
   m_Name: Normal
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.BulletData
-  bulletPrefab: {fileID: 9173587576312112462, guid: 51cad1ed0bc406245bd6a5739edfcbdb, type: 3}
+  bulletPrefab: {fileID: 8581412931328795490, guid: bf79fb78922c6aa49a14ded6b4b98e93, type: 3}
   damage: 1
   speed: 13
-  balletHp: 1
-  lifeTime: 5
+  lifeTime: 10
   maxBounces: 1
-  canDestroyOtherBullets: 1

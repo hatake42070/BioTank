@@ -125,7 +125,6 @@ GameObject:
   - component: {fileID: 7716738393629880104}
   - component: {fileID: 6150679181699490586}
   - component: {fileID: 1816477338550060194}
-  - component: {fileID: 2012759846810235107}
   m_Layer: 0
   m_Name: BalletRoot
   m_TagString: Bullet
@@ -174,7 +173,7 @@ Rigidbody:
   m_UseGravity: 0
   m_IsKinematic: 0
   m_Interpolate: 0
-  m_Constraints: 0
+  m_Constraints: 116
   m_CollisionDetection: 0
 --- !u!114 &1816477338550060194
 MonoBehaviour:
@@ -188,26 +187,3 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 607bceb9a28b4b71b32ab20148f7d8a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.BulletController
---- !u!136 &2012759846810235107
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8581412931328795490}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 0
-  serializedVersion: 2
-  m_Radius: 0.25
-  m_Height: 1
-  m_Direction: 2
-  m_Center: {x: 0, y: 0, z: 0}
