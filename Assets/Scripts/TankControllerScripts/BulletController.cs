@@ -8,9 +8,9 @@ namespace TankControllerScripts
     {
         private BulletData _data;
         private Rigidbody _rb;
-        private Collider[] _myColliders;
+        private Collider _myCollider;
         private int _boundCount;
-        
+
         // 撃った主のコライダーを覚えておく
         private Collider[] _ownerColliders;
 
@@ -21,22 +21,19 @@ namespace TankControllerScripts
         {
             _data = bulletData;
             _rb = GetComponent<Rigidbody>();
-            
+
             _boundCount = _data.maxBounces;
-            
+
             // 子オブジェクトにある横倒しのCapsuleColliderを取得する
-            _myColliders = GetComponentsInChildren<Collider>();
+            _myCollider = GetComponentInChildren<Collider>();
             _ownerColliders = ownerColliders;
-            
-            // 総当たりで無視設定（二重ループ）
-            if (_ownerColliders != null && _myColliders != null)
+
+            // 総当たりで無視設定
+            if (_ownerColliders != null && _myCollider != null)
             {
-                foreach (Collider myCol in _myColliders)
+                foreach (Collider ownerCol in _ownerColliders)
                 {
-                    foreach (Collider ownerCol in _ownerColliders)
-                    {
-                        Physics.IgnoreCollision(myCol, ownerCol, true);
-                    }
+                    Physics.IgnoreCollision(_myCollider, ownerCol, true);
                 }
             }
 
@@ -46,6 +43,24 @@ namespace TankControllerScripts
             // 何にも当たらずに飛んでいった場合、寿命（lifeTime）が来たら自動で消滅させる
             Destroy(gameObject, _data.lifeTime);
         }
+        
+        /// <summary>
+        /// センサー（Is TriggerがONのコライダー）に触れた時に自動で呼ばれる
+        /// </summary>
+        private void OnTriggerEnter(Collider other)
+        {
+            // ぶつかった相手（Trigger）の親に TankController があるか探す
+            TankController hitTank = other.GetComponentInParent<TankController>();
+
+            if (hitTank != null)
+            {
+                // 戦車にダメージを与える
+                hitTank.TakeDamage(_data.damage);
+                
+                // ダメージを与えたら、弾自身は消滅する
+                Destroy(gameObject);
+            }
+        }
 
         /// <summary>
         /// 何かにぶつかった時に自動で呼ばれる（Unityの物理エンジン機能）
@@ -54,39 +69,51 @@ namespace TankControllerScripts
         {
             // 何に当たって消えたかをコンソールに表示する（犯人探し用）
             Debug.Log($"💥 弾が【{collision.gameObject.name}】にぶつかって消滅しました！");
-
-            // ここに「ぶつかった相手が戦車ならダメージを与える」処理を書く
             
             // ぶつかった相手が壁だった場合
             if (collision.gameObject.CompareTag("Wall"))
             {
-                if (_ownerColliders != null && _myColliders != null)
+                if (_ownerColliders != null && _myCollider != null)
                 {
-                    foreach (Collider myCol in _myColliders)
+                    foreach (Collider ownerCol in _ownerColliders)
                     {
-                        foreach (Collider ownerCol in _ownerColliders)
-                        {
-                            Physics.IgnoreCollision(myCol, ownerCol, false);
-                        }
+                        Physics.IgnoreCollision(_myCollider, ownerCol, false);
                     }
                 }
 
                 if (_boundCount > 0)
                 {
                     _boundCount--;
-                    // （※ここで物理的に弾を跳ね返すための処理が別に必要になります）
+                    // 壁で反射をする処理
+                    
+                    // ぶつかった地点の壁の向き(法線)を取得する
+                    Vector3 wallNormal = collision.contacts[0].normal;
+                    // 2. 現在の「弾の進行方向」と「壁の向き」から、反射する方向を計算する
+                    Vector3 reflectDir = Vector3.Reflect(transform.forward, wallNormal);
+
+                    // 3. 弾が上にフワッと浮かないよう、Y軸（上下）のズレを強制的に0にする
+                    reflectDir.y = 0f;
+
+                    // 4. 計算した反射の方向に弾を向かせる（normalized で長さを1に整える）
+                    transform.forward = reflectDir.normalized;
+
+                    // 5. 新しい正面方向に向かって、元のスピードのまま飛ばし直す！（減速させない）
+                    _rb.linearVelocity = transform.forward * _data.speed;
                 }
                 else
                 {
                     Destroy(gameObject);
                 }
+
                 return;
             }
-            
-            // （今はまだ相手のHPを減らす処理がないので省略）
 
-            // ぶつかったら自分自身（玉）を消滅させる
-            //Destroy(gameObject);
+            // ぶつかった相手が銃弾だった場合
+            if (collision.gameObject.CompareTag("Bullet"))
+            {
+                Destroy(gameObject);
+                return;
+            }
         }
     }
 }

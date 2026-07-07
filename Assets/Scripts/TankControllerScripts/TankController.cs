@@ -41,6 +41,9 @@ namespace TankControllerScripts
             };
 
             _stateContext.Initialize(this, _stateDictionary[typeof(TankStateIdle)]);
+            
+            // TankDataから最大HPを取得して、現在のHPを初期化する
+            currentHp = tankData.maxHp;
         }
 
         private void Update()
@@ -108,6 +111,14 @@ namespace TankControllerScripts
 
         public void TakeDamage(int damage)
         {
+            currentHp -= damage;
+            Debug.Log($"戦車がダメージを受けた！ 残りHP: {currentHp}");
+
+            if (currentHp <= 0)
+            {
+                // HPが0になったら、状態を「Dead（死亡）」に切り替える！
+                ChangeState(typeof(TankStateDead));
+            }
         }
     }
 }
