@@ -3,16 +3,18 @@ using UnityEngine.InputSystem;
 
 namespace TankControllerScripts
 {
-    // GameManagerからプレイヤーが参加するたびに呼ばれるクラス
+    /// <summary>
+    /// GameManagerからプレイヤーが参加するたびに呼ばれるクラス
+    /// </summary>
     public class PlayerSessionManager : MonoBehaviour
     {
         [Header("戦車設定")] public GameObject[] myTankPrefabs; // 生成したいTankのプレハブをセット
 
         private PlayerInput _playerInput;
-        private bool _isReady = false;
+        private bool _isReady = false;  // 使用する戦車が決定したかどうかのフラグ
         private int _selectedTankIndex = 0;
 
-        // ▼ 生成した戦車の「入力受け取り窓口」を覚えておくための変数
+        // 生成した戦車の「入力受け取り窓口」を覚えておくための変数
         private TankInputHandler _spawnedTankInput;
 
         private void Awake()
@@ -34,7 +36,7 @@ namespace TankControllerScripts
             // 指定された場所に自分の戦車を生成！
             GameObject myTank = Instantiate(myTankPrefabs[_selectedTankIndex], spawnPoint.position, spawnPoint.rotation);
 
-            // ▼ 生成した戦車についている TankInputHandler を取得して記憶する
+            // 生成した戦車についている TankInputHandler を取得して記憶する
             _spawnedTankInput = myTank.GetComponent<TankInputHandler>();
 
             // 戦車が生まれたら、操作モードをUIから「Player（ゲーム中）」に切り替える！
@@ -82,10 +84,9 @@ namespace TankControllerScripts
                 _isReady = true;
                 Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} : タンク {_selectedTankIndex} で準備完了 (Ready) !");
 
-                // ✨ ここで現場監督に「戦車が決まったから出して！」と報告する
+                //　GameManagerに使用する戦車が決定したので
                 if (GameManager.Instance != null)
                 {
-                    // ※メソッド名はそのまま OnPlayerJoinedGame を使います
                     GameManager.Instance.OnPlayerJoinedGame(this);
                 }
             }

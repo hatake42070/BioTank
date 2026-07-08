@@ -35,7 +35,7 @@ public class GameManager : MonoBehaviour
         }
     }
     
-    // Sessionが生成された時（プレイヤーが参加した時）に呼ばれる関数
+    // 戦車が決定されたときに呼ばれるメソッド
     public void OnPlayerJoinedGame(PlayerSessionManager newSession)
     {
         _playerSessions.Add(newSession);
