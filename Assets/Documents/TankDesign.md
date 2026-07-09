@@ -9,17 +9,24 @@ classDiagram
     }
 
     %% コアシステム（司令塔と窓口）
-    class TankController {
+    class TankController : MonoBehaviour, IDamageable{
         -TankStateContext _stateContext
         -TankInputHandler _inputHandler
         -TankMovement _movement
         -TankShooter _shooter
         -TankData _tankData     %% タンク固有のデータ
         +int CurrentHP          %% 現在のHP
+        +TankData TankData()
         -Start()
-        -Update()
         -Initialize()
-        +TakeDamage(int damage) %% ダメージ処理を追加
+        -Update()
+        -void HandleAttack()
+        -bool CanFire()         %% 弾が打てるかどうか(CD)を判定
+        -void ResetCooldown()     %% 弾を打った時にCD時間をリセット
+        +TankInputHandler GetInputHandler()
+        +TankMovement GetMovement()
+        +void ChangeState(Type newStateType)
+        +TakeDamage(int damage) %% 戦車の受けるダメージ処理
     }
     
     class TankInputHandler {

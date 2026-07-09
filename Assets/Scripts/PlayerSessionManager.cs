@@ -117,7 +117,7 @@ namespace TankControllerScripts
         public void OnDebugRespawn(InputAction.CallbackContext context)
         {
             // ボタンが押された瞬間 ＆ 戦車が破壊されて存在しない時だけ実行
-            if (context.started && _spawnedTankInput == null)
+            if (context.started && _isReady　&& _spawnedTankInput == null)
             {
                 Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} : デバッグリスポーンを実行します！");
 
