@@ -49,13 +49,13 @@ namespace TankControllerScripts
         /// </summary>
         private void OnTriggerEnter(Collider other)
         {
-            // ぶつかった相手（Trigger）の親に TankController があるか探す
-            TankController hitTank = other.GetComponentInParent<TankController>();
+            // ぶつかった相手（Trigger）の親に IDamageable があるか探す
+            Gimmicks.IDamageable target = other.GetComponentInParent<Gimmicks.IDamageable>();
 
-            if (hitTank != null)
+            if (target != null)
             {
                 // 戦車にダメージを与える
-                hitTank.TakeDamage(_data.damage);
+                target.TakeDamage(_data.damage);
 
                 // ダメージを与えたら、弾自身は消滅する
                 Destroy(gameObject);
@@ -69,6 +69,19 @@ namespace TankControllerScripts
         {
             // 何に当たって消えたかをコンソールに表示する（犯人探し用）
             Debug.Log($"💥 弾が【{collision.gameObject.name}】にぶつかって消滅しました！");
+            
+            // ぶつかった相手がIDamageableかチェックする(壊せる壁)
+            Gimmicks.IDamageable target = collision.gameObject.GetComponentInParent<Gimmicks.IDamageable>();
+            
+            if (target != null)
+            {
+                // ダメージを与える(壊れる壁のHPが減る)
+                target.TakeDamage(_data.damage);
+
+                // ダメージを与えたら弾は消滅させる場合
+                Destroy(gameObject);
+                return; // これ以降の反射処理などは行わない
+            }
 
             // ぶつかった相手が壁だった場合
             if (collision.gameObject.CompareTag("Wall"))
@@ -94,13 +107,13 @@ namespace TankControllerScripts
                     // 現在の「弾の進行方向」と「壁の向き」から、反射する方向を計算する
                     Vector3 reflectDir = Vector3.Reflect(transform.forward, wallNormal);
 
-                    // 3. 弾が上にフワッと浮かないよう、Y軸（上下）のズレを強制的に0にする
+                    // 弾が上にフワッと浮かないよう、Y軸（上下）のズレを強制的に0にする
                     reflectDir.y = 0f;
 
-                    // 4. 計算した反射の方向に弾を向かせる（normalized で長さを1に整える）
+                    // 計算した反射の方向に弾を向かせる（normalized で長さを1に整える）
                     transform.forward = reflectDir.normalized;
 
-                    // 5. 新しい正面方向に向かって、元のスピードのまま飛ばし直す！（減速させない）
+                    // 新しい正面方向に向かって、元のスピードのまま飛ばし直す！（減速させない）
                     _rb.linearVelocity = transform.forward * _data.speed;
                 }
                 else

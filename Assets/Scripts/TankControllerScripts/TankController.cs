@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace TankControllerScripts
 {
-    public class TankController : MonoBehaviour
+    public class TankController : MonoBehaviour, Gimmicks.IDamageable
     {
         private TankStateContext _stateContext;
         private TankInputHandler _inputHandler;
@@ -55,6 +55,9 @@ namespace TankControllerScripts
             HandleAttack();
         }
 
+        /// <summary>
+        /// 入力ハンドラが攻撃入力を読み取ったかを見にいく
+        /// </summary>
         private void HandleAttack()
         {
             if (_stateContext.CurrentState is TankStateDead)
