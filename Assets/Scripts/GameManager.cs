@@ -3,10 +3,19 @@ using System.Collections.Generic;
 using TankControllerScripts;
 using UnityEngine.InputSystem;
 
+public enum GamePhase
+{
+    Lobby,       // タンク選択中
+    MapSelect,   // 1Pがマップ選択中
+    Battle       // 戦闘中
+}
+
 public class GameManager : MonoBehaviour
 {
     // どこからでもアクセスできるようにするためのシングルトン
     public static GameManager Instance;
+    // 現在のフェーズ
+    public GamePhase CurrentPhase { get; private set; } = GamePhase.Lobby;
 
     [Header("マップ設定")] public GameObject[] mapPrefabs;
     
@@ -16,6 +25,9 @@ public class GameManager : MonoBehaviour
     
     // 参加したセッションを管理するリスト
     private List<PlayerSessionManager> _playerSessions = new List<PlayerSessionManager>();
+    
+    // 現在選択されているマップの番号
+    private int _selectedMapIndex = 0;
 
     private void Awake()
     {
@@ -23,28 +35,122 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
-        // ゲーム開始直後にマップを原点に生成する
-        GameObject currentMap = Instantiate(mapPrefabs[0], Vector3.zero, Quaternion.identity);
-        // マップからスポーン地点を探して記憶する
-        _spawnPoint1P = currentMap.transform.Find("SpawnPoint_1");
-        _spawnPoint2P = currentMap.transform.Find("SpawnPoint_2");
-
-        if (_spawnPoint1P == null || _spawnPoint2P == null)
-        {
-            Debug.Log("マップ内にSpawnPoint_1またはSpawnPoint_2が見つかりません");
-        }
+        // // ゲーム開始直後にマップを原点に生成する
+        // GameObject currentMap = Instantiate(mapPrefabs[0], Vector3.zero, Quaternion.identity);
+        // // マップからスポーン地点を探して記憶する
+        // _spawnPoint1P = currentMap.transform.Find("SpawnPoint_1");
+        // _spawnPoint2P = currentMap.transform.Find("SpawnPoint_2");
+        //
+        // if (_spawnPoint1P == null || _spawnPoint2P == null)
+        // {
+        //     Debug.Log("マップ内にSpawnPoint_1またはSpawnPoint_2が見つかりません");
+        // }
     }
     
     // 戦車が決定されたときに呼ばれるメソッド
-    public void OnPlayerJoinedGame(PlayerSessionManager newSession)
+    public void RegisterPlayer(PlayerSessionManager newSession)
     {
-        _playerSessions.Add(newSession);
+        if (!_playerSessions.Contains(newSession))
+        {
+            _playerSessions.Add(newSession);
+            // ※ここでリストに追加されるため、純粋な「参加順」で1P, 2Pが確定します！
+            
+            // 2人（最大人数）揃った時点で、これ以上の新規参加受付を完全にストップする
+            if (_playerSessions.Count >= 2)
+            {
+                if (UnityEngine.InputSystem.PlayerInputManager.instance != null)
+                {
+                    UnityEngine.InputSystem.PlayerInputManager.instance.DisableJoining();
+                }
+            }
+        }
+    }
+    // public void OnPlayerJoinedGame(PlayerSessionManager newSession)
+    // {
+    //     _playerSessions.Add(newSession);
+    //
+    //     // ここでマップ選択画面に移動する
+    //     
+    //     // // 人数に応じて割り当てるスポーン地点を変える
+    //     // Transform targetSpawn = (_playerSessions.Count == 1) ? _spawnPoint1P : _spawnPoint2P;
+    //     //
+    //     // // Sessionに「ここで戦車を作れ！」と命令を出す
+    //     // newSession.SpawnMyTank(targetSpawn);
+    // }
+    
+    // 1Pから呼ばれるマップ切り替え関数
+    public void ChangeMapIndex(int direction)
+    {
+        if (mapPrefabs == null || mapPrefabs.Length == 0) return;
 
-        // 人数に応じて割り当てるスポーン地点を変える
-        Transform targetSpawn = (_playerSessions.Count == 1) ? _spawnPoint1P : _spawnPoint2P;
+        if (direction > 0)
+        {
+            _selectedMapIndex = (_selectedMapIndex + 1) % mapPrefabs.Length;
+        }
+        else if (direction < 0)
+        {
+            _selectedMapIndex--;
+            if (_selectedMapIndex < 0)
+            {
+                _selectedMapIndex = mapPrefabs.Length - 1;
+            }
+        }
+        
+        Debug.Log($"マップ選択中: {_selectedMapIndex} 番のマップ候補");
+        
+        // ゆくゆくはここで「マップ選択UI」の画像やテキストを更新する処理を呼ぶ
+    }
+    
+    // マップ選択画面でマップが確定したときに呼ばれる
+    public void SetupMap()
+    {
+        CurrentPhase = GamePhase.Battle; // 状態をバトル中へ
+        
+        // マップ生成・出撃時にロビーのUI（キャンバス）を丸ごと非表示にする！
+        if (LobbyUIManager.Instance != null)
+        {
+            LobbyUIManager.Instance.gameObject.SetActive(false);
+        }
 
-        // Sessionに「ここで戦車を作れ！」と命令を出す
-        newSession.SpawnMyTank(targetSpawn);
+        // マップを生成してスポーン地点を取得
+        GameObject currentMap = Instantiate(mapPrefabs[_selectedMapIndex], Vector3.zero, Quaternion.identity);
+        _spawnPoint1P = currentMap.transform.Find("SpawnPoint_1");
+        _spawnPoint2P = currentMap.transform.Find("SpawnPoint_2");
+
+        // 全員分の戦車をそれぞれのスポーン地点に生成！
+        for (int i = 0; i < _playerSessions.Count; i++)
+        {
+            Transform targetSpawn = (i == 0) ? _spawnPoint1P : _spawnPoint2P;
+            _playerSessions[i].SpawnMyTank(targetSpawn);
+        }
+    }
+    
+    // 特定のプレイヤーが1P（ホスト）かどうかを判定する便利関数
+    public bool IsPlayer1(PlayerSessionManager session)
+    {
+        return _playerSessions.Count > 0 && _playerSessions[0] == session;
+    }
+    
+    // 全員の準備が完了したかチェックする
+    public void CheckAllPlayersReady()
+    {
+        if (_playerSessions.Count == 0) return;
+        
+        bool isAllReady = _playerSessions.TrueForAll(s => s.IsReady);
+
+        if (isAllReady)
+        {
+            Debug.Log("全員準備完了！マップ選択に移行します。");
+            CurrentPhase = GamePhase.MapSelect; // 状態を移行！
+            
+            // 3人目以降の参加受付をシャットアウトし、Jボタン連打による警告を防ぐ
+            if (UnityEngine.InputSystem.PlayerInputManager.instance != null)
+            {
+                UnityEngine.InputSystem.PlayerInputManager.instance.DisableJoining();
+            }
+            
+            // ここでUIをマップ選択画面に切り替える処理を呼ぶ
+        }
     }
     
     // デバック用
