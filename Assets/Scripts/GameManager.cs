@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using TankControllerScripts;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// ゲームのフェーズを管理
+/// </summary>
 public enum GamePhase
 {
     Lobby,       // タンク選択中
@@ -10,6 +13,9 @@ public enum GamePhase
     Battle       // 戦闘中
 }
 
+/// <summary>
+/// 一番初めから存在し、ゲーム全体の状態を管理するクラス
+/// </summary>
 public class GameManager : MonoBehaviour
 {
     // どこからでもアクセスできるようにするためのシングルトン
@@ -17,7 +23,8 @@ public class GameManager : MonoBehaviour
     // 現在のフェーズ
     public GamePhase CurrentPhase { get; private set; } = GamePhase.Lobby;
 
-    [Header("マップ設定")] public GameObject[] mapPrefabs;
+    [Header("マップ設定")]
+    public GameObject[] mapPrefabs;
     
     // 1P,2Pのスポーンポイント
     private Transform _spawnPoint1P;
@@ -35,16 +42,6 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
         }
-        // // ゲーム開始直後にマップを原点に生成する
-        // GameObject currentMap = Instantiate(mapPrefabs[0], Vector3.zero, Quaternion.identity);
-        // // マップからスポーン地点を探して記憶する
-        // _spawnPoint1P = currentMap.transform.Find("SpawnPoint_1");
-        // _spawnPoint2P = currentMap.transform.Find("SpawnPoint_2");
-        //
-        // if (_spawnPoint1P == null || _spawnPoint2P == null)
-        // {
-        //     Debug.Log("マップ内にSpawnPoint_1またはSpawnPoint_2が見つかりません");
-        // }
     }
     
     // 戦車が決定されたときに呼ばれるメソッド
@@ -65,19 +62,7 @@ public class GameManager : MonoBehaviour
             }
         }
     }
-    // public void OnPlayerJoinedGame(PlayerSessionManager newSession)
-    // {
-    //     _playerSessions.Add(newSession);
-    //
-    //     // ここでマップ選択画面に移動する
-    //     
-    //     // // 人数に応じて割り当てるスポーン地点を変える
-    //     // Transform targetSpawn = (_playerSessions.Count == 1) ? _spawnPoint1P : _spawnPoint2P;
-    //     //
-    //     // // Sessionに「ここで戦車を作れ！」と命令を出す
-    //     // newSession.SpawnMyTank(targetSpawn);
-    // }
-    
+
     // 1Pから呼ばれるマップ切り替え関数
     public void ChangeMapIndex(int direction)
     {

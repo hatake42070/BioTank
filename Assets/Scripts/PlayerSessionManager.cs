@@ -3,15 +3,15 @@ using UnityEngine.InputSystem;
 
 
 /// <summary>
-/// GameManagerからプレイヤーが参加するたびに呼ばれるクラス
+/// GameManager(のPlayerInputManager)からプレイヤーが参加するたびに呼ばれるクラス
 /// </summary>
 public class PlayerSessionManager : MonoBehaviour
 {
-    [Header("戦車設定")] public GameObject[] myTankPrefabs; // 生成したいTankのプレハブをセット
+    [Header("戦車設定")]
+    public GameObject[] myTankPrefabs; // 生成したいTankのプレハブをセット
 
     private PlayerInput _playerInput;
-    private bool _isReady = false;  // 使用する戦車が決定したかどうかのフラグ
-    public bool IsReady => _isReady;
+    public bool IsReady { get; private set; } = false; // 使用する戦車が決定したかどうかのフラグ
     private int _selectedTankIndex = 0;
 
     // 生成した戦車の「入力受け取り窓口」を覚えておくための変数
@@ -32,7 +32,7 @@ public class PlayerSessionManager : MonoBehaviour
         {
             LobbyUIManager.Instance.UpdatePlayerSelectUI(_playerInput.playerIndex, _selectedTankIndex);
         }
-        
+
         // 自分が生成（Join）された瞬間に、GameManagerへ「参加したよ！」と登録に行く
         if (GameManager.Instance != null)
         {
@@ -70,9 +70,9 @@ public class PlayerSessionManager : MonoBehaviour
         {
             // 安全対策：配列が空なら無視
             if (myTankPrefabs == null || myTankPrefabs.Length == 0) return;
-            
-            if (_isReady) return; // タンク準備完了済なら入力を無視する
-            
+
+            if (IsReady) return; // タンク準備完了済なら入力を無視する
+
             // タンク選択のためのインデックス処理
             if (navInput.x > 0.5f)
             {
@@ -86,6 +86,7 @@ public class PlayerSessionManager : MonoBehaviour
                 {
                     _selectedTankIndex = myTankPrefabs.Length - 1;
                 }
+
                 Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} : タンク {_selectedTankIndex} を選択中");
             }
 
@@ -128,10 +129,10 @@ public class PlayerSessionManager : MonoBehaviour
         // ============================================
         if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
         {
-            if (!_isReady)
+            if (!IsReady)
             {
-                _isReady = true;
-                
+                IsReady = true;
+
                 if (LobbyUIManager.Instance != null)
                 {
                     LobbyUIManager.Instance.UpdatePlayerReadyUI(_playerInput.playerIndex);
@@ -153,10 +154,10 @@ public class PlayerSessionManager : MonoBehaviour
             if (GameManager.Instance.IsPlayer1(this))
             {
                 Debug.Log("1Pがマップを決定しました！バトル開始！");
-        
+
                 // GameManager にマップ生成と出撃を命じる
                 GameManager.Instance.SetupMap();
-                
+
                 // ここでロビー全体のUI（キャンバス）を非表示にする
             }
         }
@@ -180,10 +181,10 @@ public class PlayerSessionManager : MonoBehaviour
             _spawnedTankInput.OnAttack(context);
         }
     }
-    
+
     public void OnDebugRespawn(InputAction.CallbackContext context)
     {
-        if (context.started && _isReady && _spawnedTankInput == null)
+        if (context.started && IsReady && _spawnedTankInput == null)
         {
             Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} : デバッグリスポーンを実行します！");
 
