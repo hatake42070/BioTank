@@ -1,5 +1,8 @@
 namespace TankControllerScripts
 {
+    /// <summary>
+    /// タンクの状態を管理するクラス．
+    /// </summary>
     public class TankStateContext
     {
         public ITankState CurrentState { get; private set; }

@@ -9,7 +9,8 @@ public class LobbyUIManager : MonoBehaviour
 {
     public static LobbyUIManager Instance;
 
-    [SerializeField] private PlayerSlotUI[] playerSlots; // 0番目が1P用、1番目が2P用
+    [SerializeField]
+    private PlayerSlotUI[] playerSlots; // 0番目が1P用、1番目が2P用
 
     private void Awake()
     {
