@@ -56,16 +56,15 @@ public class PlayerSessionManager : MonoBehaviour
     }
 
     // 十字キーでタンク・マップを選ぶ処理
+    // PlayerSession Prefabの InputActionAsset で Navigate に紐づけている
     public void OnNavigate(InputAction.CallbackContext context)
     {
         if (!context.performed) return;
 
         // 入力された方向をここで読み取る（両方のフェーズで使うため）
         Vector2 navInput = context.ReadValue<Vector2>();
-
-        // ============================================
-        // フェーズ１：ロビー（タンク選択）の場合
-        // ============================================
+        
+        // --- フェーズ１：ロビー（タンク選択）の場合 ---
         if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
         {
             // 安全対策：配列が空なら無視
@@ -96,9 +95,7 @@ public class PlayerSessionManager : MonoBehaviour
                 LobbyUIManager.Instance.UpdatePlayerSelectUI(_playerInput.playerIndex, _selectedTankIndex);
             }
         }
-        // ============================================
-        // フェーズ２：マップ選択の場合
-        // ============================================
+        // --- フェーズ２：マップ選択の場合 ---
         else if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
             // 1P（ホスト）しかマップ選択の操作ができないように制限する
@@ -124,9 +121,7 @@ public class PlayerSessionManager : MonoBehaviour
     {
         if (!context.started) return;
 
-        // ============================================
-        // フェーズ１：ロビー（タンク選択）の場合
-        // ============================================
+        // --- フェーズ１：ロビー（タンク選択）の場合 ---
         if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
         {
             if (!IsReady)
@@ -146,9 +141,8 @@ public class PlayerSessionManager : MonoBehaviour
                 }
             }
         }
-        // ============================================
-        // フェーズ２：マップ選択の場合
-        // ============================================
+        
+        // --- フェーズ２：マップ選択の場合 ---
         else if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
             if (GameManager.Instance.IsPlayer1(this))

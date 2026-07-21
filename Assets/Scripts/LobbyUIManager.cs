@@ -19,7 +19,7 @@ public class LobbyUIManager : MonoBehaviour
 
     private void Start()
     {
-        // 最初は全員「Join前」状態にしておく[cite: 1]
+        // 最初は全員「Join前」状態にしておく
         foreach (var slot in playerSlots)
         {
             slot.SetupUnjoinedState();
