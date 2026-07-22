@@ -48,6 +48,7 @@ MonoBehaviour:
   myTankPrefabs:
   - {fileID: 515544002259754787, guid: 0fe1d8537f62b1f449ee6dfaf33619a2, type: 3}
   - {fileID: 515544002259754787, guid: 4b51ff41be33d644b87b4d5d0e26a76e, type: 3}
+  - {fileID: 580506073305369390, guid: 7bc1d08f2bd2bd2479a306492d743047, type: 3}
 --- !u!114 &3957874985145161075
 MonoBehaviour:
   m_ObjectHideFlags: 0
