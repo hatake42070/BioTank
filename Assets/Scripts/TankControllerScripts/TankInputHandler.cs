@@ -9,6 +9,8 @@ namespace TankControllerScripts
     public class TankInputHandler : MonoBehaviour
     {
         public Vector2 MoveInput { get; private set; }
+        public Vector2 AimInput { get; private set; }
+        public bool IsMouseAim { get; private set; }
         public bool AttackTriggered { get; private set; }
 
         /// <summary>
@@ -42,6 +44,20 @@ namespace TankControllerScripts
         public void ConsumeAttack()
         {
             AttackTriggered = false;
+        }
+
+        /// <summary>
+        /// 照準操作があった時に自動で呼ばれる
+        /// </summary>
+        /// <param name="context"></param>
+        public void OnAim(InputAction.CallbackContext context)
+        {
+            // InputSystem側で設定したVector2の値をそのまま取得
+            AimInput = context.ReadValue<Vector2>();
+            
+            IsMouseAim = context.control.device.name.Contains("Mouse");
+            
+            Debug.Log($"【{gameObject.name}】が照準操作を受信！ 値: {AimInput} / デバイス: {context.control.device.name}");
         }
     }
 }

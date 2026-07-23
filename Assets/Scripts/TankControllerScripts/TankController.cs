@@ -10,6 +10,7 @@ namespace TankControllerScripts
         private TankInputHandler _inputHandler;
         private TankMovement _tankMovement;
         private TankShooter _tankShooter;
+        private TankTurretAim  _tankTurretAim;
         [SerializeField] private TankData tankData;
 
         public TankData TankData => tankData;
@@ -31,6 +32,7 @@ namespace TankControllerScripts
             _inputHandler = GetComponent<TankInputHandler>();
             _tankMovement = GetComponent<TankMovement>();
             _tankShooter = GetComponent<TankShooter>();
+            _tankTurretAim = GetComponent<TankTurretAim>();
 
             _stateContext = new TankStateContext();
             _stateDictionary = new Dictionary<Type, ITankState>()
@@ -53,6 +55,8 @@ namespace TankControllerScripts
 
             // 攻撃の判定(stateとは独立させる)
             HandleAttack();
+            // 砲台の向きを変える
+            HandleAim();
         }
 
         /// <summary>
@@ -122,6 +126,15 @@ namespace TankControllerScripts
                 // HPが0になったら、状態を「Dead（死亡）」に切り替える！
                 ChangeState(typeof(TankStateDead));
             }
+        }
+
+        private void HandleAim()
+        {
+            if (_stateContext.CurrentState is TankStateDead)
+            {
+                return;
+            }
+            _tankTurretAim.AimTurret(_inputHandler.AimInput, _inputHandler.IsMouseAim);
         }
     }
 }

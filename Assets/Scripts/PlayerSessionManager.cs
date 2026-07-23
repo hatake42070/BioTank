@@ -175,6 +175,14 @@ public class PlayerSessionManager : MonoBehaviour
             _spawnedTankInput.OnAttack(context);
         }
     }
+    // AIM機能の実装
+    public void OnAim(InputAction.CallbackContext context)
+    {
+        if (_spawnedTankInput != null)
+        {
+            _spawnedTankInput.OnAim(context);
+        }
+    }
 
     public void OnDebugRespawn(InputAction.CallbackContext context)
     {
