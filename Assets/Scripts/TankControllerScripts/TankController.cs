@@ -134,7 +134,7 @@ namespace TankControllerScripts
             {
                 return;
             }
-            _tankTurretAim.AimTurret(_inputHandler.AimInput, _inputHandler.IsMouseAim);
+            _tankTurretAim.AimTurret(_inputHandler.PointerScreenPosition);
         }
     }
 }

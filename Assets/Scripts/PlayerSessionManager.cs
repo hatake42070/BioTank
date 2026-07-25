@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using TankControllerScripts;
+using UnityEngine;
 using UnityEngine.InputSystem;
 
 
@@ -9,6 +10,11 @@ public class PlayerSessionManager : MonoBehaviour
 {
     [Header("戦車設定")]
     public GameObject[] myTankPrefabs; // 生成したいTankのプレハブをセット
+    
+    [Header("UI")]
+    [SerializeField] private CrosshairUI crosshairUI; // クロスヘアのPrefab
+
+    private CrosshairUI _myCrosshairUI; // 生成した自分のクロスヘア
 
     private PlayerInput _playerInput;
     public bool IsReady { get; private set; } = false; // 使用する戦車が決定したかどうかのフラグ
@@ -53,6 +59,12 @@ public class PlayerSessionManager : MonoBehaviour
         _playerInput.SwitchCurrentActionMap("Player");
 
         Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} の戦車を生成完了！");
+        
+        if (GameUIManager.Instance != null)
+        {
+            _myCrosshairUI = Instantiate(crosshairUI, GameUIManager.Instance.CanvasTransform);
+            _myCrosshairUI.Initialize(_spawnedTankInput, _playerInput.playerIndex);
+        }
     }
 
     // 十字キーでタンク・マップを選ぶ処理
@@ -151,8 +163,6 @@ public class PlayerSessionManager : MonoBehaviour
 
                 // GameManager にマップ生成と出撃を命じる
                 GameManager.Instance.SetupMap();
-
-                // ここでロビー全体のUI（キャンバス）を非表示にする
             }
         }
     }
