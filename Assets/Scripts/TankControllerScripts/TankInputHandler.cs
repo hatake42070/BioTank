@@ -9,9 +9,11 @@ namespace TankControllerScripts
     public class TankInputHandler : MonoBehaviour
     {
         public Vector2 MoveInput { get; private set; }
-        public Vector2 AimInput { get; private set; }
         public bool IsMouseAim { get; private set; }
         public bool AttackTriggered { get; private set; }
+        private Vector2 _padAimInput;
+        public Vector2 PointerScreenPosition { get; private set; }
+        public float padCursorSpeed = 1000f;
 
         /// <summary>
         /// 移動入力があった時に自動で呼ばれる
@@ -52,12 +54,30 @@ namespace TankControllerScripts
         /// <param name="context"></param>
         public void OnAim(InputAction.CallbackContext context)
         {
-            // InputSystem側で設定したVector2の値をそのまま取得
-            AimInput = context.ReadValue<Vector2>();
-            
-            IsMouseAim = context.control.device.name.Contains("Mouse");
-            
-            Debug.Log($"【{gameObject.name}】が照準操作を受信！ 値: {AimInput} / デバイス: {context.control.device.name}");
+            if (context.control.device.name == "Mouse")
+            {
+                // マウスなら絶対座標を代入
+                PointerScreenPosition = context.ReadValue<Vector2>();
+                _padAimInput = Vector2.zero; // スティックの傾きは0にする
+            }
+            else
+            {
+                // パッドなら傾きを一時保存
+                _padAimInput = context.ReadValue<Vector2>();
+            }
+        }
+
+        private void Update()
+        {
+            if (_padAimInput.sqrMagnitude > 0.01f)
+            {
+                PointerScreenPosition += _padAimInput * (padCursorSpeed * Time.deltaTime);
+            }
+            // カーソルが画面の外に出ないようにする
+            PointerScreenPosition = new Vector2(
+                Mathf.Clamp(PointerScreenPosition.x, 0, Screen.width),
+                Mathf.Clamp(PointerScreenPosition.y, 0, Screen.height)
+            );
         }
     }
 }

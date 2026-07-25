@@ -108,6 +108,10 @@ public class GameManager : MonoBehaviour
             Transform targetSpawn = (i == 0) ? _spawnPoint1P : _spawnPoint2P;
             _playerSessions[i].SpawnMyTank(targetSpawn);
         }
+        
+        // マウスカーソルを非表示にして、画面内に閉じ込める
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
     }
     
     // 特定のプレイヤーが1P（ホスト）かどうかを判定する便利関数
