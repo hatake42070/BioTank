@@ -1,6 +1,6 @@
 {
   "dependencies": {
-    "com.hatake.mapeditorsystem": "file:/Users/hatayamanaoki/Unity/MapEditor_Dev/Packages/Unity-MapEditorSystem",
+    "com.hatake.mapeditorsystem": "git@github.com:hatake42070/Unity-MapEditorSystem.git",
     "com.unity.ai.navigation": "2.0.12",
     "com.unity.collab-proxy": "2.12.4",
     "com.unity.ide.rider": "3.0.40",
