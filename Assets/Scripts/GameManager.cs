@@ -109,8 +109,8 @@ public class GameManager : MonoBehaviour
         
         if (Camera.main != null)
         {
-            // 1. 画像で設定されている「最高の角度（X: 62, Y: 0, Z: 0）」を強制的にセットする
-            Camera.main.transform.rotation = Quaternion.Euler(62f, 0f, 0f);
+            // 1. 画像で設定されている「最高の角度（X: 70, Y: 0, Z: 0）」を強制的にセットする
+            Camera.main.transform.rotation = Quaternion.Euler(70f, 0f, 0f);
 
             // 2. カメラをマップの中心(mapCenter)から、「カメラが向いている方向の真後ろ」へ下げる
             // ※Orthographicの場合、どれだけ後ろに下がってもモノの大きさは変わらないため、
