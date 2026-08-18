@@ -47,10 +47,10 @@ public class PlayerSessionManager : MonoBehaviour
     }
 
     // GameManagerから呼ばれ、指定された場所に戦車を生成する
-    public void SpawnMyTank(Transform spawnPoint)
+    public void SpawnMyTank(Vector3 spawnPosition) // ← 引数を Transform から Vector3 に変更
     {
-        // 指定された場所に自分の戦車を生成！
-        GameObject myTank = Instantiate(myTankPrefabs[_selectedTankIndex], spawnPoint.position, spawnPoint.rotation);
+        // 指定された座標(Vector3)に自分の戦車を生成！ 向きはデフォルト(Quaternion.identity)にする
+        GameObject myTank = Instantiate(myTankPrefabs[_selectedTankIndex], spawnPosition, Quaternion.identity);
 
         // 生成した戦車についている TankInputHandler を取得して記憶する
         _spawnedTankInput = myTank.GetComponent<TankControllerScripts.TankInputHandler>();

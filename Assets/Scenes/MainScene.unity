@@ -181,7 +181,7 @@ Camera:
   far clip plane: 100
   field of view: 15
   orthographic: 1
-  orthographic size: 24
+  orthographic size: 25
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -205,13 +205,13 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 40457850}
   serializedVersion: 2
-  m_LocalRotation: {x: 0.5097527, y: 0.0012904553, z: -0.00076463365, w: 0.86031973}
-  m_LocalPosition: {x: 0.2, y: 29, z: -15.8}
+  m_LocalRotation: {x: 0.5150381, y: 0, z: 0, w: 0.85716736}
+  m_LocalPosition: {x: 35, y: 38, z: 3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 45, y: 0, z: 0}
+  m_LocalEulerAnglesHint: {x: 62, y: 0, z: 0}
 --- !u!114 &40457854
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1429,8 +1429,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c04a4b3351280504d92ce06d4a968f76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  mapPrefabs:
-  - {fileID: 731185053163218640, guid: aac938777b81c87479f3176e4e8e4f16, type: 3}
+  commonPalette: {fileID: 11400000, guid: 9e07b053bcdfc42e6b1ce6c0a66f543e, type: 2}
+  allStages:
+  - {fileID: 11400000, guid: e3e8a54197bac4df1bd88de2e3ac088c, type: 2}
 --- !u!1 &1424434159
 GameObject:
   m_ObjectHideFlags: 0

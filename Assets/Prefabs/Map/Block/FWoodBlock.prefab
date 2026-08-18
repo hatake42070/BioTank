@@ -48,6 +48,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5744242592261707201, guid: 62abfeaa11a0f0342890c37874da5be6, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 6430576597107354087, guid: 62abfeaa11a0f0342890c37874da5be6, type: 3}
       propertyPath: m_Name
       value: WoodBlock
