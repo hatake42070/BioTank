@@ -115,7 +115,7 @@ public class GameManager : MonoBehaviour
             // 2. カメラをマップの中心(mapCenter)から、「カメラが向いている方向の真後ろ」へ下げる
             // ※Orthographicの場合、どれだけ後ろに下がってもモノの大きさは変わらないため、
             // Clipping Planes (Near 0.3 ~ Far 100) の範囲内に収まる「適当な距離」でOKです。
-            float pullBackDistance = 40f; 
+            float pullBackDistance = 20f; 
             
             Camera.main.transform.position = mapCenter - (Camera.main.transform.forward * pullBackDistance);
             
