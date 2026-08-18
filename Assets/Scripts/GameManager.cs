@@ -2,6 +2,7 @@ using UnityEngine;
 using System.Collections.Generic;
 using TankControllerScripts;
 using UnityEngine.InputSystem;
+using MapEditorSystem.Runtime;
 
 /// <summary>
 /// ゲームのフェーズを管理
@@ -22,13 +23,14 @@ public class GameManager : MonoBehaviour
     public static GameManager Instance;
     // 現在のフェーズ
     public GamePhase CurrentPhase { get; private set; } = GamePhase.Lobby;
-
-    [Header("マップ設定")]
-    public GameObject[] mapPrefabs;
     
-    // 1P,2Pのスポーンポイント
-    private Transform _spawnPoint1P;
-    private Transform _spawnPoint2P;
+    [Header("マップ設定 (自作エディタ用)")]
+    public TilePalette commonPalette; // 共通パレット
+    public MapData[] allStages;       // 作成したマップデータの配列
+    
+    // スポーンポイントは Transform（オブジェクト）ではなく Vector3（座標）として記憶する
+    private Vector3 _spawnPoint1P;
+    private Vector3 _spawnPoint2P;
     
     // 参加したセッションを管理するリスト
     private List<PlayerSessionManager> _playerSessions = new List<PlayerSessionManager>();
@@ -66,18 +68,18 @@ public class GameManager : MonoBehaviour
     // 1Pから呼ばれるマップ切り替え関数
     public void ChangeMapIndex(int direction)
     {
-        if (mapPrefabs == null || mapPrefabs.Length == 0) return;
+        if (allStages == null || allStages.Length == 0) return;
 
         if (direction > 0)
         {
-            _selectedMapIndex = (_selectedMapIndex + 1) % mapPrefabs.Length;
+            _selectedMapIndex = (_selectedMapIndex + 1) % allStages.Length;
         }
         else if (direction < 0)
         {
             _selectedMapIndex--;
             if (_selectedMapIndex < 0)
             {
-                _selectedMapIndex = mapPrefabs.Length - 1;
+                _selectedMapIndex = allStages.Length - 1;
             }
         }
         
@@ -98,15 +100,35 @@ public class GameManager : MonoBehaviour
         }
 
         // マップを生成してスポーン地点を取得
-        GameObject currentMap = Instantiate(mapPrefabs[_selectedMapIndex], Vector3.zero, Quaternion.identity);
-        _spawnPoint1P = currentMap.transform.Find("SpawnPoint_1");
-        _spawnPoint2P = currentMap.transform.Find("SpawnPoint_2");
+        // 新しい MapGenerator に生成を依頼し、out引数で1P/2Pの座標を受け取る
+        MapData selectedData = allStages[_selectedMapIndex];
+        MapGenerator.GenerateMap(selectedData, commonPalette, out _spawnPoint1P, out _spawnPoint2P, out Vector3 mapCenter);
+        //GameObject currentMap = Instantiate(mapPrefabs[_selectedMapIndex], Vector3.zero, Quaternion.identity);
+        //_spawnPoint1P = currentMap.transform.Find("SpawnPoint_1");
+        //_spawnPoint2P = currentMap.transform.Find("SpawnPoint_2");
+        
+        if (Camera.main != null)
+        {
+            // 1. 画像で設定されている「最高の角度（X: 62, Y: 0, Z: 0）」を強制的にセットする
+            Camera.main.transform.rotation = Quaternion.Euler(62f, 0f, 0f);
 
-        // 全員分の戦車をそれぞれのスポーン地点に生成！
+            // 2. カメラをマップの中心(mapCenter)から、「カメラが向いている方向の真後ろ」へ下げる
+            // ※Orthographicの場合、どれだけ後ろに下がってもモノの大きさは変わらないため、
+            // Clipping Planes (Near 0.3 ~ Far 100) の範囲内に収まる「適当な距離」でOKです。
+            float pullBackDistance = 40f; 
+            
+            Camera.main.transform.position = mapCenter - (Camera.main.transform.forward * pullBackDistance);
+            
+            // 3. （ップごとにサイズが違う場合、カメラの「Size」も自動調整
+            // Camera.main.orthographicSize = 25f; // 必要に応じてプログラムから上書きも可能
+        }
+
+        // 全員分の戦車をそれぞれのスポーン座標に生成！
         for (int i = 0; i < _playerSessions.Count; i++)
         {
-            Transform targetSpawn = (i == 0) ? _spawnPoint1P : _spawnPoint2P;
-            _playerSessions[i].SpawnMyTank(targetSpawn);
+            Vector3 targetSpawnPos = (i == 0) ? _spawnPoint1P : _spawnPoint2P;
+            // ※注意：PlayerSessionManager側の引数も Transform から Vector3 に変更する必要があります
+            _playerSessions[i].SpawnMyTank(targetSpawnPos);
         }
         
         // マウスカーソルを非表示にして、画面内に閉じ込める
@@ -150,9 +172,9 @@ public class GameManager : MonoBehaviour
         int playerIndex = _playerSessions.IndexOf(session);
 
         // 1Pなら _spawnPoint1P、2Pなら _spawnPoint2P を割り当てる
-        Transform targetSpawn = (playerIndex == 0) ? _spawnPoint1P : _spawnPoint2P;
-
+        Vector3 targetSpawnPos = (playerIndex == 0) ? _spawnPoint1P : _spawnPoint2P;
+        
         // Sessionに再度戦車を作らせる
-        session.SpawnMyTank(targetSpawn);
+        session.SpawnMyTank(targetSpawnPos);
     }
 }
