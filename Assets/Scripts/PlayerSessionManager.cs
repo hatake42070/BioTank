@@ -18,7 +18,7 @@ public class PlayerSessionManager : MonoBehaviour
 
     private PlayerInput _playerInput;
     public bool IsReady { get; private set; } = false; // 使用する戦車が決定したかどうかのフラグ
-    private int _selectedTankIndex = 0;
+    private int _selectedTankIndex = 1;
 
     // 生成した戦車の「入力受け取り窓口」を覚えておくための変数
     private TankControllerScripts.TankInputHandler _spawnedTankInput;
@@ -47,10 +47,10 @@ public class PlayerSessionManager : MonoBehaviour
     }
 
     // GameManagerから呼ばれ、指定された場所に戦車を生成する
-    public void SpawnMyTank(Vector3 spawnPosition) // ← 引数を Transform から Vector3 に変更
+    public void SpawnMyTank(Vector3 spawnPosition)
     {
         // 指定された座標(Vector3)に自分の戦車を生成！ 向きはデフォルト(Quaternion.identity)にする
-        GameObject myTank = Instantiate(myTankPrefabs[_selectedTankIndex], spawnPosition, Quaternion.identity);
+        GameObject myTank = Instantiate(myTankPrefabs[_selectedTankIndex - 1], spawnPosition, Quaternion.identity);
 
         // 生成した戦車についている TankInputHandler を取得して記憶する
         _spawnedTankInput = myTank.GetComponent<TankControllerScripts.TankInputHandler>();
@@ -87,15 +87,16 @@ public class PlayerSessionManager : MonoBehaviour
             // タンク選択のためのインデックス処理
             if (navInput.x > 0.5f)
             {
-                _selectedTankIndex = (_selectedTankIndex + 1) % myTankPrefabs.Length;
+                // タンク選択画面のタンク番号を1オリジンにしているので、配列の長さを超えたら1に戻す
+                _selectedTankIndex = (_selectedTankIndex % myTankPrefabs.Length) + 1;
                 Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} : タンク {_selectedTankIndex} を選択中");
             }
             else if (navInput.x < -0.5f)
             {
                 _selectedTankIndex--;
-                if (_selectedTankIndex < 0)
+                if (_selectedTankIndex < 1)
                 {
-                    _selectedTankIndex = myTankPrefabs.Length - 1;
+                    _selectedTankIndex = myTankPrefabs.Length;
                 }
 
                 Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} : タンク {_selectedTankIndex} を選択中");
