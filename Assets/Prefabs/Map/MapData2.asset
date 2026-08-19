@@ -280,3 +280,13 @@ MonoBehaviour:
     gridPos: {x: 16, y: 9}
   - objectID: 2
     gridPos: {x: 17, y: 9}
+  - objectID: 3
+    gridPos: {x: 7, y: 5}
+  - objectID: 3
+    gridPos: {x: 8, y: 5}
+  - objectID: 3
+    gridPos: {x: 10, y: 5}
+  - objectID: 3
+    gridPos: {x: 11, y: 5}
+  - objectID: 3
+    gridPos: {x: 12, y: 5}

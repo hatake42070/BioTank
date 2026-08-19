@@ -46,11 +46,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.PlayerSessionManager
   myTankPrefabs:
-  - {fileID: 515544002259754787, guid: 0fe1d8537f62b1f449ee6dfaf33619a2, type: 3}
-  - {fileID: 515544002259754787, guid: 4b51ff41be33d644b87b4d5d0e26a76e, type: 3}
   - {fileID: 580506073305369390, guid: 7bc1d08f2bd2bd2479a306492d743047, type: 3}
+  - {fileID: 580506073305369390, guid: 828954dbce8d31b4aaa816f109118f87, type: 3}
   crosshairUI: {fileID: 3903834764112125375, guid: 99a47ebaf64d60447bccc3a26e8040fd, type: 3}
-  canvasTransform: {fileID: 0}
 --- !u!114 &3957874985145161075
 MonoBehaviour:
   m_ObjectHideFlags: 0
