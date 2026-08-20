@@ -81,6 +81,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b8a048588d74e9eaed0307e66b3caa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankInputHandler
+  padCursorSpeed: 1000
 --- !u!114 &5734885185544062641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,7 +141,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 580506073305369390}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 5a446a0a2ea78bb47b92ce83f7029628, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -174,7 +175,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 1
-  m_Center: {x: 0, y: 0.75, z: 0}
+  m_Center: {x: 0, y: 0.73, z: 0}
 --- !u!114 &770942841942308877
 MonoBehaviour:
   m_ObjectHideFlags: 0
