@@ -53,6 +53,10 @@ PrefabInstance:
       value: BWWoodBlock
       objectReference: {fileID: 0}
     - target: {fileID: 6430576597107354087, guid: bd909ba99297c4d02bb6626f3ffb4233, type: 3}
+      propertyPath: m_Layer
+      value: 8
+      objectReference: {fileID: 0}
+    - target: {fileID: 6430576597107354087, guid: bd909ba99297c4d02bb6626f3ffb4233, type: 3}
       propertyPath: m_TagString
       value: Breakable
       objectReference: {fileID: 0}
