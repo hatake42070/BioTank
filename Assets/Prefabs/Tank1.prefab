@@ -69,6 +69,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankShooter
   firePoint: {fileID: 4725674511447979819}
+  tarretRoot: {fileID: 5431878026098871234}
+  wallLayer:
+    serializedVersion: 2
+    m_Bits: 256
 --- !u!114 &736638755447388670
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -81,6 +85,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b8a048588d74e9eaed0307e66b3caa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankInputHandler
+  padCursorSpeed: 1000
 --- !u!114 &5734885185544062641
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -140,7 +145,7 @@ BoxCollider:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 580506073305369390}
-  m_Material: {fileID: 0}
+  m_Material: {fileID: 13400000, guid: 5a446a0a2ea78bb47b92ce83f7029628, type: 2}
   m_IncludeLayers:
     serializedVersion: 2
     m_Bits: 0
@@ -174,7 +179,7 @@ SphereCollider:
   m_Enabled: 1
   serializedVersion: 3
   m_Radius: 1
-  m_Center: {x: 0, y: 0.75, z: 0}
+  m_Center: {x: 0, y: 0.73, z: 0}
 --- !u!114 &770942841942308877
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -205,6 +210,37 @@ MonoBehaviour:
   _data:
     _json: '{"nest":{"source":"Macro","macro":null,"embed":null}}'
     _objectReferences: []
+--- !u!1 &1142137179403741698
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5431878026098871234}
+  m_Layer: 0
+  m_Name: TaretRootPosition
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5431878026098871234
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1142137179403741698}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0.7071068, y: -0, z: -0, w: 0.7071067}
+  m_LocalPosition: {x: 0, y: 0, z: -0.004629719}
+  m_LocalScale: {x: 0.01, y: 0.010000002, z: 0.010000002}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 6573619961535830862}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1382347313912702671
 GameObject:
   m_ObjectHideFlags: 0
@@ -302,6 +338,7 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4725674511447979819}
+  - {fileID: 5431878026098871234}
   m_Father: {fileID: 2147820924029150605}
   m_LocalEulerAnglesHint: {x: -90, y: 0, z: 0}
 --- !u!33 &3143911029637911445
