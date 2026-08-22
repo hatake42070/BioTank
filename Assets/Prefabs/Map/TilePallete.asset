@@ -17,28 +17,35 @@ MonoBehaviour:
     prefab: {fileID: 2164253754848641344, guid: 3795dcb2962708246b4795c4891bcb34, type: 3}
     tileName: Wood
     editorColor: {r: 1, g: 0, b: 0, a: 0}
+    role: 0
   - tileID: 2
     prefab: {fileID: 4521396678824596563, guid: cf669deab401e43ee821645f9bd3403f, type: 3}
     tileName: Stone
     editorColor: {r: 0, g: 0.10661447, b: 1, a: 0}
+    role: 0
   placeableObjects:
-  - objectID: 101
-    prefab: {fileID: 0}
-    objectName: PlayerSpown1
-    editorColor: {r: 0, g: 0, b: 0, a: 0}
-  - objectID: 102
-    prefab: {fileID: 0}
-    objectName: PlayerSpown2
-    editorColor: {r: 0, g: 0, b: 0, a: 0}
   - objectID: 1
+    prefab: {fileID: 0}
+    objectName: 1P Spawn
+    editorColor: {r: 0, g: 0, b: 0, a: 0}
+    role: 3
+  - objectID: 2
+    prefab: {fileID: 0}
+    objectName: 2P Spawn
+    editorColor: {r: 0, g: 0, b: 0, a: 0}
+    role: 3
+  - objectID: 3
     prefab: {fileID: 7254635878383845561, guid: 648880c2b1a9f4fdbb11c42fe7c34a90, type: 3}
     objectName: Wood
     editorColor: {r: 0, g: 0.21733463, b: 1, a: 0}
-  - objectID: 2
+    role: 1
+  - objectID: 5
     prefab: {fileID: 5289655571494593522, guid: fd30dfb954dc54700871c4bf2143b8c3, type: 3}
     objectName: BWood
     editorColor: {r: 0.6509434, g: 0, b: 0, a: 0}
-  - objectID: 3
+    role: 2
+  - objectID: 6
     prefab: {fileID: 4595450022713681439, guid: 6a2270f323a464b7abdb385f0a4bdb95, type: 3}
     objectName: Stone
     editorColor: {r: 1, g: 0, b: 0, a: 0}
+    role: 1
