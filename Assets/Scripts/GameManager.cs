@@ -119,7 +119,7 @@ public class GameManager : MonoBehaviour
             
             Camera.main.transform.position = mapCenter - (Camera.main.transform.forward * pullBackDistance);
             
-            // 3. （ップごとにサイズが違う場合、カメラの「Size」も自動調整
+            // 3. （マップごとにサイズが違う場合、カメラの「Size」も自動調整
             // Camera.main.orthographicSize = 25f; // 必要に応じてプログラムから上書きも可能
         }
 
