@@ -23,6 +23,11 @@ MonoBehaviour:
     tileName: Stone
     editorColor: {r: 0, g: 0.10661447, b: 1, a: 0}
     role: 0
+  - tileID: 3
+    prefab: {fileID: 6291369772318544128, guid: 2b540d3808fe6844cbc7b8e6715232ca, type: 3}
+    tileName: test
+    editorColor: {r: 0.6468049, g: 0.66322535, b: 0.8018868, a: 0}
+    role: 0
   placeableObjects:
   - objectID: 1
     prefab: {fileID: 0}
@@ -48,4 +53,9 @@ MonoBehaviour:
     prefab: {fileID: 4595450022713681439, guid: 6a2270f323a464b7abdb385f0a4bdb95, type: 3}
     objectName: Stone
     editorColor: {r: 1, g: 0, b: 0, a: 0}
+    role: 1
+  - objectID: 7
+    prefab: {fileID: 4261343990800421601, guid: 0bf11c1c301fb054186a3dd59e72bafc, type: 3}
+    objectName: test
+    editorColor: {r: 0.7735849, g: 0.6239765, b: 0.6239765, a: 0}
     role: 1
