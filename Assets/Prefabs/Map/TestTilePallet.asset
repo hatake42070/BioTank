@@ -33,6 +33,11 @@ MonoBehaviour:
     tileName: GrassSand
     editorColor: {r: 0.17608142, g: 0.8867924, b: 0.10457456, a: 1}
     role: 0
+  - tileID: 5
+    prefab: {fileID: 4000223362346477663, guid: 3b63ebfad63b4124ea4a0d0f18c48200, type: 3}
+    tileName: Sand
+    editorColor: {r: 0.4056604, g: 0.11033474, b: 0.047837302, a: 1}
+    role: 0
   placeableObjects:
   - objectID: 1
     prefab: {fileID: 0}
@@ -68,4 +73,9 @@ MonoBehaviour:
     prefab: {fileID: 4261343990800421601, guid: 0bf11c1c301fb054186a3dd59e72bafc, type: 3}
     objectName: test
     editorColor: {r: 0.7735849, g: 0.6239765, b: 0.6239765, a: 0}
+    role: 1
+  - objectID: 8
+    prefab: {fileID: 607024988926096004, guid: 922a9e06e79f399428adecee64da616d, type: 3}
+    objectName: Sand
+    editorColor: {r: 0.4528302, g: 0.22455485, b: 0.11320755, a: 0}
     role: 1
