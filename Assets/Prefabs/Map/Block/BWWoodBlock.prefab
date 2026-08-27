@@ -61,6 +61,10 @@ PrefabInstance:
       value: Breakable
       objectReference: {fileID: 0}
     - target: {fileID: 8506460204143636143, guid: bd909ba99297c4d02bb6626f3ffb4233, type: 3}
+      propertyPath: m_CastShadows
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8506460204143636143, guid: bd909ba99297c4d02bb6626f3ffb4233, type: 3}
       propertyPath: 'm_Materials.Array.data[0]'
       value: 
       objectReference: {fileID: 2100000, guid: eb7596ce83a2b0f45837226c3061cd6f, type: 2}
