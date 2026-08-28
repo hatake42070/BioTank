@@ -43,4 +43,13 @@ public class LobbyUIManager : MonoBehaviour
             playerSlots[playerIndex].SetReadyState();
         }
     }
+
+    // キャンセルボタンで呼ばれ、タンク選択状態に戻す
+    public void UpdatePlayerCancelReadyUI(int playerIndex, int tankIndex)
+    {
+        if (playerIndex >= 0 && playerIndex < playerSlots.Length)
+        {
+            playerSlots[playerIndex].SetSelectingState(tankIndex);
+        }
+    }
 }
