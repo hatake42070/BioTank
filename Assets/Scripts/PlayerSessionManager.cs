@@ -10,9 +10,10 @@ public class PlayerSessionManager : MonoBehaviour
 {
     [Header("戦車設定")]
     public GameObject[] myTankPrefabs; // 生成したいTankのプレハブをセット
-    
+
     [Header("UI")]
-    [SerializeField] private CrosshairUI crosshairUI; // クロスヘアのPrefab
+    [SerializeField]
+    private CrosshairUI crosshairUI; // クロスヘアのPrefab
 
     private CrosshairUI _myCrosshairUI; // 生成した自分のクロスヘア
 
@@ -59,7 +60,7 @@ public class PlayerSessionManager : MonoBehaviour
         _playerInput.SwitchCurrentActionMap("Player");
 
         Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} の戦車を生成完了！");
-        
+
         if (GameUIManager.Instance != null)
         {
             _myCrosshairUI = Instantiate(crosshairUI, GameUIManager.Instance.CanvasTransform);
@@ -75,7 +76,7 @@ public class PlayerSessionManager : MonoBehaviour
 
         // 入力された方向をここで読み取る（両方のフェーズで使うため）
         Vector2 navInput = context.ReadValue<Vector2>();
-        
+
         // --- フェーズ１：ロビー（タンク選択）の場合 ---
         if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
         {
@@ -154,7 +155,7 @@ public class PlayerSessionManager : MonoBehaviour
                 }
             }
         }
-        
+
         // --- フェーズ２：マップ選択の場合 ---
         else if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
@@ -164,6 +165,43 @@ public class PlayerSessionManager : MonoBehaviour
 
                 // GameManager にマップ生成と出撃を命じる
                 GameManager.Instance.SetupMap();
+            }
+        }
+    }
+
+    // キャンセル（戻る）ボタンが押されたとき
+    public void OnCancel(InputAction.CallbackContext context)
+    {
+        if (!context.started) return;
+
+        // マップ選択画面の時
+        if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
+        {
+            // 1P2Pにかかわらず、戻るボタンでタンク選択画面に戻る
+            IsReady = false;
+            // ここでUIの表示を「準備中」に戻す処理を呼ぶ
+            if (LobbyUIManager.Instance != null)
+            {
+                GameManager.Instance.ChangePhaseLobby();
+                LobbyUIManager.Instance.UpdatePlayerCancelReadyUI(_playerInput.playerIndex, _selectedTankIndex);
+            }
+        }
+        else if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
+        {
+            if (IsReady)
+            {
+                IsReady = false;
+                // ここでUIの表示をタンク選択中の状態に戻す処理を呼ぶ
+                if (LobbyUIManager.Instance != null)
+                {
+                    LobbyUIManager.Instance.UpdatePlayerCancelReadyUI(_playerInput.playerIndex, _selectedTankIndex);
+                }
+            }
+            else
+            {
+                // 自分が準備完了していない状態で戻るボタンを押したら、タイトルへ戻る！
+                Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} がタイトルへ戻る操作をしました。");
+                GameManager.Instance.GoBack();
             }
         }
     }
@@ -186,6 +224,7 @@ public class PlayerSessionManager : MonoBehaviour
             _spawnedTankInput.OnAttack(context);
         }
     }
+
     // AIM機能の実装
     public void OnAim(InputAction.CallbackContext context)
     {

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using TankControllerScripts;
 using UnityEngine.InputSystem;
 using MapEditorSystem.Runtime;
+using UnityEngine.SceneManagement;
 
 /// <summary>
 /// ゲームのフェーズを管理
@@ -43,6 +44,47 @@ public class GameManager : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
+        }
+    }
+    
+    // PlayerSessionManagerが酸化していないとき（０人）のキャンセルボタンの反応処理
+    private void Update()
+    {
+        if(CurrentPhase == GamePhase.Lobby && _playerSessions.Count == 0)
+        {
+            bool isCancelPressed = false;
+            // 1. キーボードの「Esc」キーが押されたかチェック
+            if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+            {
+                isCancelPressed = true;
+            }
+
+            // 2. 繋がっているゲームパッドの「B（東）ボタン」が押されたかチェック
+            if (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame)
+            {
+                isCancelPressed = true;
+            }
+
+            // キャンセルボタンが押されたら、タイトルへ戻る！
+            if (isCancelPressed)
+            {
+                Debug.Log("参加者ゼロの状態でキャンセルされました。タイトルに戻ります。");
+                GoBack();
+            }
+        }
+    }
+
+    public void ChangePhaseLobby()
+    {
+        CurrentPhase = GamePhase.Lobby;
+        // ロビーに戻った時、まだ2人揃っていなければ参加受付を再開(EnableJoining)する
+        if (_playerSessions.Count < 2)
+        {
+            if (UnityEngine.InputSystem.PlayerInputManager.instance != null)
+            {
+                UnityEngine.InputSystem.PlayerInputManager.instance.EnableJoining();
+                Debug.Log("参加受付を再開しました！");
+            }
         }
     }
     
@@ -161,6 +203,27 @@ public class GameManager : MonoBehaviour
             }
             
             // ここでUIをマップ選択画面に切り替える処理を呼ぶ
+        }
+    }
+    
+    // 戻る処理
+    public void GoBack()
+    {
+        switch (CurrentPhase)
+        {
+            case GamePhase.Lobby:
+                // ロビー画面で戻るボタンを押した場合、タイトル画面に戻る処理を呼ぶ
+                SceneManager.LoadScene("TitleScene");
+                break;
+            case GamePhase.MapSelect:
+                // マップ選択中に戻るボタンを押した場合、ロビー画面に戻す
+                CurrentPhase = GamePhase.Lobby;
+                // ここでUIをロビー画面に切り替える処理を呼ぶ
+                break;
+            case GamePhase.Battle:
+                // 戦闘中に戻るボタンを押した場合、何もしない（もしくは確認ダイアログを出す）
+                Debug.Log("戦闘中は戻れません！");
+                break;
         }
     }
     
