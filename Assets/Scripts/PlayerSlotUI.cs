@@ -33,7 +33,7 @@ public class PlayerSlotUI : MonoBehaviour
         tankSelectPanel.SetActive(true);
             
         // ゆくゆくはTankData(ScriptableObject)を受け取って名前やステータスを更新する
-        tankNameText.text = $"Tank Type: {tankIndex}";
+        tankNameText.text = $"タンク: {tankIndex}";
         statusText.text = "Selecting...";
     }
 
