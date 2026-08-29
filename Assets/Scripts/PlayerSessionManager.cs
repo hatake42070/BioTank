@@ -58,6 +58,9 @@ public class PlayerSessionManager : MonoBehaviour
 
         // 戦車が生まれたら、操作モードをUIから「Player（ゲーム中）」に切り替える！
         _playerInput.SwitchCurrentActionMap("Player");
+        
+        // タンクのサイドマーカー(足元の円)の色を、1Pは青、2Pは赤にする
+        myTank.GetComponentInChildren<SpriteRenderer>().color = _playerInput.playerIndex + 1 == 1 ? Color.blue : Color.red;
 
         Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} の戦車を生成完了！");
 

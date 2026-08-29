@@ -2007,8 +2007,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: 'Tank Type: 0'
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
-  m_sharedMaterial: {fileID: 2147374, guid: 0161d805a3764c089bef00bfe00793f5, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: 0a01449baf430c941b8f1d17b2655d9d, type: 2}
+  m_sharedMaterial: {fileID: -7422880061140475314, guid: 0a01449baf430c941b8f1d17b2655d9d, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
