@@ -94,7 +94,7 @@ public class GameManager : MonoBehaviour
         if (!_playerSessions.Contains(newSession))
         {
             _playerSessions.Add(newSession);
-            // ※ここでリストに追加されるため、純粋な「参加順」で1P, 2Pが確定します！
+            // ここでリストに追加されるため、純粋な「参加順」で1P, 2Pが確定する
             
             // 2人（最大人数）揃った時点で、これ以上の新規参加受付を完全にストップする
             if (_playerSessions.Count >= 2)
@@ -145,9 +145,6 @@ public class GameManager : MonoBehaviour
         // 新しい MapGenerator に生成を依頼し、out引数で1P/2Pの座標を受け取る
         MapData selectedData = allStages[_selectedMapIndex];
         MapGenerator.GenerateMap(selectedData, commonPalette, out _spawnPoint1P, out _spawnPoint2P, out Vector3 mapCenter);
-        //GameObject currentMap = Instantiate(mapPrefabs[_selectedMapIndex], Vector3.zero, Quaternion.identity);
-        //_spawnPoint1P = currentMap.transform.Find("SpawnPoint_1");
-        //_spawnPoint2P = currentMap.transform.Find("SpawnPoint_2");
         
         if (Camera.main != null)
         {
@@ -169,7 +166,6 @@ public class GameManager : MonoBehaviour
         for (int i = 0; i < _playerSessions.Count; i++)
         {
             Vector3 targetSpawnPos = (i == 0) ? _spawnPoint1P : _spawnPoint2P;
-            // ※注意：PlayerSessionManager側の引数も Transform から Vector3 に変更する必要があります
             _playerSessions[i].SpawnMyTank(targetSpawnPos);
         }
         
