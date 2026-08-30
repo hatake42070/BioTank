@@ -14,29 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: MapEditorSystem.Runtime::MapEditorSystem.Runtime.TilePalette
   baseTiles:
   - tileID: 1
-    prefab: {fileID: 2164253754848641344, guid: 3795dcb2962708246b4795c4891bcb34, type: 3}
-    tileName: Wood
-    editorColor: {r: 1, g: 0, b: 0, a: 0}
-    role: 0
-  - tileID: 2
     prefab: {fileID: 4521396678824596563, guid: cf669deab401e43ee821645f9bd3403f, type: 3}
     tileName: Stone
-    editorColor: {r: 0, g: 0.10661447, b: 1, a: 0}
+    editorColor: {r: 0.38679248, g: 0.33753118, b: 0.33753118, a: 0}
+    role: 0
+  - tileID: 2
+    prefab: {fileID: 4000223362346477663, guid: 2351b41e5563c444aa0bb83b25407bdb, type: 3}
+    tileName: Rock1
+    editorColor: {r: 0.123353496, g: 0.17507184, b: 0.41509432, a: 0}
     role: 0
   - tileID: 3
-    prefab: {fileID: 6291369772318544128, guid: 2b540d3808fe6844cbc7b8e6715232ca, type: 3}
-    tileName: test
-    editorColor: {r: 0.6468049, g: 0.66322535, b: 0.8018868, a: 0}
-    role: 0
-  - tileID: 4
-    prefab: {fileID: 4000223362346477663, guid: c985d0d1325c9f64baf65afdba54b05e, type: 3}
-    tileName: GrassSand
-    editorColor: {r: 0.17608142, g: 0.8867924, b: 0.10457456, a: 1}
-    role: 0
-  - tileID: 5
-    prefab: {fileID: 4000223362346477663, guid: 3b63ebfad63b4124ea4a0d0f18c48200, type: 3}
-    tileName: Sand
-    editorColor: {r: 0.4056604, g: 0.11033474, b: 0.047837302, a: 1}
+    prefab: {fileID: 4000223362346477663, guid: 8e69fe871fc4daa49a310efd08ae2ed8, type: 3}
+    tileName: Brick
+    editorColor: {r: 0.41568628, g: 0.14942324, b: 0.12156862, a: 0}
     role: 0
   placeableObjects:
   - objectID: 1
@@ -50,32 +40,62 @@ MonoBehaviour:
     editorColor: {r: 0, g: 0, b: 0, a: 0}
     role: 3
   - objectID: 3
-    prefab: {fileID: 7254635878383845561, guid: 648880c2b1a9f4fdbb11c42fe7c34a90, type: 3}
+    prefab: {fileID: 4000223362346477663, guid: 3a559debbd809204f9a63ca02c6b1f41, type: 3}
     objectName: Wood
     editorColor: {r: 0, g: 0.21733463, b: 1, a: 0}
     role: 1
   - objectID: 4
-    prefab: {fileID: 607024988926096004, guid: ce3ec4d4f28150146a80f84923f0c8f3, type: 3}
+    prefab: {fileID: 4000223362346477663, guid: c985d0d1325c9f64baf65afdba54b05e, type: 3}
     objectName: GrassSand
     editorColor: {r: 0.05206478, g: 0.735849, b: 0.057550963, a: 0}
     role: 1
   - objectID: 5
-    prefab: {fileID: 5289655571494593522, guid: fd30dfb954dc54700871c4bf2143b8c3, type: 3}
-    objectName: BWood
+    prefab: {fileID: 4000223362346477663, guid: f2edb2f51c188ce4a98386f906cf7b7c, type: 3}
+    objectName: BSand
     editorColor: {r: 0.6509434, g: 0, b: 0, a: 0}
     role: 2
   - objectID: 6
-    prefab: {fileID: 4595450022713681439, guid: 6a2270f323a464b7abdb385f0a4bdb95, type: 3}
+    prefab: {fileID: 4521396678824596563, guid: cf669deab401e43ee821645f9bd3403f, type: 3}
     objectName: Stone
     editorColor: {r: 1, g: 0, b: 0, a: 0}
     role: 1
   - objectID: 7
-    prefab: {fileID: 4261343990800421601, guid: 0bf11c1c301fb054186a3dd59e72bafc, type: 3}
-    objectName: test
-    editorColor: {r: 0.7735849, g: 0.6239765, b: 0.6239765, a: 0}
-    role: 1
-  - objectID: 8
-    prefab: {fileID: 607024988926096004, guid: 922a9e06e79f399428adecee64da616d, type: 3}
+    prefab: {fileID: 4000223362346477663, guid: 3b63ebfad63b4124ea4a0d0f18c48200, type: 3}
     objectName: Sand
     editorColor: {r: 0.4528302, g: 0.22455485, b: 0.11320755, a: 0}
+    role: 1
+  - objectID: 8
+    prefab: {fileID: 4000223362346477663, guid: 8e69fe871fc4daa49a310efd08ae2ed8, type: 3}
+    objectName: Brick
+    editorColor: {r: 0.5943396, g: 0.21858497, b: 0.17101279, a: 0}
+    role: 1
+  - objectID: 9
+    prefab: {fileID: 4000223362346477663, guid: 2351b41e5563c444aa0bb83b25407bdb, type: 3}
+    objectName: Rock1
+    editorColor: {r: 0.10720008, g: 0.2775307, b: 0.6886792, a: 0}
+    role: 1
+  - objectID: 10
+    prefab: {fileID: 4000223362346477663, guid: 21cc8db0b50dbd84291036c4774cb106, type: 3}
+    objectName: Rock2
+    editorColor: {r: 0.085172676, g: 0.24388818, b: 0.6226415, a: 0}
+    role: 1
+  - objectID: 11
+    prefab: {fileID: 7671268838793788201, guid: 2c65994f3514bf04e8f019e1abbd0a3e, type: 3}
+    objectName: migiue
+    editorColor: {r: 0.58592916, g: 0.626947, b: 0.7264151, a: 0}
+    role: 1
+  - objectID: 12
+    prefab: {fileID: 7671268838793788201, guid: c9b397b714e7f7a49a69dee4af3c3620, type: 3}
+    objectName: migisita
+    editorColor: {r: 0.58592916, g: 0.626947, b: 0.7264151, a: 0}
+    role: 1
+  - objectID: 13
+    prefab: {fileID: 7671268838793788201, guid: f72714f7cb11dbd4681a5f578ec8d037, type: 3}
+    objectName: hidariue
+    editorColor: {r: 0.58592916, g: 0.626947, b: 0.7264151, a: 0}
+    role: 1
+  - objectID: 14
+    prefab: {fileID: 7671268838793788201, guid: cf8a14ce084517e43907ddc0f281fdc0, type: 3}
+    objectName: hidarisita
+    editorColor: {r: 0.58592916, g: 0.626947, b: 0.7264151, a: 0}
     role: 1
