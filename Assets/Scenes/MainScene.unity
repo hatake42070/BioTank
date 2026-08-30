@@ -1559,7 +1559,6 @@ MonoBehaviour:
   commonPalette: {fileID: 11400000, guid: 9e07b053bcdfc42e6b1ce6c0a66f543e, type: 2}
   allStages:
   - {fileID: 11400000, guid: e3e8a54197bac4df1bd88de2e3ac088c, type: 2}
-  - {fileID: 11400000, guid: 7a5383ab6d2e1b943888a68bdf63a3b5, type: 2}
 --- !u!1 &1424434159
 GameObject:
   m_ObjectHideFlags: 0

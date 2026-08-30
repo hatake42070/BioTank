@@ -186,14 +186,8 @@ MonoBehaviour:
     gridPos: {x: 1, y: 7}
   - objectID: 10
     gridPos: {x: 7, y: 6}
-  - objectID: 10
-    gridPos: {x: 7, y: 5}
   - objectID: 9
     gridPos: {x: 8, y: 6}
-  - objectID: 9
-    gridPos: {x: 8, y: 5}
-  - objectID: 9
-    gridPos: {x: 6, y: 6}
   - objectID: 1
     gridPos: {x: 3, y: 3}
   - objectID: 2
@@ -208,3 +202,15 @@ MonoBehaviour:
     gridPos: {x: 2, y: 15}
   - objectID: 14
     gridPos: {x: 2, y: 2}
+  - objectID: 15
+    gridPos: {x: 7, y: 5}
+  - objectID: 15
+    gridPos: {x: 6, y: 6}
+  - objectID: 16
+    gridPos: {x: 8, y: 5}
+  - objectID: 16
+    gridPos: {x: 9, y: 6}
+  - objectID: 16
+    gridPos: {x: 5, y: 6}
+  - objectID: 13
+    gridPos: {x: 9, y: 5}
