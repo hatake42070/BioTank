@@ -14,7 +14,7 @@ namespace TankControllerScripts
         public BulletData currentBullet; // ← この戦車が現在撃つ弾のデータ！
         public float fireCooldown = 0.5f; // 発射間隔（連射速度）
         
-        [Header("アニメーション設定")]
-        public string moveAnimationTrigger = "Move";
+        //[Header("アニメーション設定")]
+        //public string moveAnimationTrigger = "Move";
     }
 }

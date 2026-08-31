@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using TankControllerScripts;
 
 /// <summary>
 /// ロビー画面のUIを管理するクラス
@@ -8,6 +9,9 @@
 public class LobbyUIManager : MonoBehaviour
 {
     public static LobbyUIManager Instance;
+
+    [Header("TankData")]
+    public TankData[] tankDatabase;
 
     [SerializeField]
     private PlayerSlotUI[] playerSlots; // 0番目が1P用、1番目が2P用
@@ -29,9 +33,12 @@ public class LobbyUIManager : MonoBehaviour
     // プレイヤーが参加した時（または戦車を切り替えた時）に呼ばれる
     public void UpdatePlayerSelectUI(int playerIndex, int tankIndex)
     {
+        // カタログからデータを取り出す
+        TankData selectedData = tankDatabase[tankIndex - 1]; // 0オリジンに戻す
+        
         if (playerIndex >= 0 && playerIndex < playerSlots.Length)
         {
-            playerSlots[playerIndex].SetSelectingState(tankIndex);
+            playerSlots[playerIndex].SetSelectingState(tankIndex, selectedData);
         }
     }
 
@@ -47,9 +54,11 @@ public class LobbyUIManager : MonoBehaviour
     // キャンセルボタンで呼ばれ、タンク選択状態に戻す
     public void UpdatePlayerCancelReadyUI(int playerIndex, int tankIndex)
     {
+        TankData selectedData = tankDatabase[tankIndex - 1];
+        
         if (playerIndex >= 0 && playerIndex < playerSlots.Length)
         {
-            playerSlots[playerIndex].SetSelectingState(tankIndex);
+            playerSlots[playerIndex].SetSelectingState(tankIndex, selectedData);
         }
     }
 }

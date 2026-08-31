@@ -99,3 +99,18 @@ MonoBehaviour:
     objectName: hidarisita
     editorColor: {r: 0.58592916, g: 0.626947, b: 0.7264151, a: 0}
     role: 1
+  - objectID: 15
+    prefab: {fileID: 4000223362346477663, guid: ae2c118bbde8237489de97bf2f1211f1, type: 3}
+    objectName: Rock3
+    editorColor: {r: 0.11414205, g: 0.24357355, b: 0.5377358, a: 0}
+    role: 1
+  - objectID: 16
+    prefab: {fileID: 4000223362346477663, guid: acd23acb35ad1624981243d4cc740ad7, type: 3}
+    objectName: Rock4
+    editorColor: {r: 0.11414205, g: 0.24357355, b: 0.5377358, a: 0}
+    role: 1
+  - objectID: 17
+    prefab: {fileID: 4000223362346477663, guid: b3ee7c129b78d3a4ba639f5c3c87c2de, type: 3}
+    objectName: BLeaf
+    editorColor: {r: 0.43173605, g: 0.764151, b: 0.14057496, a: 0}
+    role: 2
