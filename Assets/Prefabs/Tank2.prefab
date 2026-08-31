@@ -86,7 +86,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c3f2e4aa8f8fde043a4b4f444d18906b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankController
-  tankData: {fileID: 11400000, guid: 6043336c5b6af3f4db9d33ad7a1a25b9, type: 2}
+  tankData: {fileID: 11400000, guid: 1d41a99f918ddbb49b4394436d06976e, type: 2}
   currentHp: 0
 --- !u!114 &1862402504282794058
 MonoBehaviour:

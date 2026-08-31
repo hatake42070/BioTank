@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 9b1151780787455394c8a1dbe710dd60, type: 3}
-  m_Name: Normal
+  m_Name: Tank1
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankData
   maxHp: 3
   baseMoveSpeed: 7

@@ -214,3 +214,7 @@ MonoBehaviour:
     gridPos: {x: 5, y: 6}
   - objectID: 13
     gridPos: {x: 9, y: 5}
+  - objectID: 17
+    gridPos: {x: 7, y: 4}
+  - objectID: 17
+    gridPos: {x: 8, y: 4}
