@@ -13,7 +13,8 @@ namespace TankControllerScripts
         public bool AttackTriggered { get; private set; }
         private Vector2 _padAimInput;
         public Vector2 PointerScreenPosition { get; private set; }
-        public float padCursorSpeed = 1000f;
+        // クロスヘアの移動速度
+        public float padCursorSpeed = 500f;
 
         /// <summary>
         /// 移動入力があった時に自動で呼ばれる
@@ -24,7 +25,7 @@ namespace TankControllerScripts
             // InputSystem側で設定したVector2の値をそのまま取得
             MoveInput = context.ReadValue<Vector2>();
             
-            Debug.Log($"【{gameObject.name}】が移動を受信！ 値: {MoveInput} / デバイス: {context.control.device.name}");
+            //Debug.Log($"【{gameObject.name}】が移動を受信！ 値: {MoveInput} / デバイス: {context.control.device.name}");
         }
 
         /// <summary>
