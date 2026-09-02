@@ -146,7 +146,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankController
   tankData: {fileID: 11400000, guid: 6043336c5b6af3f4db9d33ad7a1a25b9, type: 2}
-  currentHp: 0
 --- !u!114 &1862402504282794058
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -176,7 +175,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b8a048588d74e9eaed0307e66b3caa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankInputHandler
-  padCursorSpeed: 1000
+  padCursorSpeed: 500
 --- !u!114 &5734885185544062641
 MonoBehaviour:
   m_ObjectHideFlags: 0
