@@ -67,7 +67,24 @@ public class PlayerSessionManager : MonoBehaviour
         if (GameUIManager.Instance != null)
         {
             _myCrosshairUI = Instantiate(crosshairUI, GameUIManager.Instance.CanvasTransform);
-            _myCrosshairUI.Initialize(_spawnedTankInput, _playerInput.playerIndex);
+            
+            // カメラがちゃんと存在するか確認
+            if (Camera.main != null)
+            {
+                // タンクの3D座標を、画面の2D座標に変換
+                Vector2 screenPos = Camera.main.WorldToScreenPoint(spawnPosition);
+                
+                _spawnedTankInput.SetInitialPointerPosition(screenPos);
+        
+                // 変換した初期座標を渡して初期化
+                _myCrosshairUI.Initialize(_spawnedTankInput, _playerInput.playerIndex);
+                Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} のクロスヘアUIを生成完了！初期座標: {screenPos}");
+            }
+            else
+            {
+                // カメラが見つからない場合の予備ルート
+                _myCrosshairUI.Initialize(_spawnedTankInput, _playerInput.playerIndex);
+            }
         }
     }
 

@@ -15,6 +15,12 @@ namespace TankControllerScripts
         public Vector2 PointerScreenPosition { get; private set; }
         // クロスヘアの移動速度
         public float padCursorSpeed = 500f;
+        
+        // 初期座標を受け取ってセットするメソッド 
+        public void SetInitialPointerPosition(Vector2 startPos)
+        {
+            PointerScreenPosition = startPos;
+        }
 
         /// <summary>
         /// 移動入力があった時に自動で呼ばれる
