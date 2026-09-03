@@ -19,7 +19,7 @@ namespace TankControllerScripts
         private float _lastFireTime = -9999f;
         private Dictionary<System.Type, ITankState> _stateDictionary; // 状態の辞書
 
-        public int currentHp;
+        private int currentHp;
 
         private void Start()
         {

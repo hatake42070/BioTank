@@ -15,4 +15,4 @@ MonoBehaviour:
   maxHp: 3
   baseMoveSpeed: 8
   currentBullet: {fileID: 11400000, guid: 3665c9b8d347b2449bece7b2b2e03b24, type: 2}
-  fireCooldown: 0.5
+  fireCooldown: 1
