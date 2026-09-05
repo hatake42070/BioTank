@@ -10,6 +10,9 @@ namespace TankControllerScripts
         private Rigidbody _rb;
         private Collider _myCollider;
         private int _boundCount;
+        
+        [Header("エフェクト")]
+        [SerializeField] private ParticleSystem smokeEffect; // 煙のパーティクル
 
         // 撃った主のコライダーを覚えておく
         private Collider[] _ownerColliders;
@@ -77,6 +80,15 @@ namespace TankControllerScripts
             {
                 // ダメージを与える(壊れる壁のHPが減る)
                 target.TakeDamage(_data.damage);
+                
+                if (smokeEffect != null)
+                {
+                    // 弾(親)から煙パーティクルを切り離し、独立させる（その場に残す）
+                    smokeEffect.transform.SetParent(null);
+
+                    // 新しい煙が生まれるのをストップする
+                    smokeEffect.Stop(); 
+                }
 
                 // ダメージを与えたら弾は消滅させる場合
                 Destroy(gameObject);
@@ -118,6 +130,15 @@ namespace TankControllerScripts
                 }
                 else
                 {
+                    if (smokeEffect != null)
+                    {
+                        // 弾(親)から煙パーティクルを切り離し、独立させる（その場に残す）
+                        smokeEffect.transform.SetParent(null);
+
+                        // 新しい煙が生まれるのをストップする
+                        smokeEffect.Stop(); 
+                    }
+                    
                     Destroy(gameObject);
                 }
 
