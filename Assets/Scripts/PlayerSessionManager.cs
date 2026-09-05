@@ -14,8 +14,11 @@ public class PlayerSessionManager : MonoBehaviour
     [Header("UI")]
     [SerializeField]
     private CrosshairUI crosshairUI; // クロスヘアのPrefab
+    [SerializeField]
+    private TankHpUI myHpUI;
 
     private CrosshairUI _myCrosshairUI; // 生成した自分のクロスヘア
+    private TankHpUI _myTankHpUI;
 
     private PlayerInput _playerInput;
     public bool IsReady { get; private set; } = false; // 使用する戦車が決定したかどうかのフラグ
@@ -67,6 +70,7 @@ public class PlayerSessionManager : MonoBehaviour
         if (GameUIManager.Instance != null)
         {
             _myCrosshairUI = Instantiate(crosshairUI, GameUIManager.Instance.CanvasTransform);
+            _myTankHpUI = Instantiate(myHpUI, GameUIManager.Instance.CanvasTransform);
             
             // カメラがちゃんと存在するか確認
             if (Camera.main != null)
@@ -85,6 +89,12 @@ public class PlayerSessionManager : MonoBehaviour
                 // カメラが見つからない場合の予備ルート
                 _myCrosshairUI.Initialize(_spawnedTankInput, _playerInput.playerIndex);
             }
+            var tankController = myTank.GetComponent<TankControllerScripts.TankController>();
+            int maxHp = tankController.TankData.maxHp;
+            _myTankHpUI.Initialize(myTank.transform, maxHp);
+            
+            // 戦車のHP変化イベントが起きたら、自分のHPバーの UpdateHpDisplay メソッドを自動で呼ぶように契約させる
+            tankController.OnHpChanged += _myTankHpUI.UpdateHpDisplay;
         }
     }
 

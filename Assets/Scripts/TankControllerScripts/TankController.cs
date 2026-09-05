@@ -20,6 +20,8 @@ namespace TankControllerScripts
         private Dictionary<System.Type, ITankState> _stateDictionary; // 状態の辞書
 
         private int currentHp;
+        // HPが変化したときに、外部に知らせるイベント
+        public event Action<int> OnHpChanged;
 
         private void Start()
         {
@@ -131,6 +133,8 @@ namespace TankControllerScripts
                 // HPが0になったら、状態を「Dead（死亡）」に切り替える！
                 ChangeState(typeof(TankStateDead));
             }
+            // HPが変化したこを、登録されている外部のメソッドに通知する
+            OnHpChanged?.Invoke(currentHp);
         }
 
         private void HandleAim()
