@@ -97,4 +97,4 @@ MonoBehaviour:
   dotCount: 3
   color1P: {r: 0.2, g: 0.6, b: 1, a: 0.5}
   color2P: {r: 1, g: 0.3, b: 0.3, a: 0.5}
-  fixedRadius: 150
+  fixedRadius: 160

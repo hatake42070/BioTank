@@ -176,7 +176,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b8a048588d74e9eaed0307e66b3caa0, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.TankInputHandler
-  padCursorSpeed: 500
+  aimRotateSpeed: 10
 --- !u!114 &5734885185544062641
 MonoBehaviour:
   m_ObjectHideFlags: 0
