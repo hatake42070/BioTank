@@ -9,17 +9,19 @@ namespace TankControllerScripts
     public class TankInputHandler : MonoBehaviour
     {
         public Vector2 MoveInput { get; private set; }
-        public bool IsMouseAim { get; private set; }
         public bool AttackTriggered { get; private set; }
-        private Vector2 _padAimInput;
-        public Vector2 PointerScreenPosition { get; private set; }
-        // クロスヘアの移動速度
-        public float padCursorSpeed = 500f;
         
-        // 初期座標を受け取ってセットするメソッド 
-        public void SetInitialPointerPosition(Vector2 startPos)
+        // 絶対座標ではなく「狙っている方向ベクトル（長さ1）」を保持する
+        public Vector2 AimDirection { get; private set; } = Vector2.up; // 初期値は上向き
+        
+        private Vector2 _padAimInput;
+        private Vector2 _mouseScreenPos;
+        private bool _isUsingMouse = false;
+        private Camera _mainCamera;
+        
+        private void Start()
         {
-            PointerScreenPosition = startPos;
+            _mainCamera = Camera.main;
         }
 
         /// <summary>
@@ -63,28 +65,41 @@ namespace TankControllerScripts
         {
             if (context.control.device.name == "Mouse")
             {
-                // マウスなら絶対座標を代入
-                PointerScreenPosition = context.ReadValue<Vector2>();
-                _padAimInput = Vector2.zero; // スティックの傾きは0にする
+                _isUsingMouse = true;
+                _mouseScreenPos = context.ReadValue<Vector2>();
             }
             else
             {
-                // パッドなら傾きを一時保存
+                _isUsingMouse = false;
                 _padAimInput = context.ReadValue<Vector2>();
             }
         }
 
         private void Update()
         {
-            if (_padAimInput.sqrMagnitude > 0.01f)
+            if (_isUsingMouse)
             {
-                PointerScreenPosition += _padAimInput * (padCursorSpeed * Time.deltaTime);
+                if (_mainCamera != null)
+                {
+                    // マウスの場合：戦車の現在位置からマウスカーソルへの「方向」を計算する
+                    Vector2 tankScreenPos = _mainCamera.WorldToScreenPoint(transform.position);
+                    Vector2 dir = _mouseScreenPos - tankScreenPos;
+                    
+                    // タンクとマウスが完全に重なっていない時だけ方向を更新
+                    if (dir.sqrMagnitude > 0.1f) 
+                    {
+                        AimDirection = dir.normalized;
+                    }
+                }
             }
-            // カーソルが画面の外に出ないようにする
-            PointerScreenPosition = new Vector2(
-                Mathf.Clamp(PointerScreenPosition.x, 0, Screen.width),
-                Mathf.Clamp(PointerScreenPosition.y, 0, Screen.height)
-            );
+            else
+            {
+                // パッドの場合：スティックの傾き自体がすでに「方向」なので、そのまま使う
+                if (_padAimInput.sqrMagnitude > 0.01f)
+                {
+                    AimDirection = _padAimInput.normalized;
+                }
+            }
         }
     }
 }

@@ -77,8 +77,6 @@ public class PlayerSessionManager : MonoBehaviour
             {
                 // タンクの3D座標を、画面の2D座標に変換
                 Vector2 screenPos = Camera.main.WorldToScreenPoint(spawnPosition);
-                
-                _spawnedTankInput.SetInitialPointerPosition(screenPos);
         
                 // 変換した初期座標を渡して初期化
                 _myCrosshairUI.Initialize(_spawnedTankInput, _playerInput.playerIndex);

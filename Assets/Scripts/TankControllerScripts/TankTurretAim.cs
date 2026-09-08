@@ -10,14 +10,30 @@ namespace TankControllerScripts
         [SerializeField]
         private Transform turretTransform; 
         
+        private Camera _mainCamera;
+
+        private void Start()
+        {
+            _mainCamera = Camera.main; // カメラをキャッシュして処理を軽くする
+        }
+        
         /// <summary>
         /// 砲塔の向きを操作するメソッド
         /// </summary>
-        /// <param name="pointerScreenPosition">マウス座標 or スティックの傾き</param>
-        public void AimTurret(Vector2 pointerScreenPosition)
+        /// <param name="aimDirection">入力された「方向」（長さ1のベクトル）</param>
+        public void AimTurret(Vector2 aimDirection)
         {
-            // カメラから、マウスの画面座標（aimInput）に向かって見えないレーザーを作る
-            Ray ray = Camera.main.ScreenPointToRay(pointerScreenPosition);
+            // 入力が無い（方向が定まっていない）場合は何もしない
+            if (aimDirection.sqrMagnitude < 0.01f || _mainCamera == null) return;
+
+            // 1. 戦車（砲塔）の現在の3D座標を、画面の2D座標に変換
+            Vector2 tankScreenPos = _mainCamera.WorldToScreenPoint(turretTransform.position);
+
+            // 2. 画面上で、戦車の位置から「入力方向」にうんと遠く離れた仮想のターゲット座標を作る
+            Vector2 virtualTargetScreenPos = tankScreenPos + aimDirection * 1000f;
+
+            // 3. カメラから、仮想ターゲット座標に向かって見えないレーザーを作る
+            Ray ray = _mainCamera.ScreenPointToRay(virtualTargetScreenPos);
 
             // 砲台と同じ高さ(Y)に、見えない仮想の床（Plane）を作る
             Plane groundPlane = new Plane(Vector3.up, new Vector3(0, turretTransform.position.y, 0));
@@ -38,7 +54,6 @@ namespace TankControllerScripts
                     turretTransform.rotation = Quaternion.LookRotation(lookDirection);
                 }
             }
-            
         }
     }
 }
