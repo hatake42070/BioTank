@@ -27,8 +27,9 @@ public class TankHpUI : MonoBehaviour
         for (int i = 0; i < maxHp; i++)
         {
             GameObject segmentObj = Instantiate(hpSegmentPrefab, hpContainer);
-            Image segmentImage = segmentObj.GetComponent<Image>();
-            _hpSegments.Add(segmentImage);
+            // 親ではなく「1番目の子オブジェクト（=赤ハート）」のImageを取得してリストに入れる
+            Image redHeartImage = segmentObj.transform.GetChild(0).GetComponent<Image>();
+            _hpSegments.Add(redHeartImage);
         }
     }
     
