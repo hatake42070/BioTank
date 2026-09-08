@@ -28,13 +28,17 @@ namespace TankControllerScripts
         private GameObject dotPrefab; // 丸い点(UIのImage)のプレハブ
 
         [SerializeField]
-        private int dotCount = 5; // 点の数
+        private int dotCount = 3; // 点の数
 
         [Header("点線の色と濃度（アルファ値）")]
         [SerializeField]
         private Color color1P = new Color(0.2f, 0.6f, 1f, 0.5f); // 1P: 少し薄い青
         [SerializeField]
         private Color color2P = new Color(1f, 0.3f, 0.3f, 0.5f); // 2P: 少し薄い赤
+        
+        // クロスヘアの固定半径（ピクセル単位）
+        [Header("クロスヘアの動作設定")]
+        [SerializeField] private float fixedRadius = 150f;
 
         private TankInputHandler _myInputHandler;
         private bool _isInitialized = false; // 初期化完了フラグを追加
@@ -85,23 +89,22 @@ namespace TankControllerScripts
             }
 
             if (crosshairRect == null) return;
+            
+            // 1. タンクの画面座標を取得
+            Vector2 tankScreenPos = _mainCamera.WorldToScreenPoint(_myInputHandler.transform.position);
 
-            // 1. クロスヘアの移動
-            crosshairRect.position = _myInputHandler.PointerScreenPosition;
+            // 2. タンクの座標 ＋ (入力の方向 × 固定半径) でクロスヘアの位置を決定！
+            Vector2 crosshairPos = tankScreenPos + _myInputHandler.AimDirection * fixedRadius;
 
-            // 2. 点線の配置計算（タンクの位置 ～ クロスヘアの位置）
-            if (_mainCamera != null && _dots != null)
+            // クロスヘアUIを移動
+            crosshairRect.position = crosshairPos;
+
+            // 3. 点線の配置計算
+            if (_dots != null)
             {
-                // タンクの3D座標を、UI用の画面2D座標に変換
-                Vector2 tankScreenPos = _mainCamera.WorldToScreenPoint(_myInputHandler.transform.position);
-                Vector2 crosshairPos = crosshairRect.position;
-
                 for (int i = 0; i < dotCount; i++)
                 {
-                    // 均等な間隔（0.0 ~ 1.0）を計算
                     float t = (float)(i + 1) / (dotCount + 1);
-
-                    // タンク位置とクロスヘア位置の間を補間して点を移動
                     _dots[i].transform.position = Vector2.Lerp(tankScreenPos, crosshairPos, t);
                 }
             }
