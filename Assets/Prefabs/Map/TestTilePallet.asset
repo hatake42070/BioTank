@@ -28,6 +28,11 @@ MonoBehaviour:
     tileName: Brick
     editorColor: {r: 0.41568628, g: 0.14942324, b: 0.12156862, a: 0}
     role: 0
+  - tileID: 4
+    prefab: {fileID: 1330379334654671082, guid: a4f10cb72b5f34d41b7cd8f1c6352063, type: 3}
+    tileName: Wood
+    editorColor: {r: 0.7264151, g: 0.60525453, b: 0.59278214, a: 0}
+    role: 0
   placeableObjects:
   - objectID: 1
     prefab: {fileID: 0}
