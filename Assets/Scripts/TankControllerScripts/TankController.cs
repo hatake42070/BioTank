@@ -1,4 +1,5 @@
 using System;
+using System.Collections; // コルーチンに使う
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -19,9 +20,19 @@ namespace TankControllerScripts
         private float _lastFireTime = -9999f;
         private Dictionary<System.Type, ITankState> _stateDictionary; // 状態の辞書
 
-        private int currentHp;
+        private int _currentHp;
         // HPが変化したときに、外部に知らせるイベント
         public event Action<int> OnHpChanged;
+
+        [HideInInspector]
+        public int activeBulletCount = 0; // 現在画面にある自分の弾の数
+        
+        [Header("無敵設定")]
+        [SerializeField] private float invincibilityDuration = 1.5f; // 無敵時間
+        [SerializeField] private float blinkInterval = 0.1f;         // 点滅スピード
+
+        private bool _isInvincible = false; // 無敵フラグ
+        private Renderer[] _renderers; // 点滅させるためのメッシュたち
 
         private void Start()
         {
@@ -35,6 +46,9 @@ namespace TankControllerScripts
             _tankMovement = GetComponent<TankMovement>();
             _tankShooter = GetComponent<TankShooter>();
             _tankTurretAim = GetComponent<TankTurretAim>();
+            
+            // 自分の戦車の見た目(MeshRenderer)をすべて取得しておく
+            _renderers = GetComponentsInChildren<Renderer>();
 
             _stateContext = new TankStateContext();
             _stateDictionary = new Dictionary<Type, ITankState>()
@@ -47,7 +61,7 @@ namespace TankControllerScripts
             _stateContext.Initialize(this, _stateDictionary[typeof(TankStateIdle)]);
             
             // TankDataから最大HPを取得して、現在のHPを初期化する
-            currentHp = tankData.maxHp;
+            _currentHp = tankData.maxHp;
         }
 
         private void Update()
@@ -75,7 +89,8 @@ namespace TankControllerScripts
             if (_inputHandler.AttackTriggered && CanFire())
             {
                 // TankShooterクラスの発射メソッドを呼ぶ(撃てたかどうかをboolで受け取る)
-                bool isFired = _tankShooter.Fire(TankData.currentBullet);
+                // 自分自身(this)をTankShooterに渡して撃ってもらう
+                bool isFired = _tankShooter.Fire(TankData.currentBullet, this);
 
                 // フラグを下ろす（連続で弾が出ないようにする）
                 _inputHandler.ConsumeAttack();
@@ -83,6 +98,7 @@ namespace TankControllerScripts
                 // 実際に弾が発射された(true)の時だけ、クールダウンをリセットする
                 if (isFired)
                 {
+                    activeBulletCount++; // 発射成功したら弾数を増やす
                     ResetCooldown();
                 }
             }
@@ -94,8 +110,11 @@ namespace TankControllerScripts
         /// <returns></returns>
         private bool CanFire()
         {
-            // 「現在のゲーム内時刻」が「最後に撃った時刻 ＋ クールダウン時間」を過ぎているか？
-            return Time.time >= _lastFireTime + TankData.fireCooldown;
+            // クールダウンが完了している ＆ 弾の数が上限未満のときだけ撃てる
+            bool isCooldownReady = Time.time >= _lastFireTime + TankData.fireCooldown;
+            bool isUnderBulletLimit = activeBulletCount < tankData.maxActiveBullets;
+            
+            return isCooldownReady && isUnderBulletLimit;
         }
 
         /// <summary>
@@ -125,16 +144,50 @@ namespace TankControllerScripts
 
         public void TakeDamage(int damage)
         {
-            currentHp -= damage;
-            Debug.Log($"戦車がダメージを受けた！ 残りHP: {currentHp}");
+            // 無敵中ならダメージを無効化する
+            if (_isInvincible || _currentHp <= 0) return;
+            
+            _currentHp -= damage;
+            Debug.Log($"戦車がダメージを受けた！ 残りHP: {_currentHp}");
 
-            if (currentHp <= 0)
+            // HPが変化したこを、登録されている外部のメソッドに通知する
+            OnHpChanged?.Invoke(_currentHp);
+            
+            if (_currentHp <= 0)
             {
                 // HPが0になったら、状態を「Dead（死亡）」に切り替える！
                 ChangeState(typeof(TankStateDead));
             }
-            // HPが変化したこを、登録されている外部のメソッドに通知する
-            OnHpChanged?.Invoke(currentHp);
+            else
+            {
+                // 生き残ったら無敵時間スタート！
+                StartCoroutine(InvincibilityRoutine());
+            }
+        }
+        
+        // 無敵時間の点滅コルーチン
+        private IEnumerator InvincibilityRoutine()
+        {
+            _isInvincible = true;
+            float timer = 0f;
+
+            // 無敵時間が終わるまでチカチカさせる
+            while (timer < invincibilityDuration)
+            {
+                foreach (var rend in _renderers)
+                {
+                    rend.enabled = !rend.enabled;
+                }
+                yield return new WaitForSeconds(blinkInterval);
+                timer += blinkInterval;
+            }
+
+            // 無敵終了時に必ず表示をONに戻す
+            foreach (var rend in _renderers)
+            {
+                rend.enabled = true;
+            }
+            _isInvincible = false;
         }
 
         private void HandleAim()

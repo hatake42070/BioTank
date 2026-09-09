@@ -14,6 +14,9 @@ namespace TankControllerScripts
         public BulletData currentBullet; // ← この戦車が現在撃つ弾のデータ！
         public float fireCooldown = 0.5f; // 発射間隔（連射速度）
         
+        // 画面に同時に存在できる自分の弾の上限
+        public int maxActiveBullets = 4;
+        
         //[Header("アニメーション設定")]
         //public string moveAnimationTrigger = "Move";
     }
