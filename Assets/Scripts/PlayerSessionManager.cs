@@ -83,7 +83,7 @@ public class PlayerSessionManager : MonoBehaviour
         _playerInput.SwitchCurrentActionMap("Player");
         
         // タンクのサイドマーカー(足元の円)の色を、1Pは青、2Pは赤にする
-        _spawnedTankObject.GetComponentInChildren<SpriteRenderer>().color = _playerInput.playerIndex + 1 == 1 ? Color.blue : Color.red;
+        // _spawnedTankObject.GetComponentInChildren<SpriteRenderer>().color = _playerInput.playerIndex + 1 == 1 ? Color.blue : Color.red;
 
         Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} の戦車を生成完了！");
 
