@@ -26,6 +26,12 @@ public class PlayerSessionManager : MonoBehaviour
 
     // 生成した戦車の「入力受け取り窓口」を覚えておくための変数
     private TankControllerScripts.TankInputHandler _spawnedTankInput;
+    
+    // 古い戦車本体の参照を覚えておく変数
+    private GameObject _spawnedTankObject;
+    // クラスの上のほうに変数を追加
+    public int CurrentHp { get; private set; } // 戦車が壊れてもHP（0）を記憶しておく
+    public GameObject SpawnedTank => _spawnedTankObject; // GameManagerから生存確認できるようにする
 
     private void Awake()
     {
@@ -53,24 +59,39 @@ public class PlayerSessionManager : MonoBehaviour
     // GameManagerから呼ばれ、指定された場所に戦車を生成する
     public void SpawnMyTank(Vector3 spawnPosition)
     {
-        // 指定された座標(Vector3)に自分の戦車を生成！ 向きはデフォルト(Quaternion.identity)にする
-        GameObject myTank = Instantiate(myTankPrefabs[_selectedTankIndex - 1], spawnPosition, Quaternion.identity);
+        // すでに戦車やUIが存在していたら、まずは綺麗に破棄(掃除)する！
+        if (_spawnedTankObject != null)
+        {
+            Destroy(_spawnedTankObject);
+        }
+        if (_myCrosshairUI != null)
+        {
+            Destroy(_myCrosshairUI.gameObject);
+        }
+        if (_myTankHpUI != null)
+        {
+            Destroy(_myTankHpUI.gameObject);
+        }
+        
+        // 指定された座標(Vector3)に自分の戦車を生成！
+        _spawnedTankObject = Instantiate(myTankPrefabs[_selectedTankIndex - 1], spawnPosition, Quaternion.identity);
 
         // 生成した戦車についている TankInputHandler を取得して記憶する
-        _spawnedTankInput = myTank.GetComponent<TankControllerScripts.TankInputHandler>();
+        _spawnedTankInput = _spawnedTankObject.GetComponent<TankControllerScripts.TankInputHandler>();
 
-        // 戦車が生まれたら、操作モードをUIから「Player（ゲーム中）」に切り替える！
+        // 戦車が生まれたら、操作モードをUIから「Player（ゲーム中）」に切り替える
         _playerInput.SwitchCurrentActionMap("Player");
         
         // タンクのサイドマーカー(足元の円)の色を、1Pは青、2Pは赤にする
-        //myTank.GetComponentInChildren<SpriteRenderer>().color = _playerInput.playerIndex + 1 == 1 ? Color.blue : Color.red;
+        _spawnedTankObject.GetComponentInChildren<SpriteRenderer>().color = _playerInput.playerIndex + 1 == 1 ? Color.blue : Color.red;
+
 
         Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} の戦車を生成完了！");
 
         if (GameUIManager.Instance != null)
         {
-            _myCrosshairUI = Instantiate(crosshairUI, GameUIManager.Instance.CanvasTransform);
-            _myTankHpUI = Instantiate(myHpUI, GameUIManager.Instance.CanvasTransform);
+            _myCrosshairUI = Instantiate(crosshairUI, GameUIManager.Instance.CanvasTransform, false);
+            _myTankHpUI = Instantiate(myHpUI, GameUIManager.Instance.CanvasTransform, false);
             
             // カメラがちゃんと存在するか確認
             if (Camera.main != null)
@@ -87,12 +108,19 @@ public class PlayerSessionManager : MonoBehaviour
                 // カメラが見つからない場合の予備ルート
                 _myCrosshairUI.Initialize(_spawnedTankInput, _playerInput.playerIndex);
             }
-            var tankController = myTank.GetComponent<TankControllerScripts.TankController>();
+            var tankController = _spawnedTankObject.GetComponent<TankControllerScripts.TankController>();
             int maxHp = tankController.TankData.maxHp;
-            _myTankHpUI.Initialize(myTank.transform, maxHp);
+            _myTankHpUI.Initialize(_spawnedTankObject.transform, maxHp);
             
-            // 戦車のHP変化イベントが起きたら、自分のHPバーの UpdateHpDisplay メソッドを自動で呼ぶように契約させる
-            tankController.OnHpChanged += _myTankHpUI.UpdateHpDisplay;
+            // 初期HPをSession側にも記憶させる
+            CurrentHp = tankController.TankData.maxHp; 
+            
+            // HPが変化した時、Session側の CurrentHp も一緒に更新する
+            tankController.OnHpChanged += (hp) => 
+            {
+                CurrentHp = hp; // Sessionの記憶を更新
+                _myTankHpUI.UpdateHpDisplay(hp); // UIの表示も更新
+            };
         }
     }
 
@@ -262,16 +290,16 @@ public class PlayerSessionManager : MonoBehaviour
         }
     }
 
-    public void OnDebugRespawn(InputAction.CallbackContext context)
-    {
-        if (context.started && IsReady && _spawnedTankInput == null)
-        {
-            Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} : デバッグリスポーンを実行します！");
-
-            if (GameManager.Instance != null)
-            {
-                GameManager.Instance.RespawnPlayer(this);
-            }
-        }
-    }
+    // public void OnDebugRespawn(InputAction.CallbackContext context)
+    // {
+    //     if (context.started && IsReady && _spawnedTankInput == null)
+    //     {
+    //         Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} : デバッグリスポーンを実行します！");
+    //
+    //         if (GameManager.Instance != null)
+    //         {
+    //             GameManager.Instance.RespawnPlayer(this);
+    //         }
+    //     }
+    // }
 }

@@ -21,7 +21,7 @@ namespace TankControllerScripts
             _myColliders = GetComponentsInChildren<Collider>();
         }
         
-        public bool Fire(BulletData bulletData)
+        public bool Fire(BulletData bulletData, TankController owner)
         {
             // --- 壁めり込み判定（Raycast） ---
             if (tarretRoot != null && firePoint != null)
@@ -48,7 +48,8 @@ namespace TankControllerScripts
             BulletController bullet = bulletObj.GetComponent<BulletController>();
             if (bullet != null)
             {
-                bullet.Initialize(bulletData, _myColliders);
+                // owner も一緒に渡す
+                bullet.Initialize(bulletData, _myColliders, owner);
             }
             else
             {

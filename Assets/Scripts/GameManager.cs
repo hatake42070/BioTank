@@ -4,6 +4,8 @@ using TankControllerScripts;
 using UnityEngine.InputSystem;
 using MapEditorSystem.Runtime;
 using UnityEngine.SceneManagement;
+using System.Collections;
+using TMPro;
 
 /// <summary>
 /// ゲームのフェーズを管理
@@ -27,7 +29,9 @@ public class GameManager : MonoBehaviour
     
     [Header("マップ設定 (自作エディタ用)")]
     public TilePalette commonPalette; // 共通パレット
-    public MapData[] allStages;       // 作成したマップデータの配列
+    // MapData単体ではなく、順番をまとめた「シーケンス」の配列を持つ
+    public MapSequenceData[] experimentSequences;
+    // public MapData[] allStages;       // 作成したマップデータの配列
     
     // スポーンポイントは Transform（オブジェクト）ではなく Vector3（座標）として記憶する
     private Vector3 _spawnPoint1P;
@@ -36,8 +40,18 @@ public class GameManager : MonoBehaviour
     // 参加したセッションを管理するリスト
     private List<PlayerSessionManager> _playerSessions = new List<PlayerSessionManager>();
     
-    // 現在選択されているマップの番号
-    private int _selectedMapIndex = 0;
+    // 進行管理用の変数
+    private int _selectedSequenceIndex = 0; // マップ選択画面で選んでいるパターンの番号
+    private int _currentMapIndexInSequence = 0; // そのパターン内で現在何戦目か
+    private GameObject _currentMapInstance; // 現在画面にあるマップオブジェクト（破棄用）
+    
+    // GameManager.cs の変数にタイマーを追加
+    [Header("試合設定")]
+    public float matchTimeLimit = 5f; 
+    private float _currentMatchTime;
+    private bool _isMatchActive = false;
+    
+    private string _resultMessage = ""; // 勝敗を描画するテキスト
 
     private void Awake()
     {
@@ -72,6 +86,80 @@ public class GameManager : MonoBehaviour
                 GoBack();
             }
         }
+        
+        // バトル中の勝敗・タイムアップ監視
+        if (CurrentPhase == GamePhase.Battle && _isMatchActive)
+        {
+            // プレイヤーが2人未満の時は判定処理を行わない（エラー落ち防止）
+            if (_playerSessions.Count < 2) return;
+            
+            _currentMatchTime -= Time.deltaTime;
+
+            // SessionManager を通じて戦車が生きているか（Destroyされていないか）チェック
+            bool p1Dead = (_playerSessions[0].SpawnedTank == null);
+            bool p2Dead = (_playerSessions[1].SpawnedTank == null);
+
+            // どちらかが死んだ、または時間切れになったらラウンド終了！
+            if (_currentMatchTime <= 0 || p1Dead || p2Dead)
+            {
+                EndRound();
+            }
+        }
+    }
+    
+    // ラウンド終了メソッド
+    private void EndRound()
+    {
+        _isMatchActive = false; // 監視ストップ
+        
+        // ここでも念のためチェック
+        if (_playerSessions.Count < 2) return;
+
+        // SessionManager が記憶している「最終HP」を取得
+        int hp1 = _playerSessions[0].CurrentHp;
+        int hp2 = _playerSessions[1].CurrentHp;
+
+        // 勝敗判定
+        if (hp1 > hp2)
+        {
+            Debug.Log("1P WIN!!!");
+            _resultMessage = "1P WIN!";
+        }
+        else if (hp2 > hp1)
+        {
+            Debug.Log("2P WIN!!!");
+            _resultMessage = "2P WIN!";
+        }
+        else
+        {
+            Debug.Log("DRAW (引き分け)!!!");
+            _resultMessage = "DRAW!";
+        }
+
+        // TODO: ここで勝利UI(Canvas)を表示し、数秒後に StartNextRound() を呼ぶ処理を入れる
+        // UIManagerにテキストを渡して表示をお願いする
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.ShowResult(_resultMessage);
+        }
+
+        // 3秒待機して次へ進むコルーチンを開始
+        StartCoroutine(TransitionToNextRoundRoutine());
+    }
+    
+    // 数秒待機してから次のラウンドへ移行するコルーチン
+    private System.Collections.IEnumerator TransitionToNextRoundRoutine()
+    {
+        yield return new WaitForSeconds(3f);
+
+        // ▼ UIManager に非表示をお願いする
+        if (GameUIManager.Instance != null)
+        {
+            GameUIManager.Instance.HideResult();
+        }
+
+        // 次のラウンドへ進行
+        StartNextRound();
     }
 
     public void ChangePhaseLobby()
@@ -83,7 +171,7 @@ public class GameManager : MonoBehaviour
             if (UnityEngine.InputSystem.PlayerInputManager.instance != null)
             {
                 UnityEngine.InputSystem.PlayerInputManager.instance.EnableJoining();
-                Debug.Log("参加受付を再開しました！");
+                //Debug.Log("参加受付を再開しました！");
             }
         }
     }
@@ -110,22 +198,24 @@ public class GameManager : MonoBehaviour
     // 1Pから呼ばれるマップ切り替え関数
     public void ChangeMapIndex(int direction)
     {
-        if (allStages == null || allStages.Length == 0) return;
+        if (experimentSequences == null || experimentSequences.Length == 0) return;
 
         if (direction > 0)
         {
-            _selectedMapIndex = (_selectedMapIndex + 1) % allStages.Length;
+            _selectedSequenceIndex = (_selectedSequenceIndex + 1) % experimentSequences.Length;
         }
         else if (direction < 0)
         {
-            _selectedMapIndex--;
-            if (_selectedMapIndex < 0)
+            _selectedSequenceIndex--;
+            if (_selectedSequenceIndex < 0)
             {
-                _selectedMapIndex = allStages.Length - 1;
+                _selectedSequenceIndex = experimentSequences.Length - 1;
             }
         }
         
-        Debug.Log($"マップ選択中: {_selectedMapIndex} 番のマップ候補");
+        // どの実験パターンが選ばれているかログ出し
+        MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
+        Debug.Log($"パターン選択中: {currentSequence.sequenceName} をセットしました");
         
         // ゆくゆくはここで「マップ選択UI」の画像やテキストを更新する処理を呼ぶ
     }
@@ -133,6 +223,9 @@ public class GameManager : MonoBehaviour
     // マップ選択画面でマップが確定したときに呼ばれる
     public void SetupMap()
     {
+        _currentMatchTime = matchTimeLimit; 
+        _isMatchActive = true;
+        
         CurrentPhase = GamePhase.Battle; // 状態をバトル中へ
         
         // マップ生成・出撃時にロビーのUI（キャンバス）を丸ごと非表示にする！
@@ -140,38 +233,69 @@ public class GameManager : MonoBehaviour
         {
             LobbyUIManager.Instance.gameObject.SetActive(false);
         }
+        
+        _currentMapIndexInSequence = 0; // 1戦目にリセット
 
-        // マップを生成してスポーン地点を取得
-        // 新しい MapGenerator に生成を依頼し、out引数で1P/2Pの座標を受け取る
-        MapData selectedData = allStages[_selectedMapIndex];
-        MapGenerator.GenerateMap(selectedData, commonPalette, out _spawnPoint1P, out _spawnPoint2P, out Vector3 mapCenter);
+        // 実際のマップ生成処理を呼び出す
+        LoadCurrentMapInSequence();
+        
+        Cursor.lockState = CursorLockMode.Confined;
+        Cursor.visible = false;
+    }
+    
+    // 実際に指定されたマップを生成するコア処理（次ラウンド開始時にも使い回す）
+    public void LoadCurrentMapInSequence()
+    {
+        _currentMatchTime = matchTimeLimit; 
+        _isMatchActive = true;
+        
+        // 前のラウンドのマップが残っていれば消去する
+        if (_currentMapInstance != null)
+        {
+            Destroy(_currentMapInstance);
+        }
+
+        // 現在選ばれているシーケンスと、その中の何戦目かを取得
+        MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
+        MapData mapToLoad = currentSequence.sequenceMaps[_currentMapIndexInSequence];
+
+        // マップを生成（戻り値として生成された GameObject を受け取って保存する前提）
+        _currentMapInstance = MapGenerator.GenerateMap(mapToLoad, commonPalette, out _spawnPoint1P, out _spawnPoint2P, out Vector3 mapCenter);
         
         if (Camera.main != null)
         {
-            // 1. 画像で設定されている「最高の角度（X: 70, Y: 0, Z: 0）」を強制的にセットする
             Camera.main.transform.rotation = Quaternion.Euler(70f, 0f, 0f);
-
-            // 2. カメラをマップの中心(mapCenter)から、「カメラが向いている方向の真後ろ」へ下げる
-            // ※Orthographicの場合、どれだけ後ろに下がってもモノの大きさは変わらないため、
-            // Clipping Planes (Near 0.3 ~ Far 100) の範囲内に収まる「適当な距離」でOKです。
             float pullBackDistance = 20f; 
-            
             Camera.main.transform.position = mapCenter - (Camera.main.transform.forward * pullBackDistance);
-            
-            // 3. （マップごとにサイズが違う場合、カメラの「Size」も自動調整
-            // Camera.main.orthographicSize = 25f; // 必要に応じてプログラムから上書きも可能
         }
 
-        // 全員分の戦車をそれぞれのスポーン座標に生成！
+        // プレイヤーの配置（毎回新規生成）
         for (int i = 0; i < _playerSessions.Count; i++)
         {
             Vector3 targetSpawnPos = (i == 0) ? _spawnPoint1P : _spawnPoint2P;
+
+            // 古い戦車の破棄はSessionManager内部で自動的にやってくれる
             _playerSessions[i].SpawnMyTank(targetSpawnPos);
         }
-        
-        // マウスカーソルを非表示にして、画面内に閉じ込める
-        Cursor.lockState = CursorLockMode.Confined;
-        Cursor.visible = false;
+    }
+    
+    // 次のマップ（ラウンド）へ進む処理
+    public void StartNextRound()
+    {
+        _currentMapIndexInSequence++;
+
+        MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
+
+        // 用意されたマップをすべて消化したか？
+        if (_currentMapIndexInSequence >= currentSequence.sequenceMaps.Length)
+        {
+            Debug.Log("すべての実験シーケンスが終了しました！タイトルへ戻ります。");
+            SceneManager.LoadScene("TitleScene");
+            return;
+        }
+
+        // 次のマップを読み込む
+        LoadCurrentMapInSequence();
     }
     
     // 特定のプレイヤーが1P（ホスト）かどうかを判定する便利関数
@@ -183,13 +307,14 @@ public class GameManager : MonoBehaviour
     // 全員の準備が完了したかチェックする
     public void CheckAllPlayersReady()
     {
-        if (_playerSessions.Count == 0) return;
+        // 0人の時だけでなく、「2人未満（1人の時）」も弾くようにする
+        if (_playerSessions.Count < 2) return;
         
         bool isAllReady = _playerSessions.TrueForAll(s => s.IsReady);
 
         if (isAllReady)
         {
-            Debug.Log("全員準備完了！マップ選択に移行します。");
+            Debug.Log("2人揃って準備完了！マップ選択に移行します。");
             CurrentPhase = GamePhase.MapSelect; // 状態を移行！
             
             // 3人目以降の参加受付をシャットアウトし、Jボタン連打による警告を防ぐ
@@ -225,15 +350,15 @@ public class GameManager : MonoBehaviour
     
     // デバック用
     // 倒されたプレイヤーを再出撃（リスポーン）させる関数
-    public void RespawnPlayer(PlayerSessionManager session)
-    {
-        // 自分がリストの何番目にいるか（0番目なら1P、1番目なら2P）を調べる
-        int playerIndex = _playerSessions.IndexOf(session);
-
-        // 1Pなら _spawnPoint1P、2Pなら _spawnPoint2P を割り当てる
-        Vector3 targetSpawnPos = (playerIndex == 0) ? _spawnPoint1P : _spawnPoint2P;
-        
-        // Sessionに再度戦車を作らせる
-        session.SpawnMyTank(targetSpawnPos);
-    }
+    // public void RespawnPlayer(PlayerSessionManager session)
+    // {
+    //     // 自分がリストの何番目にいるか（0番目なら1P、1番目なら2P）を調べる
+    //     int playerIndex = _playerSessions.IndexOf(session);
+    //
+    //     // 1Pなら _spawnPoint1P、2Pなら _spawnPoint2P を割り当てる
+    //     Vector3 targetSpawnPos = (playerIndex == 0) ? _spawnPoint1P : _spawnPoint2P;
+    //     
+    //     // Sessionに再度戦車を作らせる
+    //     session.SpawnMyTank(targetSpawnPos);
+    // }
 }

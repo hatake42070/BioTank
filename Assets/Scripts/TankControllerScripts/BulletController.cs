@@ -16,13 +16,15 @@ namespace TankControllerScripts
 
         // 撃った主のコライダーを覚えておく
         private Collider[] _ownerColliders;
+        private TankController _ownerTank;
 
         /// <summary>
         /// TankShooterから生成直後に呼ばれ、弾の性能をセットする
         /// </summary>
-        public void Initialize(BulletData bulletData, Collider[] ownerColliders)
+        public void Initialize(BulletData bulletData, Collider[] ownerColliders, TankController owner)
         {
             _data = bulletData;
+            _ownerTank = owner; // 記憶する
             _rb = GetComponent<Rigidbody>();
 
             _boundCount = _data.maxBounces;
@@ -45,6 +47,16 @@ namespace TankControllerScripts
 
             // 何にも当たらずに飛んでいった場合、寿命（lifeTime）が来たら自動で消滅させる
             Destroy(gameObject, _data.lifeTime);
+        }
+        
+        // 弾が消滅する瞬間に呼ばれるUnityの標準機能
+        private void OnDestroy()
+        {
+            // 親(戦車)がまだ生きていたら、弾数を1減らす
+            if (_ownerTank != null)
+            {
+                _ownerTank.activeBulletCount--;
+            }
         }
 
         /// <summary>
