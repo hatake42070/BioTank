@@ -62,6 +62,9 @@ namespace TankControllerScripts
             
             // TankDataから最大HPを取得して、現在のHPを初期化する
             _currentHp = tankData.maxHp;
+            
+            // 一番初め生成された瞬間は無敵にしておく（後で変えるかも）
+            StartCoroutine(InvincibilityRoutine());
         }
 
         private void Update()

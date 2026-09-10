@@ -141,8 +141,7 @@ public class GameManager : MonoBehaviour
             Debug.Log("DRAW (引き分け)!!!");
             _resultMessage = "DRAW!";
         }
-
-        // TODO: ここで勝利UI(Canvas)を表示し、数秒後に StartNextRound() を呼ぶ処理を入れる
+        
         // UIManagerにテキストを渡して表示をお願いする
         if (GameUIManager.Instance != null)
         {
@@ -239,6 +238,7 @@ public class GameManager : MonoBehaviour
         {
             LobbyUIManager.Instance.gameObject.SetActive(false);
         }
+        GameUIManager.Instance.ShowGameUI(); // ゲーム用UIを表示
         
         _currentMapIndexInSequence = 0; // 1戦目にリセット
 
