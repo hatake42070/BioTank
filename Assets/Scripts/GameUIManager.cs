@@ -31,10 +31,8 @@ public class GameUIManager : MonoBehaviour
             Instance = this;
             CanvasTransform = this.transform; // 自分がついているオブジェクト(GameUI)のTransformを記憶
 
-            if (resultUIPanel != null)
-            {
-                resultUIPanel.SetActive(false);
-            }
+            if (resultUIPanel != null) resultUIPanel.SetActive(false);
+            if (gameUIPanel != null) gameUIPanel.SetActive(false);
         }
         else
         {

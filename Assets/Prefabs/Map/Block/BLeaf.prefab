@@ -159,6 +159,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gimmicks.BreakableWall
   wallHp: 3
+  destructionEffectPrefab: {fileID: 1056495218130733249, guid: 96dff6b057f99854cb33572800433362, type: 3}
 --- !u!4 &8399346183484395460 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1886483184946351740, guid: 62abfeaa11a0f0342890c37874da5be6, type: 3}
