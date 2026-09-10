@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour
     
     // GameManager.cs の変数にタイマーを追加
     [Header("試合設定")]
-    public float matchTimeLimit = 5f; 
+    public float matchTimeLimit = 60f; 
     private float _currentMatchTime;
     private bool _isMatchActive = false;
     
@@ -94,6 +94,12 @@ public class GameManager : MonoBehaviour
             if (_playerSessions.Count < 2) return;
             
             _currentMatchTime -= Time.deltaTime;
+            
+            // UIManagerに現在の時間を渡す（軽量化済みなので毎フレーム呼び出して大丈夫）
+            if (GameUIManager.Instance != null)
+            {
+                GameUIManager.Instance.UpdateTimerDisplay(_currentMatchTime);
+            }
 
             // SessionManager を通じて戦車が生きているか（Destroyされていないか）チェック
             bool p1Dead = (_playerSessions[0].SpawnedTank == null);
