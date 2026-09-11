@@ -37,6 +37,10 @@ public class GameManager : MonoBehaviour
     private Vector3 _spawnPoint1P;
     private Vector3 _spawnPoint2P;
     
+    [Header("スコア管理")]
+    private int _score1P = 0;
+    private int _score2P = 0;
+    
     // 参加したセッションを管理するリスト
     private List<PlayerSessionManager> _playerSessions = new List<PlayerSessionManager>();
     
@@ -128,23 +132,26 @@ public class GameManager : MonoBehaviour
         // 勝敗判定
         if (hp1 > hp2)
         {
-            Debug.Log("1P WIN!!!");
-            _resultMessage = "1P WIN!";
+            _score1P++;
+            _resultMessage = "<color=blue>1P</color> WIN !";
         }
         else if (hp2 > hp1)
         {
-            Debug.Log("2P WIN!!!");
-            _resultMessage = "2P WIN!";
+            _score2P++;
+            _resultMessage = "<color=red>2P</color> WIN !";
         }
         else
         {
-            Debug.Log("DRAW (引き分け)!!!");
-            _resultMessage = "DRAW!";
+            _score1P++;
+            _score2P++;
+            _resultMessage = "DRAW !";
         }
         
         // UIManagerにテキストを渡して表示をお願いする
         if (GameUIManager.Instance != null)
         {
+            // UIに最新のスコアを渡す
+            GameUIManager.Instance.UpdateScoreDisplay(_score1P, _score2P);
             GameUIManager.Instance.ShowResult(_resultMessage);
         }
 
@@ -228,6 +235,10 @@ public class GameManager : MonoBehaviour
     // マップ選択画面でマップが確定したときに呼ばれる
     public void SetupMap()
     {
+        // 最初の出撃時にスコアをリセットする
+        _score1P = 0;
+        _score2P = 0;
+        
         _currentMatchTime = matchTimeLimit; 
         _isMatchActive = true;
         
@@ -295,13 +306,36 @@ public class GameManager : MonoBehaviour
         // 用意されたマップをすべて消化したか？
         if (_currentMapIndexInSequence >= currentSequence.sequenceMaps.Length)
         {
-            Debug.Log("すべての実験シーケンスが終了しました！タイトルへ戻ります。");
-            SceneManager.LoadScene("TitleScene");
+            // 即タイトルに戻るのではなく、最終結果表示コルーチンを呼ぶ
+            StartCoroutine(ShowFinalResultRoutine());
             return;
         }
 
         // 次のマップを読み込む
         LoadCurrentMapInSequence();
+    }
+    
+    // 最終結果を表示してタイトルに戻るコルーチン
+    private IEnumerator ShowFinalResultRoutine()
+    {
+        string finalMessage = "";
+        
+        if (_score1P > _score2P) finalMessage = "FINAL WINNER: <color=blue>1P</color> !!";
+        else if (_score2P > _score1P) finalMessage = "FINAL WINNER: <color=red>2P</color> !!";
+        else finalMessage = "FINAL RESULT: DRAW";
+
+        if (GameUIManager.Instance != null)
+        {
+            // 既存のリザルトUIを使い回して最終結果をドカンと表示
+            GameUIManager.Instance.ShowResult(finalMessage);
+        }
+
+        // 最終結果を5秒間見せる
+        yield return new WaitForSeconds(5f);
+
+        // タイトルへ戻る
+        Cursor.visible = true; // マウスカーソルを戻しておく
+        SceneManager.LoadScene("TitleScene");
     }
     
     // 特定のプレイヤーが1P（ホスト）かどうかを判定する便利関数
