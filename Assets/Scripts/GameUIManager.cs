@@ -19,9 +19,23 @@ public class GameUIManager : MonoBehaviour
     [Header("ゲーム内情報表示")]
     [SerializeField]
     private GameObject gameUIPanel;
+
     [SerializeField]
     private TextMeshProUGUI timerText; // タイマーを表示
-    
+    [SerializeField]
+    private TextMeshProUGUI timerTextShadow; // タイマーを表示
+
+    [Header("スコア表示")]
+    [SerializeField]
+    private TextMeshProUGUI p1ScoreText; // 画面上部のスコア用テキスト
+    [SerializeField]
+    private TextMeshProUGUI p1ScoreTextShadow; // 画面上部のスコア用テキスト
+
+    [SerializeField]
+    private TextMeshProUGUI p2ScoreText;
+    [SerializeField]
+    private TextMeshProUGUI p2ScoreTextShadow;
+
     private int _lastDisplayedSeconds = -1; // 最後に表示した秒数を記憶する用
 
     private void Awake()
@@ -39,7 +53,7 @@ public class GameUIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
     /// <summary>
     /// タイマー表示を更新する（1秒ごとにしかテキスト書き換えを行わない軽量版）
     /// </summary>
@@ -56,8 +70,28 @@ public class GameUIManager : MonoBehaviour
             if (timerText != null)
             {
                 // 文字列の変換はここでしか起きないので非常に軽い
-                timerText.text = seconds.ToString(); 
+                timerText.text = seconds.ToString();
             }
+            if (timerTextShadow != null)
+            {
+                // 文字列の変換はここでしか起きないので非常に軽い
+                timerTextShadow.text = seconds.ToString();
+            }
+        }
+    }
+
+    /// <summary>
+    /// GameManagerから呼ばれて画面上部のスコアを書き換える
+    /// </summary>
+    public void UpdateScoreDisplay(int p1Score, int p2Score)
+    {
+        if (p1ScoreText != null &&  p2ScoreText != null && p1ScoreTextShadow != null && p2ScoreTextShadow != null)
+        {
+            // 色分けしたい場合は "<color=blue>"+p1Score+"</color> - <color=red>"+p2Score+"</color>" なども可能
+            p1ScoreText.text = $"{p1Score}";
+            p1ScoreTextShadow.text = $"{p1Score}";
+            p2ScoreText.text = $"{p2Score}";
+            p2ScoreTextShadow.text = $"{p2Score}";
         }
     }
 
@@ -82,6 +116,9 @@ public class GameUIManager : MonoBehaviour
 
         if (resultUIPanel != null)
         {
+            // 自分自身をヒエラルキーの一番下に移動させる（最前面に表示）
+            resultUIPanel.transform.SetAsLastSibling();
+            
             resultUIPanel.SetActive(true);
         }
     }
