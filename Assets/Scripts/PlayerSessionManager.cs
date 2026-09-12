@@ -59,7 +59,7 @@ public class PlayerSessionManager : MonoBehaviour
     // GameManagerから呼ばれ、指定された場所に戦車を生成する
     public void SpawnMyTank(Vector3 spawnPosition)
     {
-        // すでに戦車やUIが存在していたら、まずは綺麗に破棄(掃除)する！
+        // すでに戦車やUIが存在していたら、まずは綺麗に破棄(掃除)する
         if (_spawnedTankObject != null)
         {
             Destroy(_spawnedTankObject);
@@ -73,7 +73,7 @@ public class PlayerSessionManager : MonoBehaviour
             Destroy(_myTankHpUI.gameObject);
         }
         
-        // 指定された座標(Vector3)に自分の戦車を生成！
+        // 指定された座標(Vector3)に自分の戦車を生成
         _spawnedTankObject = Instantiate(myTankPrefabs[_selectedTankIndex - 1], spawnPosition, Quaternion.identity);
 
         // 生成した戦車についている TankInputHandler を取得して記憶する
