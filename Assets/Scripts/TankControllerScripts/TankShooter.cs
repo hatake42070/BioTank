@@ -55,6 +55,8 @@ namespace TankControllerScripts
             {
                 Debug.LogWarning("発射されたプレハブに BulletController がアタッチされていません！");
             }
+            
+            AudioManager.Instance.PlaySE("Shoot"); // 発射音を鳴らす
             // 無事に発射されたので true を返す
             return true;
         }

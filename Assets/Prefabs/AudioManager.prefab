@@ -46,12 +46,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 9fbc2ec787646a449b6277073de25aad, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AudioManager
-  bgmMixerGroup: {fileID: -2244313003804511266, guid: 24bd362766e645646a0300616b892898, type: 2}
-  seMixerGroup: {fileID: 3494157235215540059, guid: 24bd362766e645646a0300616b892898, type: 2}
+  bgmMixerGroup: {fileID: 6600946539096636355, guid: 24bd362766e645646a0300616b892898, type: 2}
+  seMixerGroup: {fileID: -7563849966709797404, guid: 24bd362766e645646a0300616b892898, type: 2}
   bgmSource: {fileID: 1459684972264861167}
   seSource: {fileID: 5453642714879234103}
   bgmList: []
-  seList: []
+  seList:
+  - name: Shoot
+    clip: {fileID: 8300000, guid: 39e417a67a52e2d4892228f79b7e7973, type: 3}
+    volume: 0.1
 --- !u!82 &1459684972264861167
 AudioSource:
   m_ObjectHideFlags: 0
