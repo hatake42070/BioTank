@@ -88,21 +88,22 @@ namespace TankControllerScripts
                 return;
             }
 
-            // 入力ハンドラを見て、攻撃ボタンが押されていたら発射
-            if (_inputHandler.AttackTriggered && CanFire())
+            // 入力ハンドラを見て、攻撃ボタンが押されているかだけをチェックする
+            if (_inputHandler.AttackTriggered)
             {
-                // TankShooterクラスの発射メソッドを呼ぶ(撃てたかどうかをboolで受け取る)
-                // 自分自身(this)をTankShooterに渡して撃ってもらう
-                bool isFired = _tankShooter.Fire(TankData.currentBullet, this);
-
-                // フラグを下ろす（連続で弾が出ないようにする）
+                // 撃てる・撃てないに関わらず、入力フラグはここで絶対に下ろす
                 _inputHandler.ConsumeAttack();
                 
-                // 実際に弾が発射された(true)の時だけ、クールダウンをリセットする
-                if (isFired)
+                // その上で、撃てる状態（CDが明けているか等）なら発射処理を行う
+                if (CanFire())
                 {
-                    activeBulletCount++; // 発射成功したら弾数を増やす
-                    ResetCooldown();
+                    bool isFired = _tankShooter.Fire(TankData.currentBullet, this);
+
+                    if (isFired)
+                    {
+                        activeBulletCount++; // 発射成功したら弾数を増やす
+                        ResetCooldown();
+                    }
                 }
             }
         }
