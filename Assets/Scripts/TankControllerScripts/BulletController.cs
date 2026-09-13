@@ -14,6 +14,7 @@ namespace TankControllerScripts
         [Header("エフェクト")]
         [SerializeField]
         private ParticleSystem smokeEffect; // 煙のパーティクル
+        [SerializeField] private GameObject explosionPrefab; // 爆発演出プレハブ
 
         // 撃った主のコライダーを覚えておく
         private Collider[] _ownerColliders;
@@ -102,6 +103,11 @@ namespace TankControllerScripts
                     // 新しい煙が生まれるのをストップする
                     smokeEffect.Stop();
                 }
+                // 爆発演出
+                if (explosionPrefab != null)
+                {
+                    Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+                }
 
                 // ダメージを与えたら弾は消滅させる場合
                 Destroy(gameObject);
@@ -154,7 +160,11 @@ namespace TankControllerScripts
                         // 新しい煙が生まれるのをストップする
                         smokeEffect.Stop();
                     }
-
+                    // 爆発演出
+                    if (explosionPrefab != null)
+                    {
+                        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+                    }
                     Destroy(gameObject);
                 }
 
@@ -164,6 +174,12 @@ namespace TankControllerScripts
             // ぶつかった相手が銃弾だった場合
             if (collision.gameObject.CompareTag("Bullet"))
             {
+                // 爆発演出
+                if (explosionPrefab != null)
+                {
+                    Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+                }
+                
                 Destroy(gameObject);
                 return;
             }

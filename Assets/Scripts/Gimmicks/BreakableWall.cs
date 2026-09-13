@@ -13,6 +13,7 @@ namespace Gimmicks
         public void TakeDamage(int damage)
         {
             wallHp -= damage;
+            AudioManager.Instance.PlaySE("LeafBreak");
             if (wallHp <= 0)
             {
                 // 破壊エフェクトが設定されていれば、壁と全く同じ位置・角度に生成する

@@ -189,6 +189,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TankControllerScripts.BulletController
   smokeEffect: {fileID: 1370457480677850928}
+  explosionPrefab: {fileID: 7762523106434274413, guid: 9ea8058da6146744785e3ea909121f56, type: 3}
 --- !u!1001 &1923834033022501352
 PrefabInstance:
   m_ObjectHideFlags: 0
