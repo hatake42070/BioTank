@@ -98,13 +98,30 @@ namespace TankControllerScripts
             }
             else
             {
-                if (_padAimInput.sqrMagnitude > 0.01f)
+                float inputMagSq = _padAimInput.sqrMagnitude;
+        
+                if (inputMagSq > 0.0625f)
                 {
-                    _targetAimDirection = _padAimInput.normalized;
+                    // _padAimInput は Vector2 なので、Vector3 に変換して計算
+                    Vector3 newAimDir = new Vector3(_padAimInput.x, _padAimInput.y, 0).normalized; 
+
+                    // スナップバック防止フィルター
+                    // 1. Vector3.Dot で「現在の目標方向」と「新しい入力方向」の角度差を調べる（マイナスなら真逆を向いている）
+                    // 2. inputMagSq が 0.25f 以下（スティックの傾きが50%以下）か調べる
+                    if (Vector3.Dot(_targetAimDirection, newAimDir) < 0f && inputMagSq < 0.25f)
+                    {
+                        // ここに入ったということは、「急に逆方向に入力されたが、スティックは半分も倒れていない」状態
+                        // プレイヤーの指による入力ではなく、バネの跳ね返りである可能性が極めて高いので無視する
+                    }
+                    else
+                    {
+                        // 人間の意図的な入力とみなして更新
+                        _targetAimDirection = newAimDir;
+                    }
                 }
             }
 
-            // 2. 現在の方向(AimDirection)を、目標の方向(_targetAimDirection)に向かって滑らかに回転させる！
+            // 2. 現在の方向(AimDirection)を、目標の方向(_targetAimDirection)に向かって滑らかに回転させる
             // Vector3.Slerp を使うと、クロスヘアが綺麗な「円」を描いて目標に追いつくように回転する
             AimDirection = Vector3.Slerp(AimDirection, _targetAimDirection, aimRotateSpeed * Time.deltaTime);
 
