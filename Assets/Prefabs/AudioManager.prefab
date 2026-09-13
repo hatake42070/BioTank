@@ -54,6 +54,12 @@ MonoBehaviour:
   seList:
   - name: Shoot
     clip: {fileID: 8300000, guid: 39e417a67a52e2d4892228f79b7e7973, type: 3}
+    volume: 0.05
+  - name: Reflection1
+    clip: {fileID: 8300000, guid: b5779c5a105c9d44c9d1a91f035710e6, type: 3}
+    volume: 0.1
+  - name: Reflection2
+    clip: {fileID: 8300000, guid: 15faaeccf153df24fafd9dcec4ea23eb, type: 3}
     volume: 0.1
 --- !u!82 &1459684972264861167
 AudioSource:
