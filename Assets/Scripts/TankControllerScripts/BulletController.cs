@@ -10,9 +10,11 @@ namespace TankControllerScripts
         private Rigidbody _rb;
         private Collider _myCollider;
         private int _boundCount;
-        
+
         [Header("エフェクト")]
-        [SerializeField] private ParticleSystem smokeEffect; // 煙のパーティクル
+        [SerializeField]
+        private ParticleSystem smokeEffect; // 煙のパーティクル
+        [SerializeField] private GameObject explosionPrefab; // 爆発演出プレハブ
 
         // 撃った主のコライダーを覚えておく
         private Collider[] _ownerColliders;
@@ -48,7 +50,7 @@ namespace TankControllerScripts
             // 何にも当たらずに飛んでいった場合、寿命（lifeTime）が来たら自動で消滅させる
             Destroy(gameObject, _data.lifeTime);
         }
-        
+
         // 弾が消滅する瞬間に呼ばれるUnityの標準機能
         private void OnDestroy()
         {
@@ -84,22 +86,27 @@ namespace TankControllerScripts
         {
             // 何に当たって消えたかをコンソールに表示する（犯人探し用）
             Debug.Log($"💥 弾が【{collision.gameObject.name}】にぶつかって消滅しました！");
-            
+
             // ぶつかった相手がIDamageableかチェックする(壊せる壁)
             Gimmicks.IDamageable target = collision.gameObject.GetComponentInParent<Gimmicks.IDamageable>();
-            
+
             if (target != null)
             {
                 // ダメージを与える(壊れる壁のHPが減る)
                 target.TakeDamage(_data.damage);
-                
+
                 if (smokeEffect != null)
                 {
                     // 弾(親)から煙パーティクルを切り離し、独立させる（その場に残す）
                     smokeEffect.transform.SetParent(null);
 
                     // 新しい煙が生まれるのをストップする
-                    smokeEffect.Stop(); 
+                    smokeEffect.Stop();
+                }
+                // 爆発演出
+                if (explosionPrefab != null)
+                {
+                    Instantiate(explosionPrefab, transform.position, Quaternion.identity);
                 }
 
                 // ダメージを与えたら弾は消滅させる場合
@@ -139,6 +146,9 @@ namespace TankControllerScripts
 
                     // 新しい正面方向に向かって、元のスピードのまま飛ばし直す！（減速させない）
                     _rb.linearVelocity = transform.forward * _data.speed;
+
+                    int randomIndex = UnityEngine.Random.Range(1, 3); // 1 or 2
+                    AudioManager.Instance.PlaySE("Reflection" + randomIndex); // 反射音を鳴らす
                 }
                 else
                 {
@@ -148,9 +158,13 @@ namespace TankControllerScripts
                         smokeEffect.transform.SetParent(null);
 
                         // 新しい煙が生まれるのをストップする
-                        smokeEffect.Stop(); 
+                        smokeEffect.Stop();
                     }
-                    
+                    // 爆発演出
+                    if (explosionPrefab != null)
+                    {
+                        Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+                    }
                     Destroy(gameObject);
                 }
 
@@ -160,6 +174,12 @@ namespace TankControllerScripts
             // ぶつかった相手が銃弾だった場合
             if (collision.gameObject.CompareTag("Bullet"))
             {
+                // 爆発演出
+                if (explosionPrefab != null)
+                {
+                    Instantiate(explosionPrefab, transform.position, Quaternion.identity);
+                }
+                
                 Destroy(gameObject);
                 return;
             }

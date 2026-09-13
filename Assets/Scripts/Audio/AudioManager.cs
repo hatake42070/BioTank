@@ -62,6 +62,8 @@ public class AudioManager : MonoBehaviour
     {
         if (_seDictionary.TryGetValue(seName, out SoundData data))
         {
+            // 毎回0.95倍〜1.05倍の間で微妙に音の高さを変える
+            seSource.pitch = UnityEngine.Random.Range(0.95f, 1.05f);
             // PlayOneShotを使うことで、1つのAudioSourceで複数のSEを重ねて鳴らせる
             seSource.PlayOneShot(data.clip, data.volume);
         }
