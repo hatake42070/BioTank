@@ -108,6 +108,7 @@ namespace TankControllerScripts
                 {
                     Instantiate(explosionPrefab, transform.position, Quaternion.identity);
                 }
+                AudioManager.Instance.PlaySE("Explosion");
 
                 // ダメージを与えたら弾は消滅させる場合
                 Destroy(gameObject);
@@ -165,6 +166,7 @@ namespace TankControllerScripts
                     {
                         Instantiate(explosionPrefab, transform.position, Quaternion.identity);
                     }
+                    AudioManager.Instance.PlaySE("Explosion");
                     Destroy(gameObject);
                 }
 
@@ -179,6 +181,7 @@ namespace TankControllerScripts
                 {
                     Instantiate(explosionPrefab, transform.position, Quaternion.identity);
                 }
+                AudioManager.Instance.PlaySE("Explosion");
                 
                 Destroy(gameObject);
                 return;
