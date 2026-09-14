@@ -61,9 +61,15 @@ MonoBehaviour:
   - name: Reflection2
     clip: {fileID: 8300000, guid: 15faaeccf153df24fafd9dcec4ea23eb, type: 3}
     volume: 0.1
+  - name: Explosion
+    clip: {fileID: 8300000, guid: 5346e2cac463f2048870cbda745093fa, type: 3}
+    volume: 0.1
+  - name: Explosion2
+    clip: {fileID: 8300000, guid: 4e0304a59d8a4234bb63d7836dee49a0, type: 3}
+    volume: 0.15
   - name: LeafBreak
     clip: {fileID: 8300000, guid: d31d1bbbc0bd68a41a40fbc07333344c, type: 3}
-    volume: 0.1
+    volume: 0.08
 --- !u!82 &1459684972264861167
 AudioSource:
   m_ObjectHideFlags: 0

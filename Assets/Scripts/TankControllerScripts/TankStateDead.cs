@@ -6,6 +6,7 @@ namespace TankControllerScripts
         public void EnterState(TankController player)
         {
             // player (TankController) がアタッチされている大元のゲームオブジェクトを破壊する
+            AudioManager.Instance.PlaySE("Explosion2");
             Object.Destroy(player.gameObject);
             
             // ※もし将来、爆発エフェクト（パーティクル）を出したり、
