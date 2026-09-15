@@ -33,6 +33,11 @@ namespace TankControllerScripts
 
         private bool _isInvincible = false; // 無敵フラグ
         private Renderer[] _renderers; // 点滅させるためのメッシュたち
+        
+        // インスペクターから巨大化したタンク用爆発プレハブをセットする
+        [SerializeField] private GameObject tankExplosionPrefab; // タンク用爆発演出
+        // Stateクラスから安全に読み取れるようにプロパティとして公開する
+        public GameObject ExplosionPrefab => tankExplosionPrefab;
 
         private void Start()
         {
@@ -153,6 +158,8 @@ namespace TankControllerScripts
             
             _currentHp -= damage;
             Debug.Log($"戦車がダメージを受けた！ 残りHP: {_currentHp}");
+            
+            AudioManager.Instance.PlaySE("Damage");
 
             // HPが変化したこを、登録されている外部のメソッドに通知する
             OnHpChanged?.Invoke(_currentHp);

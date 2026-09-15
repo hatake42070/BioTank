@@ -7,10 +7,15 @@ namespace TankControllerScripts
         {
             // player (TankController) がアタッチされている大元のゲームオブジェクトを破壊する
             AudioManager.Instance.PlaySE("Explosion2");
-            Object.Destroy(player.gameObject);
             
-            // ※もし将来、爆発エフェクト（パーティクル）を出したり、
-            // 爆発音を鳴らしたりする場合は、Destroyの直前にここに書きます！
+            // 2. 爆発エフェクトを生成する
+            if (player.ExplosionPrefab != null)
+            {
+                // タンクの現在位置(player.transform.position)に、回転なし(Quaternion.identity)で生成
+                Object.Instantiate(player.ExplosionPrefab, player.transform.position, Quaternion.identity);
+            }
+            
+            Object.Destroy(player.gameObject);
         }
 
         public void UpdateState(TankController player)

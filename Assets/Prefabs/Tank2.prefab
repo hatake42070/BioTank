@@ -90,6 +90,7 @@ MonoBehaviour:
   activeBulletCount: 0
   invincibilityDuration: 1.5
   blinkInterval: 0.1
+  tankExplosionPrefab: {fileID: 7762523106434274413, guid: d86c76171e391e144a38ebcdfa2e7cce, type: 3}
 --- !u!114 &1862402504282794058
 MonoBehaviour:
   m_ObjectHideFlags: 0
