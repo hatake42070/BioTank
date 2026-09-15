@@ -1,6 +1,7 @@
 ﻿using TankControllerScripts;
 using UnityEngine;
 using TMPro;
+using UnityEngine.UI;
 
 /// <summary>
 /// 1P,2P用の画面枠を管理するクラス
@@ -32,6 +33,9 @@ public class PlayerSlotUI : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI boundValueText; // 銃弾の反射回数の値を表示する用
 
+    [SerializeField]
+    private Image displayImage;
+
     [Header("状態表示")]
     [SerializeField]
     private TextMeshProUGUI statusText; // 「Ready!」などを出す用
@@ -42,6 +46,7 @@ public class PlayerSlotUI : MonoBehaviour
         joinPromptPanel.SetActive(true);
         tankSelectPanel.SetActive(false);
         statusText.text = "";
+        displayImage.enabled = false;
     }
 
     // 参加完了 ＆ タンク選択中
@@ -60,6 +65,18 @@ public class PlayerSlotUI : MonoBehaviour
         cdValueText.text = selectedData.fireCooldown.ToString();
         bulletSpeedValueText.text = selectedData.currentBullet.speed.ToString();
         boundValueText.text = selectedData.currentBullet.maxBounces.ToString();
+        
+        if (selectedData.tankImage != null)
+        {
+            // 画像がある場合は、スプライトを入れてImageを「オン」にする
+            displayImage.sprite = selectedData.tankImage;
+            displayImage.enabled = true;
+        }
+        else
+        {
+            // 画像が設定されていない(null)場合は、Image自体を「オフ」にして隠す
+            displayImage.enabled = false;
+        }
     }
 
     // 決定（Ready）状態
