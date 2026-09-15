@@ -17,3 +17,4 @@ MonoBehaviour:
   currentBullet: {fileID: 11400000, guid: 3665c9b8d347b2449bece7b2b2e03b24, type: 2}
   fireCooldown: 0.5
   maxActiveBullets: 4
+  tankImage: {fileID: 21300000, guid: a7e7db8c506f7eb4d98dd3551a7b77a4, type: 3}

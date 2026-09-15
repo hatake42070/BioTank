@@ -17,6 +17,8 @@ namespace TankControllerScripts
         // 画面に同時に存在できる自分の弾の上限
         public int maxActiveBullets = 4;
         
+        public Sprite tankImage; // 選択画面に表示するタンクのイメージ
+        
         //[Header("アニメーション設定")]
         //public string moveAnimationTrigger = "Move";
     }

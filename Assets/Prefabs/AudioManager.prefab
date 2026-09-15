@@ -70,6 +70,9 @@ MonoBehaviour:
   - name: LeafBreak
     clip: {fileID: 8300000, guid: d31d1bbbc0bd68a41a40fbc07333344c, type: 3}
     volume: 0.08
+  - name: Damage
+    clip: {fileID: 8300000, guid: 447623e11d141374f8492ea07c896950, type: 3}
+    volume: 0.08
 --- !u!82 &1459684972264861167
 AudioSource:
   m_ObjectHideFlags: 0
