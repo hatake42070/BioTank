@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections.Generic;
 using TankControllerScripts;
@@ -6,6 +7,7 @@ using MapEditorSystem.Runtime;
 using UnityEngine.SceneManagement;
 using System.Collections;
 using TMPro;
+using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// ゲームのフェーズを管理
@@ -41,11 +43,15 @@ public class GameManager : MonoBehaviour
     private int _score1P = 0;
     private int _score2P = 0;
     
+    [Header("マップ選択状態")]
+    public bool IsMapConfirming { get; private set; } = false;
+    
     // 参加したセッションを管理するリスト
     private List<PlayerSessionManager> _playerSessions = new List<PlayerSessionManager>();
     
     // 進行管理用の変数
     private int _selectedSequenceIndex = 0; // マップ選択画面で選んでいるパターンの番号
+    public int SelectedSequenceIndex => _selectedSequenceIndex;
     private int _currentMapIndexInSequence = 0; // そのパターン内で現在何戦目か
     private GameObject _currentMapInstance; // 現在画面にあるマップオブジェクト（破棄用）
     
@@ -118,7 +124,7 @@ public class GameManager : MonoBehaviour
     }
     
     // ラウンド終了メソッド
-    private void EndRound()
+    private async UniTaskVoid EndRound()
     {
         _isMatchActive = false; // 監視ストップ
         
@@ -154,17 +160,11 @@ public class GameManager : MonoBehaviour
             GameUIManager.Instance.UpdateScoreDisplay(_score1P, _score2P);
             GameUIManager.Instance.ShowResult(_resultMessage);
         }
+        
+        // 3秒待機
+        await UniTask.Delay(TimeSpan.FromSeconds(3f));
 
-        // 3秒待機して次へ進むコルーチンを開始
-        StartCoroutine(TransitionToNextRoundRoutine());
-    }
-    
-    // 数秒待機してから次のラウンドへ移行するコルーチン
-    private System.Collections.IEnumerator TransitionToNextRoundRoutine()
-    {
-        yield return new WaitForSeconds(3f);
-
-        // ▼ UIManager に非表示をお願いする
+        // 3秒経過すると処理が再開
         if (GameUIManager.Instance != null)
         {
             GameUIManager.Instance.HideResult();
@@ -177,6 +177,12 @@ public class GameManager : MonoBehaviour
     public void ChangePhaseLobby()
     {
         CurrentPhase = GamePhase.Lobby;
+        
+        if (MapSelectManager.Instance != null)
+        {
+            MapSelectManager.Instance.ClosePanel();
+        }
+        
         // ロビーに戻った時、まだ2人揃っていなければ参加受付を再開(EnableJoining)する
         if (_playerSessions.Count < 2)
         {
@@ -225,6 +231,11 @@ public class GameManager : MonoBehaviour
             }
         }
         
+        if (MapSelectManager.Instance != null)
+        {
+            MapSelectManager.Instance.UpdateUI();
+        }
+        
         // どの実験パターンが選ばれているかログ出し
         MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
         Debug.Log($"パターン選択中: {currentSequence.sequenceName} をセットしました");
@@ -260,6 +271,18 @@ public class GameManager : MonoBehaviour
         Cursor.visible = false;
     }
     
+    // 状態を切り替えるためのメソッドを追加
+    public void SetMapConfirmingState(bool state)
+    {
+        IsMapConfirming = state;
+    
+        // フラグが変わったので、UIの文字の切り替えを指示する！
+        if (MapSelectManager.Instance != null) 
+        {
+            MapSelectManager.Instance.ToggleConfirmUI(state);
+        }
+    }
+    
     // 実際に指定されたマップを生成するコア処理（次ラウンド開始時にも使い回す）
     public void LoadCurrentMapInSequence()
     {
@@ -274,7 +297,7 @@ public class GameManager : MonoBehaviour
 
         // 現在選ばれているシーケンスと、その中の何戦目かを取得
         MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
-        MapData mapToLoad = currentSequence.sequenceMaps[_currentMapIndexInSequence];
+        MapData mapToLoad = currentSequence.sequenceSteps[_currentMapIndexInSequence].mapData;
 
         // マップを生成（戻り値として生成された GameObject を受け取って保存する前提）
         _currentMapInstance = MapGenerator.GenerateMap(mapToLoad, commonPalette, out _spawnPoint1P, out _spawnPoint2P, out Vector3 mapCenter);
@@ -304,10 +327,10 @@ public class GameManager : MonoBehaviour
         MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
 
         // 用意されたマップをすべて消化したか？
-        if (_currentMapIndexInSequence >= currentSequence.sequenceMaps.Length)
+        if (_currentMapIndexInSequence >= currentSequence.sequenceSteps.Length)
         {
             // 即タイトルに戻るのではなく、最終結果表示コルーチンを呼ぶ
-            StartCoroutine(ShowFinalResultRoutine());
+            ShowFinalResultRoutine();
             return;
         }
 
@@ -316,7 +339,7 @@ public class GameManager : MonoBehaviour
     }
     
     // 最終結果を表示してタイトルに戻るコルーチン
-    private IEnumerator ShowFinalResultRoutine()
+    private async UniTaskVoid ShowFinalResultRoutine()
     {
         string finalMessage = "";
         
@@ -331,7 +354,7 @@ public class GameManager : MonoBehaviour
         }
 
         // 最終結果を5秒間見せる
-        yield return new WaitForSeconds(5f);
+        await UniTask.Delay(TimeSpan.FromSeconds(5f));
 
         // タイトルへ戻る
         Cursor.visible = true; // マウスカーソルを戻しておく
@@ -363,7 +386,11 @@ public class GameManager : MonoBehaviour
                 UnityEngine.InputSystem.PlayerInputManager.instance.DisableJoining();
             }
             
-            // ここでUIをマップ選択画面に切り替える処理を呼ぶ
+            // マップ選択画面の初期化（パネルの表示など）を指示する
+            if (MapSelectManager.Instance != null)
+            {
+                MapSelectManager.Instance.OpenPanel();
+            }
         }
     }
     
@@ -378,7 +405,7 @@ public class GameManager : MonoBehaviour
                 break;
             case GamePhase.MapSelect:
                 // マップ選択中に戻るボタンを押した場合、ロビー画面に戻す
-                CurrentPhase = GamePhase.Lobby;
+                ChangePhaseLobby();
                 // ここでUIをロビー画面に切り替える処理を呼ぶ
                 break;
             case GamePhase.Battle:

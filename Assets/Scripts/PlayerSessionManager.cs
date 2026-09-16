@@ -29,7 +29,7 @@ public class PlayerSessionManager : MonoBehaviour
     
     // 古い戦車本体の参照を覚えておく変数
     private GameObject _spawnedTankObject;
-    // クラスの上のほうに変数を追加
+
     public int CurrentHp { get; private set; } // 戦車が壊れてもHP（0）を記憶しておく
     public GameObject SpawnedTank => _spawnedTankObject; // GameManagerから生存確認できるようにする
 
@@ -171,6 +171,9 @@ public class PlayerSessionManager : MonoBehaviour
             // 1P（ホスト）しかマップ選択の操作ができないように制限する
             if (GameManager.Instance.IsPlayer1(this))
             {
+                //　確認中（もう一度押してスタートの状態）はスライド操作を受け付けない
+                if (GameManager.Instance.IsMapConfirming) return;
+                
                 // GameManager側にあるマップの配列を切り替えるような処理を呼ぶ
                 if (navInput.x > 0.5f)
                 {
@@ -215,11 +218,16 @@ public class PlayerSessionManager : MonoBehaviour
         // --- フェーズ２：マップ選択の場合 ---
         else if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
-            if (GameManager.Instance.IsPlayer1(this))
+            // まだ確認状態じゃないなら、1回目の決定
+            if (!GameManager.Instance.IsMapConfirming)
             {
-                Debug.Log("1Pがマップを決定しました！バトル開始！");
-
-                // GameManager にマップ生成と出撃を命じる
+                Debug.Log("1Pがマップを仮決定！もう一度押すとスタートします。");
+                GameManager.Instance.SetMapConfirmingState(true);
+            }
+            // すでに確認状態なら、2回目の決定
+            else
+            {
+                Debug.Log("1Pがマップを最終決定しました！バトル開始！");
                 GameManager.Instance.SetupMap();
             }
         }
@@ -233,13 +241,21 @@ public class PlayerSessionManager : MonoBehaviour
         // マップ選択画面の時
         if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
-            // 1P2Pにかかわらず、戻るボタンでタンク選択画面に戻る
-            IsReady = false;
-            // ここでUIの表示を「準備中」に戻す処理を呼ぶ
-            if (LobbyUIManager.Instance != null)
+            // 確認状態の時に戻るを押したら、確認状態をキャンセルするだけ（マップを選び直せるようにする）
+            if (GameManager.Instance.IsMapConfirming)
             {
-                GameManager.Instance.ChangePhaseLobby();
-                LobbyUIManager.Instance.UpdatePlayerCancelReadyUI(_playerInput.playerIndex, _selectedTankIndex);
+                Debug.Log("マップの仮決定をキャンセルしました。");
+                GameManager.Instance.SetMapConfirmingState(false);
+            }
+            // 確認状態じゃない（普通にマップを選んでいる）時に戻るを押したら、タンク選択へ戻る
+            else
+            {
+                IsReady = false;
+                if (LobbyUIManager.Instance != null)
+                {
+                    GameManager.Instance.ChangePhaseLobby();
+                    LobbyUIManager.Instance.UpdatePlayerCancelReadyUI(_playerInput.playerIndex, _selectedTankIndex);
+                }
             }
         }
         else if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
