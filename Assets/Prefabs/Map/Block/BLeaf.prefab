@@ -70,6 +70,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: ff4e2c2022f1360438e373e7858e378e, type: 3}
   m_PrefabInstance: {fileID: 7790512099342232072}
   m_PrefabAsset: {fileID: 0}
+--- !u!23 &8925255795580319372 stripped
+MeshRenderer:
+  m_CorrespondingSourceObject: {fileID: -7511558181221131132, guid: ff4e2c2022f1360438e373e7858e378e, type: 3}
+  m_PrefabInstance: {fileID: 7790512099342232072}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &7979915285021278648
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -126,6 +131,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: BLeaf
       objectReference: {fileID: 0}
+    - target: {fileID: 6430576597107354087, guid: 62abfeaa11a0f0342890c37874da5be6, type: 3}
+      propertyPath: m_TagString
+      value: Breakable
+      objectReference: {fileID: 0}
     - target: {fileID: 8506460204143636143, guid: 62abfeaa11a0f0342890c37874da5be6, type: 3}
       propertyPath: m_Enabled
       value: 0
@@ -158,8 +167,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: dc3b53562f2d4a8bb2457325ff44280a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Gimmicks.BreakableWall
-  wallHp: 3
+  maxHp: 3
   destructionEffectPrefab: {fileID: 1056495218130733249, guid: 96dff6b057f99854cb33572800433362, type: 3}
+  damageMaterials:
+  - {fileID: 2100000, guid: 5bfdf652687d2b84fb414bbc0b0743c2, type: 2}
+  - {fileID: 2100000, guid: 55aa05f8cf4c8174baa3fdfdfd6b37d4, type: 2}
+  - {fileID: 2100000, guid: 9d50b974133d79e4d9deb20791a57543, type: 2}
+  targetMeshRenderer: {fileID: 8925255795580319372}
 --- !u!4 &8399346183484395460 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 1886483184946351740, guid: 62abfeaa11a0f0342890c37874da5be6, type: 3}

@@ -118,7 +118,7 @@ public class GameManager : MonoBehaviour
             // どちらかが死んだ、または時間切れになったらラウンド終了！
             if (_currentMatchTime <= 0 || p1Dead || p2Dead)
             {
-                EndRound();
+                EndRound().Forget(); // 非同期処理を呼び出す
             }
         }
     }
@@ -239,8 +239,6 @@ public class GameManager : MonoBehaviour
         // どの実験パターンが選ばれているかログ出し
         MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
         Debug.Log($"パターン選択中: {currentSequence.sequenceName} をセットしました");
-        
-        // ゆくゆくはここで「マップ選択UI」の画像やテキストを更新する処理を呼ぶ
     }
     
     // マップ選択画面でマップが確定したときに呼ばれる
@@ -255,7 +253,7 @@ public class GameManager : MonoBehaviour
         
         CurrentPhase = GamePhase.Battle; // 状態をバトル中へ
         
-        // マップ生成・出撃時にロビーのUI（キャンバス）を丸ごと非表示にする！
+        // マップ生成・出撃時にロビーのUI（キャンバス）を丸ごと非表示にする
         if (LobbyUIManager.Instance != null)
         {
             LobbyUIManager.Instance.gameObject.SetActive(false);
@@ -276,7 +274,7 @@ public class GameManager : MonoBehaviour
     {
         IsMapConfirming = state;
     
-        // フラグが変わったので、UIの文字の切り替えを指示する！
+        // フラグが変わったので、UIの文字の切り替えを指示する
         if (MapSelectManager.Instance != null) 
         {
             MapSelectManager.Instance.ToggleConfirmUI(state);
@@ -330,7 +328,7 @@ public class GameManager : MonoBehaviour
         if (_currentMapIndexInSequence >= currentSequence.sequenceSteps.Length)
         {
             // 即タイトルに戻るのではなく、最終結果表示コルーチンを呼ぶ
-            ShowFinalResultRoutine();
+            ShowFinalResultRoutine().Forget();
             return;
         }
 

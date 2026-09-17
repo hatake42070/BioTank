@@ -218,17 +218,20 @@ public class PlayerSessionManager : MonoBehaviour
         // --- フェーズ２：マップ選択の場合 ---
         else if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
-            // まだ確認状態じゃないなら、1回目の決定
-            if (!GameManager.Instance.IsMapConfirming)
+            if (GameManager.Instance.IsPlayer1(this))
             {
-                Debug.Log("1Pがマップを仮決定！もう一度押すとスタートします。");
-                GameManager.Instance.SetMapConfirmingState(true);
-            }
-            // すでに確認状態なら、2回目の決定
-            else
-            {
-                Debug.Log("1Pがマップを最終決定しました！バトル開始！");
-                GameManager.Instance.SetupMap();
+                // まだ確認状態じゃないなら、1回目の決定
+                if (!GameManager.Instance.IsMapConfirming)
+                {
+                    Debug.Log("1Pがマップを仮決定！もう一度押すとスタートします。");
+                    GameManager.Instance.SetMapConfirmingState(true);
+                }
+                // すでに確認状態なら、2回目の決定
+                else
+                {
+                    Debug.Log("1Pがマップを最終決定しました！バトル開始！");
+                    GameManager.Instance.SetupMap();
+                }
             }
         }
     }
