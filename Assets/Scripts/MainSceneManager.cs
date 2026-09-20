@@ -22,10 +22,10 @@ public enum GamePhase
 /// <summary>
 /// 一番初めから存在し、ゲーム全体の状態を管理するクラス
 /// </summary>
-public class GameManager : MonoBehaviour
+public class MainSceneManager : MonoBehaviour
 {
     // どこからでもアクセスできるようにするためのシングルトン
-    public static GameManager Instance;
+    public static MainSceneManager Instance;
     // 現在のフェーズ
     public GamePhase CurrentPhase { get; private set; } = GamePhase.Lobby;
     
@@ -71,7 +71,7 @@ public class GameManager : MonoBehaviour
         }
     }
     
-    // PlayerSessionManagerが酸化していないとき（０人）のキャンセルボタンの反応処理
+    // PlayerSessionManagerが参加していないとき（０人）のキャンセルボタンの反応処理
     private void Update()
     {
         if(CurrentPhase == GamePhase.Lobby && _playerSessions.Count == 0)

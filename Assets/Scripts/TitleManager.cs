@@ -43,7 +43,7 @@ public class TitleManager : MonoBehaviour
         optionsPanel.blocksRaycasts = true;
     }
 
-    // オプションパネルの中の閉じるボタンを押された時に呼ばれる
+    // キャンセルボタンで呼び出す
     public void CloseOption()
     {
         // オプション画面を透明・操作不可にする
