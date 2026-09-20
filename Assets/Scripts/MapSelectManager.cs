@@ -51,7 +51,7 @@ public class MapSelectManager : MonoBehaviour
         
         // パネルを開くついでにUIの初期化
         ToggleConfirmUI(false);
-        mapSequences = GameManager.Instance.experimentSequences;
+        mapSequences = MainSceneManager.Instance.experimentSequences;
         UpdateUI();
     }
 
@@ -65,7 +65,7 @@ public class MapSelectManager : MonoBehaviour
 
     public void UpdateUI()
     {
-        int currentIndex = GameManager.Instance.SelectedSequenceIndex;
+        int currentIndex = MainSceneManager.Instance.SelectedSequenceIndex;
         
         MapSequenceData currentData = mapSequences[currentIndex];
 

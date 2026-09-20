@@ -50,9 +50,9 @@ public class PlayerSessionManager : MonoBehaviour
         }
 
         // 自分が生成（Join）された瞬間に、GameManagerへ「参加したよ！」と登録に行く
-        if (GameManager.Instance != null)
+        if (MainSceneManager.Instance != null)
         {
-            GameManager.Instance.RegisterPlayer(this);
+            MainSceneManager.Instance.RegisterPlayer(this);
         }
     }
 
@@ -134,7 +134,7 @@ public class PlayerSessionManager : MonoBehaviour
         Vector2 navInput = context.ReadValue<Vector2>();
 
         // --- フェーズ１：ロビー（タンク選択）の場合 ---
-        if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
+        if (MainSceneManager.Instance.CurrentPhase == GamePhase.Lobby)
         {
             // 安全対策：配列が空なら無視
             if (myTankPrefabs == null || myTankPrefabs.Length == 0) return;
@@ -166,24 +166,24 @@ public class PlayerSessionManager : MonoBehaviour
             }
         }
         // --- フェーズ２：マップ選択の場合 ---
-        else if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
+        else if (MainSceneManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
             // 1P（ホスト）しかマップ選択の操作ができないように制限する
-            if (GameManager.Instance.IsPlayer1(this))
+            if (MainSceneManager.Instance.IsPlayer1(this))
             {
                 //　確認中（もう一度押してスタートの状態）はスライド操作を受け付けない
-                if (GameManager.Instance.IsMapConfirming) return;
+                if (MainSceneManager.Instance.IsMapConfirming) return;
                 
                 // GameManager側にあるマップの配列を切り替えるような処理を呼ぶ
                 if (navInput.x > 0.5f)
                 {
                     Debug.Log("1Pが次のマップを選択...");
-                    GameManager.Instance.ChangeMapIndex(1); // 次のマップへ
+                    MainSceneManager.Instance.ChangeMapIndex(1); // 次のマップへ
                 }
                 else if (navInput.x < -0.5f)
                 {
                     Debug.Log("1Pが前のマップを選択...");
-                    GameManager.Instance.ChangeMapIndex(-1); // 前のマップへ
+                    MainSceneManager.Instance.ChangeMapIndex(-1); // 前のマップへ
                 }
             }
         }
@@ -195,7 +195,7 @@ public class PlayerSessionManager : MonoBehaviour
         if (!context.started) return;
 
         // --- フェーズ１：ロビー（タンク選択）の場合 ---
-        if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
+        if (MainSceneManager.Instance.CurrentPhase == GamePhase.Lobby)
         {
             if (!IsReady)
             {
@@ -207,30 +207,30 @@ public class PlayerSessionManager : MonoBehaviour
                 }
 
                 // GameManagerに自分が参加（Ready）したことを伝える
-                if (GameManager.Instance != null)
+                if (MainSceneManager.Instance != null)
                 {
                     // 全員揃ったか確認する
-                    GameManager.Instance.CheckAllPlayersReady();
+                    MainSceneManager.Instance.CheckAllPlayersReady();
                 }
             }
         }
 
         // --- フェーズ２：マップ選択の場合 ---
-        else if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
+        else if (MainSceneManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
-            if (GameManager.Instance.IsPlayer1(this))
+            if (MainSceneManager.Instance.IsPlayer1(this))
             {
                 // まだ確認状態じゃないなら、1回目の決定
-                if (!GameManager.Instance.IsMapConfirming)
+                if (!MainSceneManager.Instance.IsMapConfirming)
                 {
                     Debug.Log("1Pがマップを仮決定！もう一度押すとスタートします。");
-                    GameManager.Instance.SetMapConfirmingState(true);
+                    MainSceneManager.Instance.SetMapConfirmingState(true);
                 }
                 // すでに確認状態なら、2回目の決定
                 else
                 {
                     Debug.Log("1Pがマップを最終決定しました！バトル開始！");
-                    GameManager.Instance.SetupMap();
+                    MainSceneManager.Instance.SetupMap();
                 }
             }
         }
@@ -242,13 +242,13 @@ public class PlayerSessionManager : MonoBehaviour
         if (!context.started) return;
 
         // マップ選択画面の時
-        if (GameManager.Instance.CurrentPhase == GamePhase.MapSelect)
+        if (MainSceneManager.Instance.CurrentPhase == GamePhase.MapSelect)
         {
             // 確認状態の時に戻るを押したら、確認状態をキャンセルするだけ（マップを選び直せるようにする）
-            if (GameManager.Instance.IsMapConfirming)
+            if (MainSceneManager.Instance.IsMapConfirming)
             {
                 Debug.Log("マップの仮決定をキャンセルしました。");
-                GameManager.Instance.SetMapConfirmingState(false);
+                MainSceneManager.Instance.SetMapConfirmingState(false);
             }
             // 確認状態じゃない（普通にマップを選んでいる）時に戻るを押したら、タンク選択へ戻る
             else
@@ -256,12 +256,12 @@ public class PlayerSessionManager : MonoBehaviour
                 IsReady = false;
                 if (LobbyUIManager.Instance != null)
                 {
-                    GameManager.Instance.ChangePhaseLobby();
+                    MainSceneManager.Instance.ChangePhaseLobby();
                     LobbyUIManager.Instance.UpdatePlayerCancelReadyUI(_playerInput.playerIndex, _selectedTankIndex);
                 }
             }
         }
-        else if (GameManager.Instance.CurrentPhase == GamePhase.Lobby)
+        else if (MainSceneManager.Instance.CurrentPhase == GamePhase.Lobby)
         {
             if (IsReady)
             {
@@ -276,7 +276,7 @@ public class PlayerSessionManager : MonoBehaviour
             {
                 // 自分が準備完了していない状態で戻るボタンを押したら、タイトルへ戻る！
                 Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} がタイトルへ戻る操作をしました。");
-                GameManager.Instance.GoBack();
+                MainSceneManager.Instance.GoBack();
             }
         }
     }
