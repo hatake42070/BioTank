@@ -16,7 +16,7 @@ public class LobbyUIManager : MonoBehaviour
     [SerializeField]
     private PlayerSlotUI[] playerSlots; // 0番目が1P用、1番目が2P用
 
-    private bool isOptionOpened = false;
+    // private bool isOptionOpened = false;
 
     private void Awake()
     {
