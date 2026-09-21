@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
 public class TitleManager : MonoBehaviour
@@ -17,8 +18,27 @@ public class TitleManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        bool isCancelPressed = false;
+        // キーボードのキャンセルボタン（ESC）が押されたかのチェック
+        if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
+        {
+            isCancelPressed = true;
+        }
+        // 繋がっているゲームパッドの「B（キャンセル）ボタン」が押されたかチェック
+        if (Gamepad.current != null && Gamepad.current.buttonEast.wasPressedThisFrame)
+        {
+            isCancelPressed = true;
+        }
+        // キャンセルボタンが押されたら戻る処理を行う
+        if (isCancelPressed)
+        {
+            if (optionsPanel.alpha > 0f)
+            {
+                CloseOption();
+            }
+        }
     }
+    
     // 2P対戦モードへの遷移
     public void OnClickVersusMode()
     {
@@ -54,6 +74,6 @@ public class TitleManager : MonoBehaviour
         // メインメニューを表示・操作可能にする
         mainMenuPanel.alpha = 1;
         mainMenuPanel.interactable = true;
-        optionsPanel.blocksRaycasts = true;
+        mainMenuPanel.blocksRaycasts = true;
     }
 }
