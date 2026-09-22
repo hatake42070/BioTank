@@ -17,6 +17,7 @@ public class AudioManager : MonoBehaviour
     public static AudioManager Instance { get; private set; }
 
     [Header("Audio Mixer")]
+    [SerializeField] private AudioMixer mainMixer; // 全体を統括するメインミキサー
     [SerializeField] private AudioMixerGroup bgmMixerGroup;
     [SerializeField] private AudioMixerGroup seMixerGroup;
 
@@ -87,5 +88,33 @@ public class AudioManager : MonoBehaviour
             bgmSource.loop = true;
             bgmSource.Play();
         }
+    }
+    
+    // ----------------------------------------------------------------
+    // プレイヤー用の音長英メソッド（UIスライダーから呼ばれる）
+    
+    /// <summary>
+    /// 全体の音量を設定する（スライダーの範囲は 0.0001 〜 1.0）
+    /// </summary>
+    public void SetMasterVolume(float volume)
+    {
+        // Mathf.Log10を使って、人間の耳に自然な音量変化（デシベル）に変換
+        mainMixer.SetFloat("MasterVolume", Mathf.Log10(volume) * 20);
+    }
+
+    /// <summary>
+    /// BGMの音量を設定する
+    /// </summary>
+    public void SetBGMVolume(float volume)
+    {
+        mainMixer.SetFloat("BGMVolume", Mathf.Log10(volume) * 20);
+    }
+
+    /// <summary>
+    /// SEの音量を設定する
+    /// </summary>
+    public void SetSEVolume(float volume)
+    {
+        mainMixer.SetFloat("SEVolume", Mathf.Log10(volume) * 20);
     }
 }
