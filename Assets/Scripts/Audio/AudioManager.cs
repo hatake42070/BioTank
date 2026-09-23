@@ -100,6 +100,12 @@ public class AudioManager : MonoBehaviour
     {
         // Mathf.Log10を使って、人間の耳に自然な音量変化（デシベル）に変換
         mainMixer.SetFloat("MasterVolume", Mathf.Log10(volume) * 20);
+        
+        // GameManager の「現在の設定」も更新しておく
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.currentSettings.masterVolume = volume;
+        }
     }
 
     /// <summary>
@@ -108,6 +114,11 @@ public class AudioManager : MonoBehaviour
     public void SetBGMVolume(float volume)
     {
         mainMixer.SetFloat("BGMVolume", Mathf.Log10(volume) * 20);
+        
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.currentSettings.bgmVolume = volume;
+        }
     }
 
     /// <summary>
@@ -116,5 +127,10 @@ public class AudioManager : MonoBehaviour
     public void SetSEVolume(float volume)
     {
         mainMixer.SetFloat("SEVolume", Mathf.Log10(volume) * 20);
+        
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.currentSettings.seVolume = volume;
+        }
     }
 }
