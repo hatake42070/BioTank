@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
+using UnityEngine.UI;
 
 public class TitleManager : MonoBehaviour
 {
@@ -34,7 +35,14 @@ public class TitleManager : MonoBehaviour
     // 現在開いている設定パネルを記憶しておく変数
     private CanvasGroup _currentSubPanel = null;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    [Header("Option UI Elements")]
+    [SerializeField]
+    private Slider masterSlider;
+    [SerializeField]
+    private Slider bgmSlider;
+    [SerializeField]
+    private Slider seSlider;
+
     void Start()
     {
         // 登録されているすべてのサブパネルを強制的に非表示にする
@@ -50,6 +58,28 @@ public class TitleManager : MonoBehaviour
         
         // オプションパネルを閉じる
         CloseOption();
+        
+        // GameManagerのセーブデータをUIに反映させる
+        SyncSettingsToUI();
+    }
+    
+    /// <summary>
+    /// GameManagerのデータをスライダー等のUIに反映させる
+    /// </summary>
+    private void SyncSettingsToUI()
+    {
+        // GameManagerが存在しない場合は何もしない（エラー防止）
+        if (GameManager.Instance == null) return;
+
+        // GameManagerが保持しているロード済みの設定データを取得
+        GameSettingsData settings = GameManager.Instance.currentSettings;
+
+        // スライダーの値をセーブデータと同じにする
+        // 値を入れた瞬間にスライダーの OnValueChanged が自動で動き、
+        //  AudioManagerに設定が送られてゲームの音量も正しくなる
+        if (masterSlider != null) masterSlider.value = settings.masterVolume;
+        if (bgmSlider != null) bgmSlider.value = settings.bgmVolume;
+        if (seSlider != null) seSlider.value = settings.seVolume;
     }
 
     // Update is called once per frame
@@ -176,5 +206,11 @@ public class TitleManager : MonoBehaviour
         // フォーカスを左側のオプションボタンに戻す
         EventSystem.current.SetSelectedGameObject(null);
         EventSystem.current.SetSelectedGameObject(firstOptionButton);
+        
+        // オプションを閉じるタイミングで、最後にまとめてJSONファイルに書き込む
+        if (GameManager.Instance != null)
+        {
+            GameManager.Instance.SaveSettings();
+        }
     }
 }
