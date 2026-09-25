@@ -1,0 +1,71 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3ccbcc2605bffb74685563ea9a5605f0, type: 3}
+  m_Name: 00_TilePallet
+  m_EditorClassIdentifier: MapEditorSystem.Runtime::MapEditorSystem.Runtime.TilePalette
+  baseTiles:
+  - tileID: 1
+    prefab: {fileID: 1330379334654671082, guid: a4f10cb72b5f34d41b7cd8f1c6352063, type: 3}
+    tileName: Wood
+    editorColor: {r: 0.7264151, g: 0.5832434, b: 0.38033998, a: 0}
+    role: 0
+  - tileID: 2
+    prefab: {fileID: 403342742326808795, guid: 433688e7d8aa4db49ab38c82b8413792, type: 3}
+    tileName: Wood
+    editorColor: {r: 0.9056604, g: 0.88348466, b: 0.46564615, a: 0}
+    role: 0
+  placeableObjects:
+  - objectID: 1
+    prefab: {fileID: 0}
+    objectName: 1P Spawn
+    editorColor: {r: 1, g: 1, b: 1, a: 0}
+    role: 3
+  - objectID: 2
+    prefab: {fileID: 0}
+    objectName: 2P Spawn
+    editorColor: {r: 1, g: 1, b: 1, a: 0}
+    role: 3
+  - objectID: 3
+    prefab: {fileID: 7671268838793788201, guid: cf8a14ce084517e43907ddc0f281fdc0, type: 3}
+    objectName: hidarisita
+    editorColor: {r: 0, g: 0, b: 0, a: 0}
+    role: 1
+  - objectID: 4
+    prefab: {fileID: 7671268838793788201, guid: f72714f7cb11dbd4681a5f578ec8d037, type: 3}
+    objectName: hdariue
+    editorColor: {r: 0, g: 0, b: 0, a: 0}
+    role: 1
+  - objectID: 5
+    prefab: {fileID: 7671268838793788201, guid: c9b397b714e7f7a49a69dee4af3c3620, type: 3}
+    objectName: migisita
+    editorColor: {r: 0, g: 0, b: 0, a: 0}
+    role: 1
+  - objectID: 6
+    prefab: {fileID: 7671268838793788201, guid: 2c65994f3514bf04e8f019e1abbd0a3e, type: 3}
+    objectName: migiue
+    editorColor: {r: 0, g: 0, b: 0, a: 0}
+    role: 1
+  - objectID: 7
+    prefab: {fileID: 4000223362346477663, guid: 2351b41e5563c444aa0bb83b25407bdb, type: 3}
+    objectName: Rock1
+    editorColor: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 0}
+    role: 1
+  - objectID: 8
+    prefab: {fileID: 4000223362346477663, guid: c985d0d1325c9f64baf65afdba54b05e, type: 3}
+    objectName: GrassSand
+    editorColor: {r: 0, g: 1, b: 0.10349077, a: 0}
+    role: 1
+  - objectID: 9
+    prefab: {fileID: 4000223362346477663, guid: 3b63ebfad63b4124ea4a0d0f18c48200, type: 3}
+    objectName: Sand
+    editorColor: {r: 0.02683338, g: 0.6320754, b: 0.08854437, a: 0}
+    role: 1
