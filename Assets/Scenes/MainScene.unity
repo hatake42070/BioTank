@@ -4343,7 +4343,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c04a4b3351280504d92ce06d4a968f76, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  commonPalette: {fileID: 11400000, guid: 9e07b053bcdfc42e6b1ce6c0a66f543e, type: 2}
+  commonPalette: {fileID: 11400000, guid: 3692c000d3df70849b508a9f50d6d9fc, type: 2}
   experimentSequences:
   - {fileID: 11400000, guid: 43a443a0f9eebb94c80d78dc4f003826, type: 2}
   - {fileID: 11400000, guid: bb2b599eb6c5c5548b39004f5d651d12, type: 2}
