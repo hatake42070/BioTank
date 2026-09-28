@@ -2,8 +2,11 @@ using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
 
+// 最終的にシングルトンなのでタイトルシーンにのみ置く
 public class BioSignalManager : MonoBehaviour
 {
+    public static BioSignalManager Instance { get; private set; }
+    
     // --- 1. C++ (DLL) の関数をUnityにインポート ---
     [DllImport("BlePlugin")]
     private static extern bool StartHeartRateScan();
@@ -23,7 +26,22 @@ public class BioSignalManager : MonoBehaviour
     
     // 接続状態のフラグ
     public bool IsConnected { get; private set; } = false;
-
+    
+    private void Awake()
+    {
+        // 自分が最初の1個目なら、絶対に破棄されないように設定する
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        // もしタイトル画面に戻ってきた時など、2個目が生まれようとしたら自爆する
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
+    
     private async void Start()
     {
         Debug.Log("BLE Scan Started... (5秒間スキャンします)");
