@@ -27,6 +27,9 @@ public class BioSignalManager : MonoBehaviour
     // 接続状態のフラグ
     public bool IsConnected { get; private set; } = false;
     
+    // 現在スキャン中かどうかを外部から確認できるプロパティ
+    public bool IsScanning { get; private set; } = false;
+
     private void Awake()
     {
         // 自分が最初の1個目なら、絶対に破棄されないように設定する
@@ -42,19 +45,27 @@ public class BioSignalManager : MonoBehaviour
         }
     }
     
-    private async void Start()
+    private void Start()
     {
+        // 起動時にも一応1回目のスキャンを走らせておく
+        _ = TryConnectAsync();
+    }
+
+    // 外部（TitleManager等）から何度でも呼べる接続メソッド
+    public async Task TryConnectAsync()
+    {
+        // 既にスキャン中、または接続済みの場合は何もしない
+        if (IsScanning || IsConnected) return;
+
+        IsScanning = true;
         Debug.Log("BLE Scan Started... (5秒間スキャンします)");
 
-        // ★超重要: 5秒間処理が止まる StartHeartRateScan() を、
-        // Unityのメイン処理とは別のスレッドに丸投げして非同期で待つ（フリーズ回避）
+        // 5秒間のスキャンを非同期で実行
         bool scanSuccess = await Task.Run(() => StartHeartRateScan());
 
         if (scanSuccess)
         {
             Debug.Log("心拍計を発見！接続を開始します...");
-            
-            // 接続処理は一瞬で終わるのでそのまま実行
             IsConnected = ConnectToDevices();
             
             if (IsConnected) 
@@ -70,6 +81,9 @@ public class BioSignalManager : MonoBehaviour
         {
             Debug.LogWarning("心拍計が見つからない、またはBluetoothがオフです。");
         }
+
+        // スキャン終了
+        IsScanning = false;
     }
 
     private void Update()
@@ -90,8 +104,8 @@ public class BioSignalManager : MonoBehaviour
 
     private void OnDestroy()
     {
-        // ★重要: Unityのプレイボタンを停止した時に、必ずBLEの切断処理を呼ぶ
-        // これを忘れると、次回再生時にデバイスが「使用中」になって接続できなくなります
+        // Unityのプレイボタンを停止した時に、必ずBLEの切断処理を呼ぶ
+        // これを忘れると、次回再生時にデバイスが「使用中」になって接続できなくなる
         StopBLE();
         Debug.Log("BLEを安全に切断しました。");
     }
