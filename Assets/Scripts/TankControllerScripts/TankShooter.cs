@@ -17,7 +17,7 @@ namespace TankControllerScripts
 
         private void Awake()
         {
-            // 戦車本体や子に付いている【全て】のコライダーをまるごと取得！
+            // 戦車本体や子に付いている[全て]のコライダーをまるごと取得
             _myColliders = GetComponentsInChildren<Collider>();
         }
         
