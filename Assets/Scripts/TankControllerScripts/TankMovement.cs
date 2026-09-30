@@ -5,7 +5,7 @@ namespace TankControllerScripts
 {
     public class TankMovement : MonoBehaviour
     {
-        private CharacterController _tankController;
+        //private CharacterController _tankController;
         private Rigidbody _rb;
 
         private void Awake()
@@ -45,7 +45,7 @@ namespace TankControllerScripts
             // 重力（Y軸の落下スピード）だけは、現在の物理演算の数値をそのまま引き継ぐ
             targetVelocity.y = currentVelocity.y;
 
-            // 計算した速度をRigidbodyに直接叩き込んで上書きする（キビキビ動く！）
+            // 計算した速度をRigidbodyに直接叩き込んで上書きする（キビキビ動く）
             _rb.linearVelocity = targetVelocity;
         }
         
