@@ -120,14 +120,38 @@ public class TitleManager : MonoBehaviour
                 Player1HRText.text = "1P: 未接続 (Rキーで再接続)";
                 Player2HRText.text = "2P: 未接続 (Rキーで再接続)";
             }
-            // 接続が成功している時
+            // 接続が成功している時（※1台でも繋がればここに来る）
             else
             {
+                // --- 1P の表示 ---
                 int p1Hr = BioSignalManager.Instance.RealHeartRates[0];
-                Player1HRText.text = (p1Hr > 0) ? $"1P: {p1Hr}" : "1P: 待機中/未接続";
+                if (p1Hr == -1)
+                {
+                    Player1HRText.text = "1P: 未接続 (電源を確認してください)";
+                }
+                else if (p1Hr == 0)
+                {
+                    Player1HRText.text = "1P: 接続済 (心拍データ待機中...)";
+                }
+                else
+                {
+                    Player1HRText.text = $"1P: {p1Hr}";
+                }
     
+                // --- 2P の表示 ---
                 int p2Hr = BioSignalManager.Instance.RealHeartRates[1];
-                Player2HRText.text = (p2Hr > 0) ? $"2P: {p2Hr}" : "2P: 待機中/未接続";
+                if (p2Hr == -1)
+                {
+                    Player2HRText.text = "2P: 未接続 (電源を確認してください)";
+                }
+                else if (p2Hr == 0)
+                {
+                    Player2HRText.text = "2P: 接続済 (心拍データ待機中...)";
+                }
+                else
+                {
+                    Player2HRText.text = $"2P: {p2Hr}";
+                }
             }
             
             // Rキーによる強制再スキャン（いつでも可能）
