@@ -5,6 +5,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
+using Cysharp.Threading.Tasks;
 
 public class TitleManager : MonoBehaviour
 {
@@ -117,22 +118,23 @@ public class TitleManager : MonoBehaviour
             else if (!BioSignalManager.Instance.IsConnected)
             {
                 Player1HRText.text = "1P: 未接続 (Rキーで再接続)";
-                Player2HRText.text = "2P: 未接続";
-
-                // Rキーが押されたら再スキャンを開始
-                if (Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
-                {
-                    // 戻り値を待たずに非同期で実行（_ = で警告を消す）
-                    _ = BioSignalManager.Instance.TryConnectAsync();
-                }
+                Player2HRText.text = "2P: 未接続 (Rキーで再接続)";
             }
             // 接続が成功している時
             else
             {
-                int p1Hr = BioSignalManager.Instance.RealHeartRate;
-                Player1HRText.text = (p1Hr > 0) ? $"1P: {p1Hr}" : "1P: --";
-                
-                Player2HRText.text = "2P: --"; 
+                int p1Hr = BioSignalManager.Instance.RealHeartRates[0];
+                Player1HRText.text = (p1Hr > 0) ? $"1P: {p1Hr}" : "1P: 待機中/未接続";
+    
+                int p2Hr = BioSignalManager.Instance.RealHeartRates[1];
+                Player2HRText.text = (p2Hr > 0) ? $"2P: {p2Hr}" : "2P: 待機中/未接続";
+            }
+            
+            // Rキーによる強制再スキャン（いつでも可能）
+            if (!BioSignalManager.Instance.IsScanning && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
+            {
+                // 拡張メソッド Forget() を使って安全に呼び出す
+                BioSignalManager.Instance.ForceRescanAsync().AsUniTask().Forget();
             }
         }
         
