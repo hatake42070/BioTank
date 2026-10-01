@@ -54,36 +54,46 @@ public class BioSignalManager : MonoBehaviour
     // 外部（TitleManager等）から何度でも呼べる接続メソッド
     public async Task TryConnectAsync()
     {
-        // 既にスキャン中、または接続済みの場合は何もしない
         if (IsScanning || IsConnected) return;
 
         IsScanning = true;
         Debug.Log("BLE Scan Started... (5秒間スキャンします)");
 
-        // 5秒間のスキャンを非同期で実行
-        bool scanSuccess = await Task.Run(() => StartHeartRateScan());
-
-        if (scanSuccess)
+        try
         {
-            Debug.Log("心拍計を発見！接続を開始します...");
-            IsConnected = ConnectToDevices();
-            
-            if (IsConnected) 
+            // 5秒間のスキャンを非同期で実行
+            bool scanSuccess = await Task.Run(() => StartHeartRateScan());
+
+            if (scanSuccess)
             {
-                Debug.Log("接続成功！心拍数の取得を開始します。");
-            } 
-            else 
+                Debug.Log("心拍計を発見！接続を開始します...");
+                IsConnected = ConnectToDevices();
+                
+                if (IsConnected) 
+                {
+                    Debug.Log("接続成功！心拍数の取得を開始します。");
+                } 
+                else 
+                {
+                    Debug.LogWarning("心拍計は見つかりましたが、指定のMACアドレスとの接続に失敗しました。");
+                }
+            }
+            else
             {
-                Debug.LogWarning("心拍計は見つかりましたが、接続に失敗しました。");
+                Debug.LogWarning("心拍計が見つからない、またはBluetoothがオフです。");
             }
         }
-        else
+        catch (System.Exception e)
         {
-            Debug.LogWarning("心拍計が見つからない、またはBluetoothがオフです。");
+            // C++側でどんなエラーが起きてもここで受け止め、フリーズを防ぐ
+            Debug.LogError($"BLE処理中にエラーが発生しました: {e.Message}");
         }
-
-        // スキャン終了
-        IsScanning = false;
+        finally
+        {
+            // ★超重要：成功しても、失敗しても、エラーで落ちても「絶対に」ここを通る！
+            // これにより確実にロックが解除され、Rキーが何度でも押せるようになる
+            IsScanning = false;
+        }
     }
     
     // いつでも強制的に再スキャンを行うメソッド
