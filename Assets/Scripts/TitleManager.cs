@@ -52,6 +52,8 @@ public class TitleManager : MonoBehaviour
     private TextMeshProUGUI Player1HRText;
     [SerializeField]
     private TextMeshProUGUI Player2HRText;
+    [SerializeField]
+    private TextMeshProUGUI HrConnectLogText;
 
     private bool _isHRVisible = true; // 最初は表示状態にしておく
 
@@ -108,6 +110,12 @@ public class TitleManager : MonoBehaviour
         // 2. 心拍数のテキスト更新（表示されている時だけ処理する）
         if (_isHRVisible)
         {
+            // 毎フレーム、BioSignalManagerの文字列をそのままUIテキストに入れる
+            if (HrConnectLogText != null)
+            {
+                HrConnectLogText.text = BioSignalManager.Instance.HrConnectLog;
+            }
+            
             // BioSignalManagerがスキャン処理を実行中の時
             if (BioSignalManager.Instance.IsScanning)
             {
@@ -117,8 +125,8 @@ public class TitleManager : MonoBehaviour
             // 接続に失敗している、または未接続の時
             else if (!BioSignalManager.Instance.IsConnected)
             {
-                Player1HRText.text = "1P: 未接続 (Rキーで再接続)";
-                Player2HRText.text = "2P: 未接続 (Rキーで再接続)";
+                Player1HRText.text = "1P: 未接続";
+                Player2HRText.text = "2P: 未接続";
             }
             // 接続が成功している時（※1台でも繋がればここに来る）
             else
