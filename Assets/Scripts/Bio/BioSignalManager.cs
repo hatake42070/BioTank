@@ -129,13 +129,24 @@ public class BioSignalManager : MonoBehaviour
             // C++の latest_bpm を一瞬で読み取る
             RealHeartRates[0] = GetHeartRate(0);
             RealHeartRates[1] = GetHeartRate(1);
+        }
 
-            // （本番ではここに GameManager のモード分岐を入れます）
-            GameplayHeartRates[0] = RealHeartRates[0];
-            GameplayHeartRates[1] = RealHeartRates[1];
+        // GameManagerのモードを見て、ゲームに使う心拍数（GameplayHeartRates）を決める
+        BioGameMode currentMode = GameManager.Instance != null ? GameManager.Instance.CurrentBioMode : BioGameMode.Normal;
 
-            // テスト用：値が更新されているかコンソールで確認（邪魔になったら消してください）
-            //Debug.Log($"現在の心拍数: {RealHeartRates[0]}");
+        if (currentMode == BioGameMode.BioFake)
+        {
+            // フェイクモードの時：偽の心拍数（例：時間で波打つ数値や固定値）を入れる
+            // GameplayHeartRates[0] = GetFakeHeartRate(0); 
+            // GameplayHeartRates[1] = GetFakeHeartRate(1);
+            GameplayHeartRates[0] = 80;
+            GameplayHeartRates[1] = 80;
+        }
+        else
+        {
+            // リアルモード（または通常モード）の時：本物の心拍数をそのまま入れる
+            GameplayHeartRates[0] = RealHeartRates[0]; 
+            GameplayHeartRates[1] = RealHeartRates[1]; 
         }
     }
 

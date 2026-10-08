@@ -298,4 +298,19 @@ public class TitleManager : MonoBehaviour
             GameManager.Instance.SaveSettings();
         }
     }
+    
+    /// <summary>
+    /// UIボタンの OnClick() から呼ぶ用（0: Normal, 1: BioReal, 2: BioFake）
+    /// </summary>
+    public void OnClickSetBioMode(int modeIndex)
+    {
+        if (GameManager.Instance != null)
+        {
+            // int の数字を BioGameMode (enum) に変換して渡す
+            BioGameMode selectedMode = (BioGameMode)modeIndex;
+            GameManager.Instance.SetBioMode(selectedMode);
+            
+            Debug.Log($"ゲームモードを {selectedMode} に変更しました！");
+        }
+    }
 }

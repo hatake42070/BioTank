@@ -122,6 +122,20 @@ public class PlayerSessionManager : MonoBehaviour
                 _myTankHpUI.UpdateHpDisplay(hp); // UIの表示も更新
             };
         }
+        // BioFeedbackController の初期化
+        var bioFeedback = _spawnedTankObject.GetComponent<BioFeedbackController>();
+        if (bioFeedback != null)
+        {
+            bool isBioMode = false;
+
+            if (GameManager.Instance != null)
+            {
+                // Normal以外（BioReal または BioFake）なら心拍連動をON(true)にする
+                isBioMode = (GameManager.Instance.CurrentBioMode != BioGameMode.Normal);
+            }
+
+            bioFeedback.Initialize(_playerInput.playerIndex, isBioMode);
+        }
     }
 
     // 十字キーでタンク・マップを選ぶ処理

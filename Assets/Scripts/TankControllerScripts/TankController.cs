@@ -38,6 +38,13 @@ namespace TankControllerScripts
         [SerializeField] private GameObject tankExplosionPrefab; // タンク用爆発演出
         // Stateクラスから安全に読み取れるようにプロパティとして公開する
         public GameObject ExplosionPrefab => tankExplosionPrefab;
+        
+        // 外部から心拍数に応じて倍率を調節するパラメータ
+        public float CurrentSpeedMultiplier { get; private set; } = 1.0f;
+        public float CurrentFireIntervalMultiplier { get; private set; } = 1.0f;
+        
+        // ステート側が参照するための「実際の移動速度」プロパティ
+        public float CurrentMoveSpeed => tankData.baseMoveSpeed * CurrentSpeedMultiplier;
 
         private void Start()
         {
@@ -119,8 +126,9 @@ namespace TankControllerScripts
         /// <returns></returns>
         private bool CanFire()
         {
+            float actualCooldown = TankData.fireCooldown * CurrentFireIntervalMultiplier;
             // クールダウンが完了している ＆ 弾の数が上限未満のときだけ撃てる
-            bool isCooldownReady = Time.time >= _lastFireTime + TankData.fireCooldown;
+            bool isCooldownReady = Time.time >= _lastFireTime + actualCooldown;
             bool isUnderBulletLimit = activeBulletCount < tankData.maxActiveBullets;
             
             return isCooldownReady && isUnderBulletLimit;
@@ -208,6 +216,25 @@ namespace TankControllerScripts
                 return;
             }
             _tankTurretAim.AimTurret(_inputHandler.AimDirection);
+        }
+        
+        /// <summary>
+        /// 外部（SessionManager等）から倍率を更新するための窓口メソッド
+        /// </summary>
+        public void SetBioMultipliers(float speedMult, float fireIntervalMult)
+        {
+            // 万が一おかしな値が来てもゲームが壊れないように安全な範囲（0.5倍〜3.0倍など）に制限する
+            CurrentSpeedMultiplier = Mathf.Clamp(speedMult, 0.5f, 3.0f);
+            CurrentFireIntervalMultiplier = Mathf.Clamp(fireIntervalMult, 0.5f, 3.0f);
+        }
+
+        /// <summary>
+        /// 倍率を初期状態（1.0倍）にリセットするメソッド（通常モード用）
+        /// </summary>
+        public void ResetMultipliers()
+        {
+            CurrentSpeedMultiplier = 1.0f;
+            CurrentFireIntervalMultiplier = 1.0f;
         }
     }
 }
