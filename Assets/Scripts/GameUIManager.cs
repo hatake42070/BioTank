@@ -37,6 +37,14 @@ public class GameUIManager : MonoBehaviour
     private TextMeshProUGUI p2ScoreTextShadow;
 
     private int _lastDisplayedSeconds = -1; // 最後に表示した秒数を記憶する用
+    
+    [Header("心拍数表示")]
+    [SerializeField] private TextMeshProUGUI p1HR;
+    [SerializeField] private TextMeshProUGUI p2HR;
+    
+    // 前回表示した心拍数を記憶する変数（初期値はあり得ない数値にしておく）
+    private int _lastDisplayedP1HR = -999;
+    private int _lastDisplayedP2HR = -999;
 
     private void Awake()
     {
@@ -51,6 +59,40 @@ public class GameUIManager : MonoBehaviour
         else
         {
             Destroy(gameObject);
+        }
+    }
+    
+    /// <summary>
+    /// 心拍数表示を更新する（値が変化した時のみテキストを書き換える軽量版）
+    /// </summary>
+    public void UpdateHeartRateDisplay()
+    {
+        if (BioSignalManager.Instance == null) return;
+
+        // RealHeartRates ではなく GameplayHeartRates を参照する
+        // これにより、BioFake（偽の心拍モード）の時はプレイヤーに「偽の数値」を見せることができる
+        int currentP1HR = BioSignalManager.Instance.GameplayHeartRates[0];
+        int currentP2HR = BioSignalManager.Instance.GameplayHeartRates[1];
+
+        // 1Pの心拍数が前回と変わった時だけUIを更新
+        if (currentP1HR != _lastDisplayedP1HR)
+        {
+            _lastDisplayedP1HR = currentP1HR;
+            if (p1HR != null)
+            {
+                // 0より大きければ数値を表示、0や-1（未接続・待機中）なら「--」と表示
+                p1HR.text = (currentP1HR > 0) ? $"BPM: {currentP1HR}" : "BPM: --";
+            }
+        }
+
+        // 2Pの心拍数が前回と変わった時だけUIを更新
+        if (currentP2HR != _lastDisplayedP2HR)
+        {
+            _lastDisplayedP2HR = currentP2HR;
+            if (p2HR != null)
+            {
+                p2HR.text = (currentP2HR > 0) ? $"BPM: {currentP2HR}" : "BPM: --";
+            }
         }
     }
 

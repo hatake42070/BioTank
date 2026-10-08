@@ -109,6 +109,7 @@ public class MainSceneManager : MonoBehaviour
             if (GameUIManager.Instance != null)
             {
                 GameUIManager.Instance.UpdateTimerDisplay(_currentMatchTime);
+                GameUIManager.Instance.UpdateHeartRateDisplay();
             }
 
             // SessionManager を通じて戦車が生きているか（Destroyされていないか）チェック

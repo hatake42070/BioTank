@@ -19,18 +19,18 @@ public class GameSettingsData
     public float bgmVolume;
     public float seVolume;
     public bool isMuted = false;
-    public BioGameMode bioMode =  BioGameMode.Normal;
+    public BioGameMode bioMode = BioGameMode.Normal;
 }
 
 // ゲームモード（通常、心拍リアル、心拍フェイク）の現在の状態を記憶する
 public class GameManager : MonoBehaviour
 {
     public static GameManager Instance { get; private set; }
-    
-    [Header("現在の設定データ")]
-    public GameSettingsData currentSettings = new GameSettingsData();
+
+    [Header("現在の設定データ")] public GameSettingsData currentSettings = new GameSettingsData();
 
     private string _saveFilePath;
+    public BioGameMode CurrentBioMode => currentSettings.bioMode;
 
     private void Awake()
     {
@@ -38,11 +38,11 @@ public class GameManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
-            
+
             // OSごとに最適な保存場所を自動で決定してパスを作る
             // (Windowsなら AppData/LocalLow/DefaultCompany/プロジェクト名/gamesettings.json)
             _saveFilePath = Path.Combine(Application.persistentDataPath, "gamesettings.json");
-            
+
             // 起動時にデータをロードする
             LoadSettings();
         }
@@ -51,6 +51,11 @@ public class GameManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
+    // タイトル画面のUIボタンやドロップダウンからモードを変更するためのメソッド
+    public void SetBioMode(BioGameMode mode)
+    {
+        currentSettings.bioMode = mode;
+    }
 
     /// <summary>
     /// 現在の currentSettings の中身を Json ファイルとして保存する
@@ -58,11 +63,11 @@ public class GameManager : MonoBehaviour
     public void SaveSettings()
     {
         // オブジェクトをJSON形式の文字列に変換（trueで改行される）
-        string json = JsonUtility.ToJson(currentSettings,  true);
-        
+        string json = JsonUtility.ToJson(currentSettings, true);
+
         // テキストファイルとして書き出し
         File.WriteAllText(_saveFilePath, json);
-        
+
         Debug.Log($"設定を保存しました。保存先:\n{_saveFilePath}");
     }
 
@@ -76,10 +81,10 @@ public class GameManager : MonoBehaviour
         {
             // ファイルのテキストを読み込む
             string json = File.ReadAllText(_saveFilePath);
-            
+
             // 文字列をオブジェクトに復元する
             currentSettings = JsonUtility.FromJson<GameSettingsData>(json);
-            
+
             Debug.Log("設定を読み込みました。");
         }
         else

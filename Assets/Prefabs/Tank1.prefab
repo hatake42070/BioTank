@@ -19,6 +19,7 @@ GameObject:
   - component: {fileID: 8846183468401098908}
   - component: {fileID: 770942841942308877}
   - component: {fileID: -1836452233064421838}
+  - component: {fileID: -1525834475078057769}
   m_Layer: 0
   m_Name: Tank1
   m_TagString: Untagged
@@ -214,6 +215,22 @@ MonoBehaviour:
   _data:
     _json: '{"nest":{"source":"Macro","macro":null,"embed":null}}'
     _objectReferences: []
+--- !u!114 &-1525834475078057769
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 580506073305369390}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d93551afc79994c0bb1f6ee70f462b82, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::BioFeedbackController
+  minBpm: 50
+  maxBpm: 110
+  maxSpeedMultiplier: 2
+  maxFireIntervalMultiplier: 2
 --- !u!1 &1142137179403741698
 GameObject:
   m_ObjectHideFlags: 0

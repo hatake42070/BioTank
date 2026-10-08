@@ -23,7 +23,7 @@ namespace TankControllerScripts
                 return; // これ以降の処理はしない
             }
             // 移動命令
-            player.GetMovement().Move(input, player.TankData.baseMoveSpeed);
+            player.GetMovement().Move(input, player.CurrentMoveSpeed);
         }
 
         public void ExitState(TankController player)
