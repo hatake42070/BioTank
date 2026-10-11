@@ -29,7 +29,7 @@ namespace Assets.Scripts.Bio
         public int GetHeartRate(int playerIndex)
         {
             // 時間経過で 70 〜 130 を行ったり来たりするサイン波フェイク
-            float wave = Mathf.Sin(Time.time * 0.5f);
+            float wave = Mathf.Sin(Time.time * 0.5f);   // Time.time: ゲーム開始からの時間
             return (int)Mathf.Lerp(50f, 130f, (wave + 1f) / 2f);
         }
     }
