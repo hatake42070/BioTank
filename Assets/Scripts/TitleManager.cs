@@ -1,11 +1,11 @@
+﻿using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
+using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using UnityEngine.EventSystems;
 using UnityEngine.Serialization;
 using UnityEngine.UI;
-using Cysharp.Threading.Tasks;
 
 public class TitleManager : MonoBehaviour
 {
@@ -22,7 +22,7 @@ public class TitleManager : MonoBehaviour
 
     [SerializeField]
     private GameObject firstOptionButton; // オプション最初の選択ボタン
-    
+
     // パネルとボタンをセットで管理するための設計図
     [System.Serializable]
     public struct SubPanelData
@@ -31,10 +31,10 @@ public class TitleManager : MonoBehaviour
         public CanvasGroup panel;             // 対象のパネル
         public GameObject firstSelectedButton; // 最初に選択させたいボタン
     }
-    
+
     [Header("Sub Panels")]
     [SerializeField] private SubPanelData[] subPanels;
-    
+
     // 現在開いている設定パネルを記憶しておく変数
     private CanvasGroup _currentSubPanel = null;
 
@@ -45,7 +45,7 @@ public class TitleManager : MonoBehaviour
     private Slider bgmSlider;
     [SerializeField]
     private Slider seSlider;
-    
+
     [FormerlySerializedAs("titleText")]
     [Header("心拍数など")]
     [SerializeField]
@@ -69,14 +69,14 @@ public class TitleManager : MonoBehaviour
                 data.panel.blocksRaycasts = false;
             }
         }
-        
+
         // オプションパネルを閉じる
         CloseOption();
-        
+
         // GameManagerのセーブデータをUIに反映させる
         SyncSettingsToUI();
     }
-    
+
     /// <summary>
     /// GameManagerのデータをスライダー等のUIに反映させる
     /// </summary>
@@ -106,7 +106,7 @@ public class TitleManager : MonoBehaviour
             Player1HRText.enabled = _isHRVisible; // Textコンポーネント自体のON/OFF
             Player2HRText.enabled = _isHRVisible;
         }
-        
+
         // 2. 心拍数のテキスト更新（表示されている時だけ処理する）
         if (_isHRVisible)
         {
@@ -115,7 +115,7 @@ public class TitleManager : MonoBehaviour
             {
                 HrConnectLogText.text = BioSignalManager.Instance.HrConnectLog;
             }
-            
+
             // BioSignalManagerがスキャン処理を実行中の時
             if (BioSignalManager.Instance.IsScanning)
             {
@@ -145,7 +145,7 @@ public class TitleManager : MonoBehaviour
                 {
                     Player1HRText.text = $"1P: {p1Hr}";
                 }
-    
+
                 // --- 2P の表示 ---
                 int p2Hr = BioSignalManager.Instance.RealHeartRates[1];
                 if (p2Hr == -1)
@@ -161,7 +161,7 @@ public class TitleManager : MonoBehaviour
                     Player2HRText.text = $"2P: {p2Hr}";
                 }
             }
-            
+
             // Rキーによる強制再スキャン（いつでも可能）
             if (!BioSignalManager.Instance.IsScanning && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
             {
@@ -169,7 +169,7 @@ public class TitleManager : MonoBehaviour
                 BioSignalManager.Instance.ForceRescanAsync().AsUniTask().Forget();
             }
         }
-        
+
         bool isCancelPressed = false;
         // キーボードのキャンセルボタン（ESC）が押されたかのチェック
         if (Keyboard.current != null && Keyboard.current.escapeKey.wasPressedThisFrame)
@@ -232,7 +232,7 @@ public class TitleManager : MonoBehaviour
     {
         // 念のためサブパネルも閉じておく
         CloseCurrentSubPanel();
-        
+
         // オプション画面を透明・操作不可にする
         optionsPanel.alpha = 0;
         optionsPanel.interactable = false; // パネルの中にあるUIを操作不能にする
@@ -247,7 +247,7 @@ public class TitleManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(firstMainMenuButton);
     }
 
-    
+
     /// <summary>
     /// 指定したサブパネルを開き、指定したボタンをフォーカスする
     /// </summary>
@@ -272,7 +272,7 @@ public class TitleManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(null);
         EventSystem.current.SetSelectedGameObject(targetData.firstSelectedButton);
     }
-    
+
     /// <summary>
     /// 現在開いているサブパネルを閉じて、左側のボタン（GameやSound）にフォーカスを戻す
     /// </summary>
@@ -284,21 +284,21 @@ public class TitleManager : MonoBehaviour
         _currentSubPanel.alpha = 0;
         _currentSubPanel.interactable = false;
         _currentSubPanel.blocksRaycasts = false;
-        
+
         // 記憶をリセット
         _currentSubPanel = null;
 
         // フォーカスを左側のオプションボタンに戻す
         EventSystem.current.SetSelectedGameObject(null);
         EventSystem.current.SetSelectedGameObject(firstOptionButton);
-        
+
         // オプションを閉じるタイミングで、最後にまとめてJSONファイルに書き込む
         if (GameManager.Instance != null)
         {
             GameManager.Instance.SaveSettings();
         }
     }
-    
+
     /// <summary>
     /// UIボタンの OnClick() から呼ぶ用（0: Normal, 1: BioReal, 2: BioFake）
     /// </summary>
@@ -309,7 +309,8 @@ public class TitleManager : MonoBehaviour
             // int の数字を BioGameMode (enum) に変換して渡す
             BioGameMode selectedMode = (BioGameMode)modeIndex;
             GameManager.Instance.SetBioMode(selectedMode);
-            
+            BioSignalManager.Instance.UpdateProvider();
+
             Debug.Log($"ゲームモードを {selectedMode} に変更しました！");
         }
     }

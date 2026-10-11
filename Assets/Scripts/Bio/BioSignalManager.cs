@@ -1,3 +1,4 @@
+﻿using Assets.Scripts.Bio;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using UnityEngine;
@@ -31,6 +32,9 @@ public class BioSignalManager : MonoBehaviour
     // 現在スキャン中かどうかを外部から確認できるプロパティ
     public bool IsScanning { get; private set; } = false;
 
+    // 現在のプロバイダー（リアル心拍なのか，偽なのかなど）
+    private IHeartRateProvider currentProvider;
+
     private void Awake()
     {
         // 自分が最初の1個目なら、絶対に破棄されないように設定する
@@ -48,6 +52,7 @@ public class BioSignalManager : MonoBehaviour
 
     private void Start()
     {
+        UpdateProvider();
         // 起動時にも一応1回目のスキャンを走らせておく
         _ = TryConnectAsync();
     }
@@ -131,22 +136,27 @@ public class BioSignalManager : MonoBehaviour
             RealHeartRates[1] = GetHeartRate(1);
         }
 
-        // GameManagerのモードを見て、ゲームに使う心拍数（GameplayHeartRates）を決める
-        BioGameMode currentMode = GameManager.Instance != null ? GameManager.Instance.CurrentBioMode : BioGameMode.Normal;
-
-        if (currentMode == BioGameMode.BioFake)
+        if (currentProvider != null)
         {
-            // フェイクモードの時：偽の心拍数（例：時間で波打つ数値や固定値）を入れる
-            // GameplayHeartRates[0] = GetFakeHeartRate(0); 
-            // GameplayHeartRates[1] = GetFakeHeartRate(1);
-            GameplayHeartRates[0] = 80;
-            GameplayHeartRates[1] = 80;
+            GameplayHeartRates[0] = currentProvider.GetHeartRate(0);
+            GameplayHeartRates[1] = currentProvider.GetHeartRate(1);
+        }
+    }
+
+    public void UpdateProvider()
+    {
+        // ゲームモードによってカセットを変える
+        BioGameMode mode = GameManager.Instance != null ? GameManager.Instance.CurrentBioMode : BioGameMode.Normal;
+
+        // 疑似心拍モードのみ疑似心拍プロバイダー
+        if (mode == BioGameMode.BioFake)
+        {
+            // --- ここでプロバイダーを切り替えてテストする ---
+            currentProvider = new SinWaveFakeProvider();
         }
         else
         {
-            // リアルモード（または通常モード）の時：本物の心拍数をそのまま入れる
-            GameplayHeartRates[0] = RealHeartRates[0]; 
-            GameplayHeartRates[1] = RealHeartRates[1]; 
+            currentProvider = new RealHeartRateProvider(this);
         }
     }
 
