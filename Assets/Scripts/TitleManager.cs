@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Assets.Scripts.Log;
+using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -75,6 +76,9 @@ public class TitleManager : MonoBehaviour
 
         // GameManagerのセーブデータをUIに反映させる
         SyncSettingsToUI();
+
+        // 最初の計測開始(test)
+        ExperimentLogger.Instance.StartLogging("Phase0_Baseline");
     }
 
     /// <summary>
@@ -203,6 +207,8 @@ public class TitleManager : MonoBehaviour
     {
         GameSetting.IsSoloMode = false;
         SceneManager.LoadScene("MainScene");
+        // 今までのファイルを閉じて、自動的に0秒から新しいファイルを作り直す
+        ExperimentLogger.Instance.SwitchNextPhase("Phase1_BioReal");
     }
 
     // ソロモードへの遷移

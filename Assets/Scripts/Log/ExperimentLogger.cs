@@ -11,6 +11,9 @@ namespace Assets.Scripts.Log
         private StreamWriter _streamWriter;
         private string _currentFilePath;
         private bool _isLogging = false;    // 現在ログを記録中か
+        private float _startTime;
+        private float _timeSinceLastLog;
+        private float _logInterval = 0.5f; // 0.5秒ごとに記録
 
         private void Awake()
         {
@@ -28,7 +31,7 @@ namespace Assets.Scripts.Log
         /// 環境に応じで最適なログファイルパスを作成する
         /// </summary>
         /// <summary>
-        /// 【重要】環境に応じて、一番アクセスしやすい保存先パスを決定する
+        /// 環境に応じて、一番アクセスしやすい保存先パスを決定する
         /// </summary>
         private string GetLogDirectoryPath()
         {
@@ -56,25 +59,94 @@ namespace Assets.Scripts.Log
             {
                 Directory.CreateDirectory(logDirPath);
             }
-        
+
             return logDirPath;
         }
-        
+
         /// <summary>
         /// ログ記録を開始する
         /// </summary>
         public void StartLogging(string phaseName = "Match")
         {
             if (_isLogging) return;
-            
+
             string dirPath = GetLogDirectoryPath(); // ファイルの保存場所を取得(Path)
-            
+
             // 例: Phase1_BioReal_20261011_120339.csv
-            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH:mm:ss"); 
+            string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
             _currentFilePath = Path.Combine(dirPath, $"{phaseName}_{timestamp}.csv");
-            
+
             _streamWriter = new StreamWriter(_currentFilePath, false, System.Text.Encoding.UTF8); // パス、追記するか、エンコード指定
             _streamWriter.WriteLine("Time,P1_RealHR,P1_GameHR,P2_RealHR,P2_GameHR,Event");
+
+            _startTime = Time.time;
+            _isLogging = true;
+            _timeSinceLastLog = 0f;
+        }
+
+        /// <summary>
+        /// 現在の記録を終了し，そのまま次のフェーズの記録を開始する
+        /// </summary>
+        public void SwitchNextPhase(string nextPhaseName)
+        {
+            StopLogging();
+            StartLogging(nextPhaseName);
+        }
+
+        public void Update()
+        {
+            if (!_isLogging || BioSignalManager.Instance == null) return;
+
+            _timeSinceLastLog += Time.deltaTime;
+            if (_timeSinceLastLog > _logInterval)
+            {
+                _timeSinceLastLog = 0f;
+                RecordDataRow("None");
+            }
+        }
+
+        /// <summary>
+        /// 外部からイベントタグをつけるときに使う
+        /// </summary>
+        public void LogEvent(string eventName)
+        {
+            if (!_isLogging) return;
+            RecordDataRow(eventName);
+        }
+
+        private void RecordDataRow(string eventName)
+        {
+            // ログ記録開始からの経過時間
+            float elapsedTime = Time.time - _startTime;
+
+            int p1RealHR = BioSignalManager.Instance.RealHeartRates[0];
+            int p2RealHR = BioSignalManager.Instance.RealHeartRates[1];
+            int p1GameHR = BioSignalManager.Instance.GameplayHeartRates[0];
+            int p2GameHR = BioSignalManager.Instance.GameplayHeartRates[1];
+
+            string line = $"{elapsedTime:F2},{p1RealHR},{p1GameHR},{p2RealHR},{p2GameHR},{eventName}";
+            _streamWriter.WriteLine(line);
+        }
+
+        public void StopLogging()
+        {
+            if (!_isLogging) return;
+
+            _isLogging = false;
+            if (_streamWriter != null)
+            {
+                _streamWriter.Flush();
+                _streamWriter.Close();
+                _streamWriter.Dispose();
+                _streamWriter = null;
+            }
+
+            Debug.Log("[Logger] 記録終了・保存完了");
+        }
+
+        private void OnDestroy()
+        {
+            StopLogging();
         }
     }
 }
