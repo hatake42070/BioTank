@@ -10,6 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 7017857596859792121}
   - component: {fileID: -8234112196920790226}
+  - component: {fileID: 8486569132632065782}
   m_Layer: 0
   m_Name: GameManager
   m_TagString: Untagged
@@ -50,3 +51,15 @@ MonoBehaviour:
     seVolume: 0
     isMuted: 0
     bioMode: 0
+--- !u!114 &8486569132632065782
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3346012784134195501}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f627ba08c1fda4e93bcdede7d07d5c8d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Assets.Scripts.Log.ExperimentLogger
