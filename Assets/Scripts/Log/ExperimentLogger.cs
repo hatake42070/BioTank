@@ -20,6 +20,7 @@ namespace Assets.Scripts.Log
             if (Instance == null)
             {
                 Instance = this;
+                DontDestroyOnLoad(gameObject);
             }
             else
             {
@@ -68,6 +69,11 @@ namespace Assets.Scripts.Log
         /// </summary>
         public void StartLogging(string phaseName = "Match")
         {
+            if (GameManager.Instance != null && !GameManager.Instance.currentSettings.isLog)
+            {
+                return;
+            }
+
             if (_isLogging) return;
 
             string dirPath = GetLogDirectoryPath(); // ファイルの保存場所を取得(Path)

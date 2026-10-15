@@ -56,6 +56,10 @@ public class TitleManager : MonoBehaviour
     [SerializeField]
     private TextMeshProUGUI HrConnectLogText;
 
+    [Header("選択状態を示す枠（ハイライト）の画像")]
+    [SerializeField] private GameObject[] bioModeHighlights; // 0:Normal, 1:Real, 2:Fake
+    [SerializeField] private GameObject[] logModeHighlights; // 0:LogON, 1:LogOFF
+
     private bool _isHRVisible = true; // 最初は表示状態にしておく
 
     void Start()
@@ -76,6 +80,9 @@ public class TitleManager : MonoBehaviour
 
         // GameManagerのセーブデータをUIに反映させる
         SyncSettingsToUI();
+
+        // セーブデータをUI(モード選択の枠)に反映させる
+        IsEnableMode();
 
         // 最初の計測開始(test)
         ExperimentLogger.Instance.StartLogging("Phase0_Baseline");
@@ -207,6 +214,7 @@ public class TitleManager : MonoBehaviour
     {
         GameSetting.IsSoloMode = false;
         SceneManager.LoadScene("MainScene");
+
         // 今までのファイルを閉じて、自動的に0秒から新しいファイルを作り直す
         ExperimentLogger.Instance.SwitchNextPhase("Phase1_BioReal");
     }
@@ -318,6 +326,89 @@ public class TitleManager : MonoBehaviour
             BioSignalManager.Instance.UpdateProvider();
 
             Debug.Log($"ゲームモードを {selectedMode} に変更しました！");
+
+            // 選ばれた番号の枠だけを表示し、他を非表示にする
+            for (int i = 0; i < bioModeHighlights.Length; i++)
+            {
+                if (bioModeHighlights[i] != null)
+                {
+                    bioModeHighlights[i].SetActive(i == modeIndex);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// UIボタンの OnClick() から呼ぶ用（0: Logとる, 1: Logとらない）
+    /// </summary>
+    public void OnClickSetLogMode(int modeIndex)
+    {
+        if (GameManager.Instance != null)
+        {
+            if (modeIndex == 0)
+            {
+                GameManager.Instance.currentSettings.isLog = true;
+
+                // ONにした瞬間に、ベースラインの計測を確実にスタートさせる
+                if (ExperimentLogger.Instance != null)
+                {
+                    ExperimentLogger.Instance.StartLogging("Phase0_Baseline");
+                }
+
+                Debug.Log($"ゲームモードをLogありに変更しました！");
+            }
+            else
+            {
+                GameManager.Instance.currentSettings.isLog = false;
+
+                // OFFにした瞬間に、走っているログ記録を即座に強制停止する
+                if (ExperimentLogger.Instance != null)
+                {
+                    ExperimentLogger.Instance.StopLogging();
+                }
+
+                Debug.Log($"ゲームモードをLogなしに変更しました！");
+            }
+
+            // 選ばれた番号の枠だけを表示し、他を非表示にする
+            for (int i = 0; i < logModeHighlights.Length; i++)
+            {
+                if (logModeHighlights[i] != null)
+                {
+                    logModeHighlights[i].SetActive(i == modeIndex);
+                }
+            }
+        }
+    }
+
+    /// <summary>
+    /// セーブデータ（GameManager）の状態を読み取り、現在のモードのハイライト枠を初期表示する
+    /// </summary>
+    public void IsEnableMode()
+    {
+        if (GameManager.Instance != null)
+        {
+            GameSettingsData settings = GameManager.Instance.currentSettings;
+
+            // 1. BioMode（0: Normal, 1: BioReal, 2: BioFake）の枠を復元
+            int bioIndex = (int)settings.bioMode;
+            for (int i = 0; i < bioModeHighlights.Length; i++)
+            {
+                if (bioModeHighlights[i] != null)
+                {
+                    bioModeHighlights[i].SetActive(i == bioIndex);
+                }
+            }
+
+            // 2. LogMode（trueなら0[ON]、falseなら1[OFF]）の枠を復元
+            int logIndex = settings.isLog ? 0 : 1;
+            for (int i = 0; i < logModeHighlights.Length; i++)
+            {
+                if (logModeHighlights[i] != null)
+                {
+                    logModeHighlights[i].SetActive(i == logIndex);
+                }
+            }
         }
     }
 }
