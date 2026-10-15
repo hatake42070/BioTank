@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Audio; // AudioMixerを使うために必要
 
@@ -8,7 +8,7 @@ public class SoundData
 {
     public string name;      // 呼び出す時の名前 ("Shoot", "Explosion" など)
     public AudioClip clip;   // 音源データ
-    [Range(0f, 1f)] 
+    [Range(0f, 1f)]
     public float volume = 1.0f; // 個別の音量調整用
 }
 
@@ -49,11 +49,11 @@ public class AudioManager : MonoBehaviour
 
         // 起動時にListからDictionaryへ変換し、検索速度を最速にする
         foreach (var bgm in bgmList) _bgmDictionary.Add(bgm.name, bgm);
-        foreach (var se in seList)   _seDictionary.Add(se.name, se);
+        foreach (var se in seList) _seDictionary.Add(se.name, se);
 
         // Mixerの割り当て
         if (bgmSource != null) bgmSource.outputAudioMixerGroup = bgmMixerGroup;
-        if (seSource != null)  seSource.outputAudioMixerGroup = seMixerGroup;
+        if (seSource != null) seSource.outputAudioMixerGroup = seMixerGroup;
     }
 
     /// <summary>
@@ -89,10 +89,10 @@ public class AudioManager : MonoBehaviour
             bgmSource.Play();
         }
     }
-    
+
     // ----------------------------------------------------------------
-    // プレイヤー用の音長英メソッド（UIスライダーから呼ばれる）
-    
+    // プレイヤー用の音調整メソッド（UIスライダーから呼ばれる）
+
     /// <summary>
     /// 全体の音量を設定する（スライダーの範囲は 0.0001 〜 1.0）
     /// </summary>
@@ -100,7 +100,7 @@ public class AudioManager : MonoBehaviour
     {
         // Mathf.Log10を使って、人間の耳に自然な音量変化（デシベル）に変換
         mainMixer.SetFloat("MasterVolume", Mathf.Log10(volume) * 20);
-        
+
         // GameManager の「現在の設定」も更新しておく
         if (GameManager.Instance != null)
         {
@@ -114,7 +114,7 @@ public class AudioManager : MonoBehaviour
     public void SetBGMVolume(float volume)
     {
         mainMixer.SetFloat("BGMVolume", Mathf.Log10(volume) * 20);
-        
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.currentSettings.bgmVolume = volume;
@@ -127,7 +127,7 @@ public class AudioManager : MonoBehaviour
     public void SetSEVolume(float volume)
     {
         mainMixer.SetFloat("SEVolume", Mathf.Log10(volume) * 20);
-        
+
         if (GameManager.Instance != null)
         {
             GameManager.Instance.currentSettings.seVolume = volume;

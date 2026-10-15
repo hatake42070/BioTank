@@ -1,13 +1,13 @@
+﻿using System.IO;
 using UnityEngine;
-using System.IO;
-using UnityEngine.Rendering; // ファイルの読み書き
 
 // 3つのゲームモード
 public enum BioGameMode
 {
     Normal, // 心拍連動なし
-    BioReal, // 実際の心拍センサーを使用
-    BioFake // 疑似心拍を使用
+    BioFake, // 疑似心拍を使用
+    BioReal // 実際の心拍センサーを使用
+
 }
 
 // JSONに変換するためのデータだけの箱
@@ -20,6 +20,7 @@ public class GameSettingsData
     public float seVolume;
     public bool isMuted = false;
     public BioGameMode bioMode = BioGameMode.Normal;
+    public bool isLog = false;
 }
 
 // ゲームモード（通常、心拍リアル、心拍フェイク）の現在の状態を記憶する
