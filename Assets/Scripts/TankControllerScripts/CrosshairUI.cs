@@ -35,36 +35,46 @@ namespace TankControllerScripts
         private Color color1P = new Color(0.2f, 0.6f, 1f, 0.5f); // 1P: 少し薄い青
         [SerializeField]
         private Color color2P = new Color(1f, 0.3f, 0.3f, 0.5f); // 2P: 少し薄い赤
-        
+
         // クロスヘアの固定半径（ピクセル単位）
         [Header("クロスヘアの動作設定")]
         [SerializeField] private float fixedRadius = 150f;
 
         private TankInputHandler _myInputHandler;
-        private bool _isInitialized = false; // 初期化完了フラグを追加
-        private GameObject[] _dots; // 生成した点を保存する配列
+        private bool _isInitialized = false;
+        private GameObject[] _dots;
         private Camera _mainCamera;
+
+        // 親のCanvasを記憶しておく変数
+        private Canvas _parentCanvas;
 
         public void Initialize(TankInputHandler inputHandler, int playerIndex)
         {
             Color crosshairColor = (playerIndex == 0) ? crosshairColor1P : crosshairColor2P;
             _myInputHandler = inputHandler;
-            _mainCamera = Camera.main; // カメラの参照をキャッシュ（毎フレーム探すと重いため）
+            _mainCamera = Camera.main;
+
+            // 自分が所属しているCanvas（GameUIなど）を取得して記憶しておく
+            if (transform.parent != null)
+            {
+                _parentCanvas = transform.parent.GetComponentInParent<Canvas>();
+            }
+
             if (playerCrosshairSprites != null && crosshairImage != null)
             {
                 crosshairImage.sprite = playerCrosshairSprites;
                 crosshairImage.color = crosshairColor;
             }
 
-            // 点のUIを生成
             Color dotColor = (playerIndex == 0) ? color1P : color2P;
             _dots = new GameObject[dotCount];
             for (int i = 0; i < dotCount; i++)
             {
-                // クロスヘアと同じ親(Canvasなど)の中に点を生成
                 _dots[i] = Instantiate(dotPrefab, transform.parent);
 
-                // 生成した点の「Image」コンポーネントを取得して、色を適用する
+                // 点線のサイズや位置がバグらないようにスケールをリセットしておく
+                _dots[i].GetComponent<RectTransform>().localScale = Vector3.one * 2.4f;
+
                 Image dotImage = _dots[i].GetComponent<Image>();
                 if (dotImage != null)
                 {
@@ -72,45 +82,53 @@ namespace TankControllerScripts
                 }
             }
 
-            _isInitialized = true; // 初期化完了！
+            _isInitialized = true;
         }
 
-        private void Update()
+        // UpdateではなくLateUpdateに変更（チラつき防止）
+        private void LateUpdate()
         {
-            // まだ初期化されていなければ、何もしない（Initializeされる前にUpdate()での自爆防止）
             if (!_isInitialized) return;
 
-            // 追従すべき対象（タンク）が破壊されてnullになっていたら...
-            if (_myInputHandler == null)
+            // ターゲットやカメラ、Canvasが存在しない場合は処理しない
+            if (_myInputHandler == null || _mainCamera == null || _parentCanvas == null)
             {
-                // 自分自身（クロスヘアUI）も消滅させる
                 Destroy(gameObject);
                 return;
             }
 
             if (crosshairRect == null) return;
-            
-            // 1. タンクの画面座標を取得
-            Vector2 tankScreenPos = _mainCamera.WorldToScreenPoint(_myInputHandler.transform.position);
 
-            // 2. タンクの座標 ＋ (入力の方向 × 固定半径) でクロスヘアの位置を決定！
-            Vector2 crosshairPos = tankScreenPos + _myInputHandler.AimDirection * fixedRadius;
+            // 1. タンクの画面座標(ピクセル)を取得（Vector2ではなくVector3で受けるのがコツ）
+            Vector3 tankScreenPos = _mainCamera.WorldToScreenPoint(_myInputHandler.transform.position);
 
-            // クロスヘアUIを移動
-            crosshairRect.position = crosshairPos;
+            // 2. タンクの座標 ＋ (入力の方向 × 固定半径) でクロスヘアの画面座標を決定
+            Vector3 crosshairScreenPos = tankScreenPos;
+            crosshairScreenPos.x += _myInputHandler.AimDirection.x * fixedRadius;
+            crosshairScreenPos.y += _myInputHandler.AimDirection.y * fixedRadius;
 
-            // 3. 点線の配置計算
+            // 3. Z軸（奥行き）を、Canvasの「カメラからの距離」に強制的に合わせる
+            tankScreenPos.z = _parentCanvas.planeDistance;
+            crosshairScreenPos.z = _parentCanvas.planeDistance;
+
+            // 4. ピクセル座標を、Canvas上の正しいワールド座標に戻して直接代入する
+            crosshairRect.position = _mainCamera.ScreenToWorldPoint(crosshairScreenPos);
+
+            // 5. 点線の配置計算（点線も同じく安全な方法で座標変換する）
             if (_dots != null)
             {
                 for (int i = 0; i < dotCount; i++)
                 {
                     float t = (float)(i + 1) / (dotCount + 1);
-                    _dots[i].transform.position = Vector2.Lerp(tankScreenPos, crosshairPos, t);
+                    // 画面上のピクセル座標空間で、戦車とクロスヘアの間の位置（Lerp）を計算
+                    Vector3 dotScreenPos = Vector3.Lerp(tankScreenPos, crosshairScreenPos, t);
+
+                    // ワールド座標に変換して代入
+                    _dots[i].transform.position = _mainCamera.ScreenToWorldPoint(dotScreenPos);
                 }
             }
         }
 
-        // クロスヘアが消滅する時（タンク破壊時など）に、生成した点も一緒に削除する
         private void OnDestroy()
         {
             if (_dots != null)

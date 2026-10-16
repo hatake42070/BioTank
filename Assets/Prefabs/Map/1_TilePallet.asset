@@ -10,7 +10,7 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 3ccbcc2605bffb74685563ea9a5605f0, type: 3}
-  m_Name: 00_TilePallet
+  m_Name: 1_TilePallet
   m_EditorClassIdentifier: MapEditorSystem.Runtime::MapEditorSystem.Runtime.TilePalette
   baseTiles:
   - tileID: 1
@@ -20,7 +20,7 @@ MonoBehaviour:
     role: 0
   - tileID: 2
     prefab: {fileID: 403342742326808795, guid: 433688e7d8aa4db49ab38c82b8413792, type: 3}
-    tileName: Wood
+    tileName: Rock
     editorColor: {r: 0.9056604, g: 0.88348466, b: 0.46564615, a: 0}
     role: 0
   placeableObjects:
