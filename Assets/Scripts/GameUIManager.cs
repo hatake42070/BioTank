@@ -1,5 +1,5 @@
-﻿using UnityEngine;
-using TMPro;
+﻿using TMPro;
+using UnityEngine;
 
 public class GameUIManager : MonoBehaviour
 {
@@ -37,11 +37,11 @@ public class GameUIManager : MonoBehaviour
     private TextMeshProUGUI p2ScoreTextShadow;
 
     private int _lastDisplayedSeconds = -1; // 最後に表示した秒数を記憶する用
-    
+
     [Header("心拍数表示")]
     [SerializeField] private TextMeshProUGUI p1HR;
     [SerializeField] private TextMeshProUGUI p2HR;
-    
+
     // 前回表示した心拍数を記憶する変数（初期値はあり得ない数値にしておく）
     private int _lastDisplayedP1HR = -999;
     private int _lastDisplayedP2HR = -999;
@@ -61,7 +61,7 @@ public class GameUIManager : MonoBehaviour
             Destroy(gameObject);
         }
     }
-    
+
     /// <summary>
     /// 心拍数表示を更新する（値が変化した時のみテキストを書き換える軽量版）
     /// </summary>
@@ -109,15 +109,21 @@ public class GameUIManager : MonoBehaviour
         {
             _lastDisplayedSeconds = seconds;
 
+            // 文字列にして1文字ずつに分解し、間にスペース(" ")を挟んで結合する
+            // "60" ➔ "6 0", "9" ➔ "9"
+            string spacedText = string.Join(" ", seconds.ToString().ToCharArray());
+
             if (timerText != null)
             {
                 // 文字列の変換はここでしか起きないので非常に軽い
-                timerText.text = seconds.ToString();
+                //timerText.text = seconds.ToString();
+                timerText.text = spacedText;
             }
             if (timerTextShadow != null)
             {
                 // 文字列の変換はここでしか起きないので非常に軽い
-                timerTextShadow.text = seconds.ToString();
+                //timerTextShadow.text = seconds.ToString();
+                timerTextShadow.text = spacedText;
             }
         }
     }
@@ -127,7 +133,7 @@ public class GameUIManager : MonoBehaviour
     /// </summary>
     public void UpdateScoreDisplay(int p1Score, int p2Score)
     {
-        if (p1ScoreText != null &&  p2ScoreText != null && p1ScoreTextShadow != null && p2ScoreTextShadow != null)
+        if (p1ScoreText != null && p2ScoreText != null && p1ScoreTextShadow != null && p2ScoreTextShadow != null)
         {
             // 色分けしたい場合は "<color=blue>"+p1Score+"</color> - <color=red>"+p2Score+"</color>" なども可能
             p1ScoreText.text = $"{p1Score}";
@@ -160,7 +166,7 @@ public class GameUIManager : MonoBehaviour
         {
             // 自分自身をヒエラルキーの一番下に移動させる（最前面に表示）
             resultUIPanel.transform.SetAsLastSibling();
-            
+
             resultUIPanel.SetActive(true);
         }
     }

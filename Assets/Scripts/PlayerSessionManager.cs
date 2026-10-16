@@ -26,7 +26,7 @@ public class PlayerSessionManager : MonoBehaviour
 
     // 生成した戦車の「入力受け取り窓口」を覚えておくための変数
     private TankControllerScripts.TankInputHandler _spawnedTankInput;
-    
+
     // 古い戦車本体の参照を覚えておく変数
     private GameObject _spawnedTankObject;
 
@@ -72,7 +72,7 @@ public class PlayerSessionManager : MonoBehaviour
         {
             Destroy(_myTankHpUI.gameObject);
         }
-        
+
         // 指定された座標(Vector3)に自分の戦車を生成
         _spawnedTankObject = Instantiate(myTankPrefabs[_selectedTankIndex - 1], spawnPosition, Quaternion.identity);
 
@@ -81,7 +81,7 @@ public class PlayerSessionManager : MonoBehaviour
 
         // 戦車が生まれたら、操作モードをUIから「Player（ゲーム中）」に切り替える
         _playerInput.SwitchCurrentActionMap("Player");
-        
+
         // タンクのサイドマーカー(足元の円)の色を、1Pは青、2Pは赤にする
         // _spawnedTankObject.GetComponentInChildren<SpriteRenderer>().color = _playerInput.playerIndex + 1 == 1 ? Color.blue : Color.red;
 
@@ -90,15 +90,25 @@ public class PlayerSessionManager : MonoBehaviour
 
         if (GameUIManager.Instance != null)
         {
-            _myCrosshairUI = Instantiate(crosshairUI, GameUIManager.Instance.CanvasTransform, false);
-            _myTankHpUI = Instantiate(myHpUI, GameUIManager.Instance.CanvasTransform, false);
-            
+            _myCrosshairUI = Instantiate(crosshairUI);
+            _myTankHpUI = Instantiate(myHpUI);
+
+            // 生成したUIを、明示的にCanvasの子オブジェクトにする
+            // false を渡すことで、Canvasのスケール（Canvas Scaler）に正しくフィットさせる
+            _myCrosshairUI.transform.SetParent(GameUIManager.Instance.CanvasTransform, false);
+            _myTankHpUI.transform.SetParent(GameUIManager.Instance.CanvasTransform, false);
+
+            // --- 念のため、変な位置や大きさに飛ばないようにリセット ---
+            _myTankHpUI.GetComponent<RectTransform>().localScale = Vector3.one;
+            _myTankHpUI.GetComponent<RectTransform>().localPosition = Vector3.zero;
+            _myCrosshairUI.GetComponent<RectTransform>().localScale = Vector3.one;
+
             // カメラがちゃんと存在するか確認
             if (Camera.main != null)
             {
                 // タンクの3D座標を、画面の2D座標に変換
                 Vector2 screenPos = Camera.main.WorldToScreenPoint(spawnPosition);
-        
+
                 // 変換した初期座標を渡して初期化
                 _myCrosshairUI.Initialize(_spawnedTankInput, _playerInput.playerIndex);
                 Debug.Log($"プレイヤー {_playerInput.playerIndex + 1} のクロスヘアUIを生成完了！初期座標: {screenPos}");
@@ -111,12 +121,12 @@ public class PlayerSessionManager : MonoBehaviour
             var tankController = _spawnedTankObject.GetComponent<TankControllerScripts.TankController>();
             int maxHp = tankController.TankData.maxHp;
             _myTankHpUI.Initialize(_spawnedTankObject.transform, maxHp);
-            
+
             // 初期HPをSession側にも記憶させる
-            CurrentHp = tankController.TankData.maxHp; 
-            
+            CurrentHp = tankController.TankData.maxHp;
+
             // HPが変化した時、Session側の CurrentHp も一緒に更新する
-            tankController.OnHpChanged += (hp) => 
+            tankController.OnHpChanged += (hp) =>
             {
                 CurrentHp = hp; // Sessionの記憶を更新
                 _myTankHpUI.UpdateHpDisplay(hp); // UIの表示も更新
@@ -187,7 +197,7 @@ public class PlayerSessionManager : MonoBehaviour
             {
                 //　確認中（もう一度押してスタートの状態）はスライド操作を受け付けない
                 if (MainSceneManager.Instance.IsMapConfirming) return;
-                
+
                 // GameManager側にあるマップの配列を切り替えるような処理を呼ぶ
                 if (navInput.x > 0.5f)
                 {
