@@ -83,7 +83,7 @@ namespace Assets.Scripts.Log
             _currentFilePath = Path.Combine(dirPath, $"{phaseName}_{timestamp}.csv");
 
             _streamWriter = new StreamWriter(_currentFilePath, false, System.Text.Encoding.UTF8); // パス、追記するか、エンコード指定
-            _streamWriter.WriteLine("Time,P1_RealHR,P1_GameHR,P2_RealHR,P2_GameHR,Event");
+            _streamWriter.WriteLine("Time,RealTime,P1_RealHR,P1_GameHR,P2_RealHR,P2_GameHR,Event");
 
             _startTime = Time.time;
             _isLogging = true;
@@ -125,12 +125,15 @@ namespace Assets.Scripts.Log
             // ログ記録開始からの経過時間
             float elapsedTime = Time.time - _startTime;
 
+            // hh:mm:ss.fff で「時:分:秒.ミリ秒」を取得
+            string realTime = DateTime.Now.ToString("HH:mm:ss.fff");
+
             int p1RealHR = BioSignalManager.Instance.RealHeartRates[0];
             int p2RealHR = BioSignalManager.Instance.RealHeartRates[1];
             int p1GameHR = BioSignalManager.Instance.GameplayHeartRates[0];
             int p2GameHR = BioSignalManager.Instance.GameplayHeartRates[1];
 
-            string line = $"{elapsedTime:F2},{p1RealHR},{p1GameHR},{p2RealHR},{p2GameHR},{eventName}";
+            string line = $"{elapsedTime:F2},{realTime},{p1RealHR},{p1GameHR},{p2RealHR},{p2GameHR},{eventName}";
             _streamWriter.WriteLine(line);
         }
 
