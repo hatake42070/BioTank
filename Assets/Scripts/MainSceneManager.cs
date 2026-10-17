@@ -1,13 +1,10 @@
-using System;
-using UnityEngine;
-using System.Collections.Generic;
-using TankControllerScripts;
-using UnityEngine.InputSystem;
+﻿using Cysharp.Threading.Tasks;
 using MapEditorSystem.Runtime;
+using System;
+using System.Collections.Generic;
+using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
-using System.Collections;
-using TMPro;
-using Cysharp.Threading.Tasks;
 
 /// <summary>
 /// ゲームのフェーズを管理
@@ -28,39 +25,39 @@ public class MainSceneManager : MonoBehaviour
     public static MainSceneManager Instance;
     // 現在のフェーズ
     public GamePhase CurrentPhase { get; private set; } = GamePhase.Lobby;
-    
+
     [Header("マップ設定 (自作エディタ用)")]
     public TilePalette commonPalette; // 共通パレット
     // MapData単体ではなく、順番をまとめた「シーケンス」の配列を持つ
     public MapSequenceData[] experimentSequences;
     // public MapData[] allStages;       // 作成したマップデータの配列
-    
+
     // スポーンポイントは Transform（オブジェクト）ではなく Vector3（座標）として記憶する
     private Vector3 _spawnPoint1P;
     private Vector3 _spawnPoint2P;
-    
+
     [Header("スコア管理")]
     private int _score1P = 0;
     private int _score2P = 0;
-    
+
     [Header("マップ選択状態")]
     public bool IsMapConfirming { get; private set; } = false;
-    
+
     // 参加したセッションを管理するリスト
     private List<PlayerSessionManager> _playerSessions = new List<PlayerSessionManager>();
-    
+
     // 進行管理用の変数
     private int _selectedSequenceIndex = 0; // マップ選択画面で選んでいるパターンの番号
     public int SelectedSequenceIndex => _selectedSequenceIndex;
     private int _currentMapIndexInSequence = 0; // そのパターン内で現在何戦目か
     private GameObject _currentMapInstance; // 現在画面にあるマップオブジェクト（破棄用）
-    
+
     // GameManager.cs の変数にタイマーを追加
     [Header("試合設定")]
-    public float matchTimeLimit = 60f; 
+    public float matchTimeLimit = 60f;
     private float _currentMatchTime;
     private bool _isMatchActive = false;
-    
+
     private string _resultMessage = ""; // 勝敗を描画するテキスト
 
     private void Awake()
@@ -70,11 +67,11 @@ public class MainSceneManager : MonoBehaviour
             Instance = this;
         }
     }
-    
+
     // PlayerSessionManagerが参加していないとき（０人）のキャンセルボタンの反応処理
     private void Update()
     {
-        if(CurrentPhase == GamePhase.Lobby && _playerSessions.Count == 0)
+        if (CurrentPhase == GamePhase.Lobby && _playerSessions.Count == 0)
         {
             bool isCancelPressed = false;
             // 1. キーボードの「Esc」キーが押されたかチェック
@@ -96,15 +93,15 @@ public class MainSceneManager : MonoBehaviour
                 GoBack();
             }
         }
-        
+
         // バトル中の勝敗・タイムアップ監視
         if (CurrentPhase == GamePhase.Battle && _isMatchActive)
         {
             // プレイヤーが2人未満の時は判定処理を行わない（エラー落ち防止）
             if (_playerSessions.Count < 2) return;
-            
+
             _currentMatchTime -= Time.deltaTime;
-            
+
             // UIManagerに現在の時間を渡す（軽量化済みなので毎フレーム呼び出して大丈夫）
             if (GameUIManager.Instance != null)
             {
@@ -123,12 +120,12 @@ public class MainSceneManager : MonoBehaviour
             }
         }
     }
-    
+
     // ラウンド終了メソッド
     private async UniTaskVoid EndRound()
     {
         _isMatchActive = false; // 監視ストップ
-        
+
         // ここでも念のためチェック
         if (_playerSessions.Count < 2) return;
 
@@ -153,7 +150,7 @@ public class MainSceneManager : MonoBehaviour
             _score2P++;
             _resultMessage = "DRAW !";
         }
-        
+
         // UIManagerにテキストを渡して表示をお願いする
         if (GameUIManager.Instance != null)
         {
@@ -161,7 +158,7 @@ public class MainSceneManager : MonoBehaviour
             GameUIManager.Instance.UpdateScoreDisplay(_score1P, _score2P);
             GameUIManager.Instance.ShowResult(_resultMessage);
         }
-        
+
         // 3秒待機
         await UniTask.Delay(TimeSpan.FromSeconds(3f));
 
@@ -178,12 +175,12 @@ public class MainSceneManager : MonoBehaviour
     public void ChangePhaseLobby()
     {
         CurrentPhase = GamePhase.Lobby;
-        
+
         if (MapSelectManager.Instance != null)
         {
             MapSelectManager.Instance.ClosePanel();
         }
-        
+
         // ロビーに戻った時、まだ2人揃っていなければ参加受付を再開(EnableJoining)する
         if (_playerSessions.Count < 2)
         {
@@ -194,7 +191,7 @@ public class MainSceneManager : MonoBehaviour
             }
         }
     }
-    
+
     // 戦車が決定されたときに呼ばれるメソッド
     public void RegisterPlayer(PlayerSessionManager newSession)
     {
@@ -202,7 +199,7 @@ public class MainSceneManager : MonoBehaviour
         {
             _playerSessions.Add(newSession);
             // ここでリストに追加されるため、純粋な「参加順」で1P, 2Pが確定する
-            
+
             // 2人（最大人数）揃った時点で、これ以上の新規参加受付を完全にストップする
             if (_playerSessions.Count >= 2)
             {
@@ -231,63 +228,58 @@ public class MainSceneManager : MonoBehaviour
                 _selectedSequenceIndex = experimentSequences.Length - 1;
             }
         }
-        
+
         if (MapSelectManager.Instance != null)
         {
             MapSelectManager.Instance.UpdateUI();
         }
-        
+
         // どの実験パターンが選ばれているかログ出し
         MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
         Debug.Log($"パターン選択中: {currentSequence.sequenceName} をセットしました");
     }
-    
+
     // マップ選択画面でマップが確定したときに呼ばれる
     public void SetupMap()
     {
         // 最初の出撃時にスコアをリセットする
         _score1P = 0;
         _score2P = 0;
-        
-        _currentMatchTime = matchTimeLimit; 
-        _isMatchActive = true;
-        
+
+        _currentMapIndexInSequence = 0; // 1戦目にリセット
+
         CurrentPhase = GamePhase.Battle; // 状態をバトル中へ
-        
+
         // マップ生成・出撃時にロビーのUI（キャンバス）を丸ごと非表示にする
         if (LobbyUIManager.Instance != null)
         {
             LobbyUIManager.Instance.gameObject.SetActive(false);
         }
         GameUIManager.Instance.ShowGameUI(); // ゲーム用UIを表示
-        
-        _currentMapIndexInSequence = 0; // 1戦目にリセット
+
 
         // 実際のマップ生成処理を呼び出す
         LoadCurrentMapInSequence();
-        
+
         Cursor.lockState = CursorLockMode.Confined;
         Cursor.visible = false;
     }
-    
+
     // 状態を切り替えるためのメソッドを追加
     public void SetMapConfirmingState(bool state)
     {
         IsMapConfirming = state;
-    
+
         // フラグが変わったので、UIの文字の切り替えを指示する
-        if (MapSelectManager.Instance != null) 
+        if (MapSelectManager.Instance != null)
         {
             MapSelectManager.Instance.ToggleConfirmUI(state);
         }
     }
-    
+
     // 実際に指定されたマップを生成するコア処理（次ラウンド開始時にも使い回す）
     public void LoadCurrentMapInSequence()
     {
-        _currentMatchTime = matchTimeLimit; 
-        _isMatchActive = true;
-        
         // 前のラウンドのマップが残っていれば消去する
         if (_currentMapInstance != null)
         {
@@ -296,15 +288,27 @@ public class MainSceneManager : MonoBehaviour
 
         // 現在選ばれているシーケンスと、その中の何戦目かを取得
         MapSequenceData currentSequence = experimentSequences[_selectedSequenceIndex];
-        MapData mapToLoad = currentSequence.sequenceSteps[_currentMapIndexInSequence].mapData;
+        MapSequenceStep mapStep = currentSequence.sequenceSteps[_currentMapIndexInSequence];
+        MapData mapToLoad = mapStep.mapData;
+
+        if (mapStep.matchLimitTime <= 0f)
+        {
+            _currentMatchTime = matchTimeLimit;
+        }
+        else
+        {
+            _currentMatchTime = mapStep.matchLimitTime;
+        }
+
+        _isMatchActive = true;
 
         // マップを生成（戻り値として生成された GameObject を受け取って保存する前提）
         _currentMapInstance = MapGenerator.GenerateMap(mapToLoad, commonPalette, out _spawnPoint1P, out _spawnPoint2P, out Vector3 mapCenter);
-        
+
         if (Camera.main != null)
         {
             Camera.main.transform.rotation = Quaternion.Euler(70f, 0f, 0f);
-            float pullBackDistance = 20f; 
+            float pullBackDistance = 20f;
             Camera.main.transform.position = mapCenter - (Camera.main.transform.forward * pullBackDistance);
         }
 
@@ -317,7 +321,7 @@ public class MainSceneManager : MonoBehaviour
             _playerSessions[i].SpawnMyTank(targetSpawnPos);
         }
     }
-    
+
     // 次のマップ（ラウンド）へ進む処理
     public void StartNextRound()
     {
@@ -336,12 +340,12 @@ public class MainSceneManager : MonoBehaviour
         // 次のマップを読み込む
         LoadCurrentMapInSequence();
     }
-    
+
     // 最終結果を表示してタイトルに戻るコルーチン
     private async UniTaskVoid ShowFinalResultRoutine()
     {
         string finalMessage = "";
-        
+
         if (_score1P > _score2P) finalMessage = "FINAL WINNER: <color=blue>1P</color> !!";
         else if (_score2P > _score1P) finalMessage = "FINAL WINNER: <color=red>2P</color> !!";
         else finalMessage = "FINAL RESULT: DRAW";
@@ -359,32 +363,32 @@ public class MainSceneManager : MonoBehaviour
         Cursor.visible = true; // マウスカーソルを戻しておく
         SceneManager.LoadScene("TitleScene");
     }
-    
+
     // 特定のプレイヤーが1P（ホスト）かどうかを判定する便利関数
     public bool IsPlayer1(PlayerSessionManager session)
     {
         return _playerSessions.Count > 0 && _playerSessions[0] == session;
     }
-    
+
     // 全員の準備が完了したかチェックする
     public void CheckAllPlayersReady()
     {
         // 0人の時だけでなく、「2人未満（1人の時）」も弾くようにする
         if (_playerSessions.Count < 2) return;
-        
+
         bool isAllReady = _playerSessions.TrueForAll(s => s.IsReady);
 
         if (isAllReady)
         {
             Debug.Log("2人揃って準備完了！マップ選択に移行します。");
             CurrentPhase = GamePhase.MapSelect; // 状態を移行！
-            
+
             // 3人目以降の参加受付をシャットアウトし、Jボタン連打による警告を防ぐ
             if (UnityEngine.InputSystem.PlayerInputManager.instance != null)
             {
                 UnityEngine.InputSystem.PlayerInputManager.instance.DisableJoining();
             }
-            
+
             // マップ選択画面の初期化（パネルの表示など）を指示する
             if (MapSelectManager.Instance != null)
             {
@@ -392,7 +396,7 @@ public class MainSceneManager : MonoBehaviour
             }
         }
     }
-    
+
     // 戻る処理
     public void GoBack()
     {
@@ -413,7 +417,7 @@ public class MainSceneManager : MonoBehaviour
                 break;
         }
     }
-    
+
     // デバック用
     // 倒されたプレイヤーを再出撃（リスポーン）させる関数
     // public void RespawnPlayer(PlayerSessionManager session)

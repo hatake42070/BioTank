@@ -1,5 +1,5 @@
+﻿using MapEditorSystem.Runtime;
 using UnityEngine;
-using MapEditorSystem.Runtime;
 
 // マップ選択画面に表示するための１マップ分の情報をまとめるクラスを定義
 [System.Serializable]
@@ -10,6 +10,9 @@ public class MapSequenceStep
 
     [Header("UIに表示する画像")]
     public Sprite previewImage;
+
+    [Header("試合時間")]
+    public float matchLimitTime;
 
     [Header("実際に読み込むマップデータ")]
     public MapData mapData;
