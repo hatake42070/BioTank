@@ -177,7 +177,7 @@ public class TitleManager : MonoBehaviour
             if (!BioSignalManager.Instance.IsScanning && Keyboard.current != null && Keyboard.current.rKey.wasPressedThisFrame)
             {
                 // 拡張メソッド Forget() を使って安全に呼び出す
-                BioSignalManager.Instance.ForceRescanAsync().AsUniTask().Forget();
+                BioSignalManager.Instance.ForceRescanAsync().Forget();
             }
         }
 
