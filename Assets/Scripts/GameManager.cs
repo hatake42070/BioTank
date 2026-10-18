@@ -21,6 +21,7 @@ public class GameSettingsData
     public bool isMuted = false;
     public BioGameMode bioMode = BioGameMode.Normal;
     public bool isLog = false;
+    public bool isStatic = false;
 }
 
 // ゲームモード（通常、心拍リアル、心拍フェイク）の現在の状態を記憶する
