@@ -59,6 +59,7 @@ public class TitleManager : MonoBehaviour
     [Header("選択状態を示す枠（ハイライト）の画像")]
     [SerializeField] private GameObject[] bioModeHighlights; // 0:Normal, 1:Real, 2:Fake
     [SerializeField] private GameObject[] logModeHighlights; // 0:LogON, 1:LogOFF
+    [SerializeField] private GameObject[] CalibrationModeHighlights; // 0:Static, 1:Dynamic
 
     private bool _isHRVisible = true; // 最初は表示状態にしておく
 
@@ -381,6 +382,44 @@ public class TitleManager : MonoBehaviour
         }
     }
 
+    // キャリブレーションモードを選択するボタンから呼ばれる
+    public void OnclickCalibrationMode(int modeIndex)
+    {
+        BioSignalManager.BaselineMode baselineMode;
+        if (modeIndex == 0)
+        {
+            GameManager.Instance.currentSettings.isStatic = true;
+            baselineMode = BioSignalManager.BaselineMode.Static;
+        }
+        else
+        {
+            GameManager.Instance.currentSettings.isStatic = false;
+            baselineMode = BioSignalManager.BaselineMode.Dynamic;
+        }
+
+        BioSignalManager.Instance.SetBaselineMode(baselineMode);
+
+        // 選ばれた番号の枠だけを表示し、他を非表示にする
+        for (int i = 0; i < CalibrationModeHighlights.Length; i++)
+        {
+            if (CalibrationModeHighlights[i] != null)
+            {
+                CalibrationModeHighlights[i].SetActive(i == modeIndex);
+            }
+        }
+    }
+
+    public void OnClickCalibrate1P()
+    {
+        // UniTaskの非同期メソッドを、ボタンから安全に発火させる書き方（.Forget() を使う）
+        BioSignalManager.Instance.CalibrateStaticBaselineAsync(0, 60).Forget();
+    }
+
+    public void OnClickCalibrate2P()
+    {
+        BioSignalManager.Instance.CalibrateStaticBaselineAsync(1, 60).Forget();
+    }
+
     /// <summary>
     /// セーブデータ（GameManager）の状態を読み取り、現在のモードのハイライト枠を初期表示する
     /// </summary>
@@ -407,6 +446,16 @@ public class TitleManager : MonoBehaviour
                 if (logModeHighlights[i] != null)
                 {
                     logModeHighlights[i].SetActive(i == logIndex);
+                }
+            }
+
+            // 3. CalibrationMode（trueなら0[Static]、falseなら1[Dynamic]）の枠を復元
+            int CalibrationIndex = settings.isStatic ? 0 : 1;
+            for (int i = 0; i < CalibrationModeHighlights.Length; i++)
+            {
+                if (CalibrationModeHighlights[i] != null)
+                {
+                    CalibrationModeHighlights[i].SetActive(i == CalibrationIndex);
                 }
             }
         }
