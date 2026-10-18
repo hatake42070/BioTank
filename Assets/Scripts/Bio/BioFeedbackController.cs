@@ -17,21 +17,28 @@ public class BioFeedbackController : MonoBehaviour
     [Range(40, 160)]
     [SerializeField] private int debugBpm = 80;
 
-    [Space(5)]
+    [Space(5)]  // Inspectorで値を確認する用
     [SerializeField] private int currentBpmDisplay;
     [SerializeField] private float currentSpeedMultDisplay;
+    [SerializeField] private float currentBaselineDisplay; // ベースとする心拍数
 
-    [Header("心拍数の基準範囲")]
-    [SerializeField] private float minBpm = 60f;  // 安静時（割合 0.0）
-    [SerializeField] private float maxBpm = 130f; // 最大興奮時（割合 1.0）
+    //[Header("心拍数の基準範囲")]
+    //[SerializeField] private float minBpm = 60f;  // 安静時（割合 0.0）
+    //[SerializeField] private float maxBpm = 130f; // 最大興奮時（割合 1.0）
+
+    [Tooltip("平均からいくつ上がったら最大スピードにするか")]
+    [SerializeField] private float upperThreshold = 15f;
+
+    [Tooltip("平均からいくつ(BPM)下がったら「最低スピード」にするか")]
+    [SerializeField] private float lowerThreshold = -15f;
 
     [Header("移動スピード倍率")]
-    [SerializeField] private float minSpeedMultiplier = 0.7f;
+    [SerializeField] private float minSpeedMultiplier = 0.5f;
     [SerializeField] private float maxSpeedMultiplier = 2.0f;
 
     [Header("発射間隔倍率")]
-    [SerializeField] private float minFireIntervalMultiplier = 0.6f;
-    [SerializeField] private float maxFireIntervalMultiplier = 1.8f;
+    [SerializeField] private float minFireIntervalMultiplier = 0.5f;
+    [SerializeField] private float maxFireIntervalMultiplier = 2.0f;
 
     [Header("立体メッシュパーティクル演出")]
     [SerializeField] private GameObject auraParticlePrefab;
@@ -153,21 +160,67 @@ public class BioFeedbackController : MonoBehaviour
 
         currentBpmDisplay = currentBpm;
 
+        // エラー時（未接続など）は等倍に戻して終了
         if (currentBpm <= 0)
         {
             _tankController.ResetMultipliers();
             currentSpeedMultDisplay = 1.0f;
+            currentBaselineDisplay = 0f;
             UpdateParticleVisuals(1.0f);
             return;
         }
 
-        float t = Mathf.InverseLerp(minBpm, maxBpm, currentBpm);
-        float speedMult = Mathf.Lerp(minSpeedMultiplier, maxSpeedMultiplier, t);
-        float fireIntervalMult = Mathf.Lerp(minFireIntervalMultiplier, maxFireIntervalMultiplier, t);
+        // --- ベースラインの記録と更新 ---
+        float currentBaseline = 0f;
+        if (BioSignalManager.Instance.currentBaselineMode == BioSignalManager.BaselineMode.Static)
+        {
+            currentBaseline = BioSignalManager.Instance.staticBaselines[_playerIndex];
+        }
+        else
+        {
+            currentBaseline = BioSignalManager.Instance.GetDynamicBaselineAverage(_playerIndex);
+        }
+        currentBaselineDisplay = currentBaseline;
+
+        // --- ベースラインからのずれで性能を変化させる計算ロジック ---
+        float speedMult = 1.0f;
+        float fireIntervalMult = 1.0f;
+
+        // 基準値からの「ズレ（差分）」を計算する
+        float diff = currentBpm - currentBaseline;
+
+        if (diff < 0)
+        {
+            // ① ベースラインより低い場合（落ち着いている時）
+            // lowerThreshold（-15）に対して、今どれくらい下がっているかの割合 (0.0 ~ 1.0)
+            float t = Mathf.Clamp01(diff / lowerThreshold);
+
+            // 1.0(等倍) から 0.5(最小) へ向かって変化させる
+            speedMult = Mathf.Lerp(1.0f, minSpeedMultiplier, t);
+            fireIntervalMult = Mathf.Lerp(1.0f, minFireIntervalMultiplier, t);
+        }
+        else
+        {
+            // ② ベースライン以上の場合（焦っている時）
+            // upperThreshold（+15）に対して、今どれくらい上がっているかの割合 (0.0 ~ 1.0)
+            float t = Mathf.Clamp01(diff / upperThreshold);
+
+            // 1.0(等倍) から 2.0(最大) へ向かって変化させる
+            speedMult = Mathf.Lerp(1.0f, maxSpeedMultiplier, t);
+            fireIntervalMult = Mathf.Lerp(1.0f, maxFireIntervalMultiplier, t);
+        }
 
         currentSpeedMultDisplay = speedMult;
         _tankController.SetBioMultipliers(speedMult, fireIntervalMult);
         UpdateParticleVisuals(speedMult);
+
+        //float t = Mathf.InverseLerp(minBpm, maxBpm, currentBpm);
+        //float speedMult = Mathf.Lerp(minSpeedMultiplier, maxSpeedMultiplier, t);
+        //float fireIntervalMult = Mathf.Lerp(minFireIntervalMultiplier, maxFireIntervalMultiplier, t);
+
+        //currentSpeedMultDisplay = speedMult;
+        //_tankController.SetBioMultipliers(speedMult, fireIntervalMult);
+        //UpdateParticleVisuals(speedMult);
     }
 
     private void UpdateParticleVisuals(float currentSpeedMult)

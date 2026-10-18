@@ -1,9 +1,16 @@
 ﻿using Assets.Scripts.Bio;
+using Cysharp.Threading.Tasks;
+using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.InteropServices;
-using System.Threading.Tasks;
+using System.Threading;
 using UnityEngine;
 
 // 最終的にシングルトンなのでタイトルシーンにのみ置く
+/// <summary>
+/// 心拍の収集・履歴の記憶を行う
+/// </summary>
 public class BioSignalManager : MonoBehaviour
 {
     public static BioSignalManager Instance { get; private set; }
@@ -35,6 +42,30 @@ public class BioSignalManager : MonoBehaviour
     // 現在のプロバイダー（リアル心拍なのか，偽なのかなど）
     private IHeartRateProvider currentProvider;
 
+    // --- ベースライン関係 ---
+    public enum BaselineMode
+    {
+        Static,
+        Dynamic
+    }
+    public BaselineMode currentBaselineMode = BaselineMode.Dynamic;
+
+    // 事前計測で決めた固定ベースライン（1P, 2P）
+    public float[] staticBaselines = new float[2];    // 2つの要素を確保し，0.0fで初期化
+    // 動的ベースラインの履歴（1P, 2P）
+    public Queue<int>[] dynamicBpmHistories = new Queue<int>[2];
+
+    private float _timeSinceLastRecord = 0.0f;
+    private float _recordInterval = 1.0f;
+
+    [Header("動的ベースライン")]
+    [Tooltip("何秒間（何サンプル）を平均の基準にするか")]
+    [SerializeField] private int baselineHistorySize = 15;
+
+    [Header("ベースライン確認用")]
+    [SerializeField] private float[] dynamicBpmBaselineDisplay = new float[2];
+    [SerializeField] private float[] staticBpmBaselineDisplay = new float[2];
+
     private void Awake()
     {
         // 自分が最初の1個目なら、絶対に破棄されないように設定する
@@ -42,6 +73,10 @@ public class BioSignalManager : MonoBehaviour
         {
             Instance = this;
             DontDestroyOnLoad(gameObject);
+
+            // Queueをそれぞれインスタンス化する
+            dynamicBpmHistories[0] = new Queue<int>();
+            dynamicBpmHistories[1] = new Queue<int>();
         }
         // もしタイトル画面に戻ってきた時など、2個目が生まれようとしたら自爆する
         else
@@ -58,7 +93,7 @@ public class BioSignalManager : MonoBehaviour
     }
 
     // 外部（TitleManager等）から何度でも呼べる接続メソッド
-    public async Task TryConnectAsync()
+    public async UniTask TryConnectAsync()
     {
         if (IsScanning || IsConnected) return;
 
@@ -69,7 +104,7 @@ public class BioSignalManager : MonoBehaviour
         try
         {
             // 5秒間のスキャンを非同期で実行
-            bool scanSuccess = await Task.Run(() => StartHeartRateScan());
+            bool scanSuccess = await UniTask.RunOnThreadPool(() => StartHeartRateScan());
 
             if (scanSuccess)
             {
@@ -109,7 +144,7 @@ public class BioSignalManager : MonoBehaviour
     }
 
     // いつでも強制的に再スキャンを行うメソッド
-    public async Task ForceRescanAsync()
+    public async UniTask ForceRescanAsync()
     {
         if (IsScanning) return; // すでにスキャン中なら無視
 
@@ -119,8 +154,11 @@ public class BioSignalManager : MonoBehaviour
         IsConnected = false;
         StopBLE(); // C++側に「今の接続を切れ」と命令する
 
+        // このManagerオブジェクトが破棄されたら、自動的に待機をキャンセルする安全装置
+        CancellationToken token = this.GetCancellationTokenOnDestroy();
+
         // デバイス側のBluetooth切断処理が完全に終わるのを0.5秒待つ
-        await Task.Delay(500);
+        await UniTask.Delay(TimeSpan.FromSeconds(0.5), cancellationToken: token);
 
         // 再びスキャン処理を呼ぶ
         await TryConnectAsync();
@@ -141,6 +179,25 @@ public class BioSignalManager : MonoBehaviour
             GameplayHeartRates[0] = currentProvider.GetHeartRate(0);
             GameplayHeartRates[1] = currentProvider.GetHeartRate(1);
         }
+
+        _timeSinceLastRecord += Time.deltaTime;
+        if (_timeSinceLastRecord >= _recordInterval)
+        {
+            _timeSinceLastRecord = 0f;
+
+            // Queueへの記録
+            dynamicBpmHistories[0].Enqueue(GameplayHeartRates[0]);
+            dynamicBpmHistories[1].Enqueue(GameplayHeartRates[1]);
+
+            if (dynamicBpmHistories[0].Count > baselineHistorySize)
+            {
+                dynamicBpmHistories[0].Dequeue();
+            }
+            if (dynamicBpmHistories[1].Count > baselineHistorySize)
+            {
+                dynamicBpmHistories[1].Dequeue();
+            }
+        }
     }
 
     public void UpdateProvider()
@@ -158,6 +215,56 @@ public class BioSignalManager : MonoBehaviour
         {
             currentProvider = new RealHeartRateProvider(this);
         }
+    }
+
+    // BioFeedbackControllerから呼ばれ，ベースラインを計算して返す
+    public float GetDynamicBaselineAverage(int playerIndex)
+    {
+        if (dynamicBpmHistories[playerIndex].Count > 0)
+        {
+            float dynamicBpmBaseline = (float)dynamicBpmHistories[playerIndex].Average();
+            dynamicBpmBaselineDisplay[playerIndex] = dynamicBpmBaseline;
+            return dynamicBpmBaseline;
+        }
+        else
+        {
+            dynamicBpmBaselineDisplay[playerIndex] = GameplayHeartRates[playerIndex];
+            return GameplayHeartRates[playerIndex];
+        }
+    }
+
+    // UIのボタンやドロップダウンから呼ぶ用
+    public void SetBaselineMode(BaselineMode mode)
+    {
+        currentBaselineMode = mode;
+        Debug.Log($"ベースラインモードを {mode} に変更しました");
+    }
+
+    // タイトルのキャリブレーションボタンが押されたときに呼ばれる
+    public async UniTask CalibrateStaticBaselineAsync(int playerIndex, int durationSeconds = 60)
+    {
+        Debug.Log($"{playerIndex + 1}PのStaticベースライン計測を{durationSeconds}秒計測します");
+
+        long sumBpm = 0;
+        int count = 0;
+
+        // このManagerオブジェクトが破棄されたら、自動的に待機をキャンセルする安全装置
+        CancellationToken token = this.GetCancellationTokenOnDestroy();
+
+        // 指定秒数間、1秒ごとに心拍を足していく
+        for (int i = 0; i < durationSeconds; i++)
+        {
+            // TimeSpan を使うと「1秒」という意図がより明確になります
+            await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
+
+            sumBpm += GameplayHeartRates[playerIndex];
+            count++;
+        }
+
+        // 平均を求めて、固定ベースラインとして保存する
+        staticBaselines[playerIndex] = (float)sumBpm / count;
+        Debug.Log($"{playerIndex + 1}Pの固定ベースラインが {staticBaselines[playerIndex]} に設定されました");
+        staticBpmBaselineDisplay[playerIndex] = staticBaselines[playerIndex];
     }
 
     private void OnDestroy()
