@@ -1,4 +1,5 @@
-﻿using Assets.Scripts.Log;
+﻿using System;
+using Assets.Scripts.Log;
 using Cysharp.Threading.Tasks;
 using TMPro;
 using UnityEngine;
@@ -46,20 +47,23 @@ public class TitleManager : MonoBehaviour
     private Slider bgmSlider;
     [SerializeField]
     private Slider seSlider;
-
-    [FormerlySerializedAs("titleText")]
+    
     [Header("心拍数など")]
     [SerializeField]
-    private TextMeshProUGUI Player1HRText;
+    private TextMeshProUGUI player1HRText;
     [SerializeField]
-    private TextMeshProUGUI Player2HRText;
+    private TextMeshProUGUI player2HRText;
     [SerializeField]
-    private TextMeshProUGUI HrConnectLogText;
+    private TextMeshProUGUI hrConnectLogText;
+    [SerializeField]
+    private TextMeshProUGUI p1CalibrationLogText;
+    [SerializeField]
+    private TextMeshProUGUI p2CalibrationLogText;
 
     [Header("選択状態を示す枠（ハイライト）の画像")]
     [SerializeField] private GameObject[] bioModeHighlights; // 0:Normal, 1:Real, 2:Fake
     [SerializeField] private GameObject[] logModeHighlights; // 0:LogON, 1:LogOFF
-    [SerializeField] private GameObject[] CalibrationModeHighlights; // 0:Static, 1:Dynamic
+    [FormerlySerializedAs("CalibrationModeHighlights")] [SerializeField] private GameObject[] calibrationModeHighlights; // 0:Static, 1:Dynamic
 
     private bool _isHRVisible = true; // 最初は表示状態にしておく
 
@@ -115,30 +119,30 @@ public class TitleManager : MonoBehaviour
         if (Keyboard.current != null && Keyboard.current.tabKey.wasPressedThisFrame)
         {
             _isHRVisible = !_isHRVisible; // trueとfalseを反転
-            Player1HRText.enabled = _isHRVisible; // Textコンポーネント自体のON/OFF
-            Player2HRText.enabled = _isHRVisible;
+            player1HRText.enabled = _isHRVisible; // Textコンポーネント自体のON/OFF
+            player2HRText.enabled = _isHRVisible;
         }
 
         // 2. 心拍数のテキスト更新（表示されている時だけ処理する）
         if (_isHRVisible)
         {
             // 毎フレーム、BioSignalManagerの文字列をそのままUIテキストに入れる
-            if (HrConnectLogText != null)
+            if (hrConnectLogText != null)
             {
-                HrConnectLogText.text = BioSignalManager.Instance.HrConnectLog;
+                hrConnectLogText.text = BioSignalManager.Instance.HrConnectLog;
             }
 
             // BioSignalManagerがスキャン処理を実行中の時
             if (BioSignalManager.Instance.IsScanning)
             {
-                Player1HRText.text = "1P: スキャン中";
-                Player2HRText.text = "2P: スキャン中";
+                player1HRText.text = "1P: スキャン中";
+                player2HRText.text = "2P: スキャン中";
             }
             // 接続に失敗している、または未接続の時
             else if (!BioSignalManager.Instance.IsConnected)
             {
-                Player1HRText.text = "1P: 未接続";
-                Player2HRText.text = "2P: 未接続";
+                player1HRText.text = "1P: 未接続";
+                player2HRText.text = "2P: 未接続";
             }
             // 接続が成功している時（※1台でも繋がればここに来る）
             else
@@ -147,30 +151,30 @@ public class TitleManager : MonoBehaviour
                 int p1Hr = BioSignalManager.Instance.RealHeartRates[0];
                 if (p1Hr == -1)
                 {
-                    Player1HRText.text = "1P: 未接続 (電源を確認してください)";
+                    player1HRText.text = "1P: 未接続 (電源を確認してください)";
                 }
                 else if (p1Hr == 0)
                 {
-                    Player1HRText.text = "1P: 接続済 (心拍データ待機中...)";
+                    player1HRText.text = "1P: 接続済 (心拍データ待機中...)";
                 }
                 else
                 {
-                    Player1HRText.text = $"1P: {p1Hr}";
+                    player1HRText.text = $"1P: {p1Hr}";
                 }
 
                 // --- 2P の表示 ---
                 int p2Hr = BioSignalManager.Instance.RealHeartRates[1];
                 if (p2Hr == -1)
                 {
-                    Player2HRText.text = "2P: 未接続 (電源を確認してください)";
+                    player2HRText.text = "2P: 未接続 (電源を確認してください)";
                 }
                 else if (p2Hr == 0)
                 {
-                    Player2HRText.text = "2P: 接続済 (心拍データ待機中...)";
+                    player2HRText.text = "2P: 接続済 (心拍データ待機中...)";
                 }
                 else
                 {
-                    Player2HRText.text = $"2P: {p2Hr}";
+                    player2HRText.text = $"2P: {p2Hr}";
                 }
             }
 
@@ -400,24 +404,56 @@ public class TitleManager : MonoBehaviour
         BioSignalManager.Instance.SetBaselineMode(baselineMode);
 
         // 選ばれた番号の枠だけを表示し、他を非表示にする
-        for (int i = 0; i < CalibrationModeHighlights.Length; i++)
+        for (int i = 0; i < calibrationModeHighlights.Length; i++)
         {
-            if (CalibrationModeHighlights[i] != null)
+            if (calibrationModeHighlights[i] != null)
             {
-                CalibrationModeHighlights[i].SetActive(i == modeIndex);
+                calibrationModeHighlights[i].SetActive(i == modeIndex);
             }
         }
     }
 
-    public void OnClickCalibrate1P()
+    public async void OnClickCalibrate1P()
     {
-        // UniTaskの非同期メソッドを、ボタンから安全に発火させる書き方（.Forget() を使う）
-        BioSignalManager.Instance.CalibrateStaticBaselineAsync(0, 60).Forget();
+        try
+        {
+            p1CalibrationLogText.gameObject.SetActive(true);
+            p1CalibrationLogText.text = "計測中";
+            
+            await BioSignalManager.Instance.CalibrateStaticBaselineAsync(0, 60);
+            float resultBpm = BioSignalManager.Instance.staticBaselines[0];
+            p1CalibrationLogText.text = $"{resultBpm:F1}BPM";
+        }
+        catch (OperationCanceledException)
+        {
+            Debug.Log("1Pのキャリブレーションがキャンセルされました。");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
-    public void OnClickCalibrate2P()
+    public async void OnClickCalibrate2P()
     {
-        BioSignalManager.Instance.CalibrateStaticBaselineAsync(1, 60).Forget();
+        try
+        {
+            p2CalibrationLogText.gameObject.SetActive(true);
+            p2CalibrationLogText.text = "計測中";
+            
+            await BioSignalManager.Instance.CalibrateStaticBaselineAsync(1, 60);
+            float resultBpm = BioSignalManager.Instance.staticBaselines[1];
+            p2CalibrationLogText.text = $"{resultBpm:F1} BPM";
+        }
+        catch (OperationCanceledException)
+        {
+            // もし待機中に画面が切り替わったりしたら、安全に処理を終了する
+            Debug.Log("2Pのキャリブレーションがキャンセルされました。");
+        }
+        catch (Exception ex)
+        {
+            Debug.LogException(ex);
+        }
     }
 
     /// <summary>
@@ -450,12 +486,12 @@ public class TitleManager : MonoBehaviour
             }
 
             // 3. CalibrationMode（trueなら0[Static]、falseなら1[Dynamic]）の枠を復元
-            int CalibrationIndex = settings.isStatic ? 0 : 1;
-            for (int i = 0; i < CalibrationModeHighlights.Length; i++)
+            int calibrationIndex = settings.isStatic ? 0 : 1;
+            for (int i = 0; i < calibrationModeHighlights.Length; i++)
             {
-                if (CalibrationModeHighlights[i] != null)
+                if (calibrationModeHighlights[i] != null)
                 {
-                    CalibrationModeHighlights[i].SetActive(i == CalibrationIndex);
+                    calibrationModeHighlights[i].SetActive(i == calibrationIndex);
                 }
             }
         }

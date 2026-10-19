@@ -257,7 +257,7 @@ public class BioSignalManager : MonoBehaviour
             // TimeSpan を使うと「1秒」という意図がより明確になります
             await UniTask.Delay(TimeSpan.FromSeconds(1), cancellationToken: token);
 
-            sumBpm += GameplayHeartRates[playerIndex];
+            sumBpm += RealHeartRates[playerIndex];
             count++;
         }
 
