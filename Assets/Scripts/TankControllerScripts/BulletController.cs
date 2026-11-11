@@ -29,7 +29,8 @@ namespace TankControllerScripts
             _ownerTank = owner; // 記憶する
             _rb = GetComponent<Rigidbody>();
 
-            _boundCount = _data.maxBounces;
+            int bounceOffset = owner != null ? owner.CurrentBounceOffset : 0;
+            _boundCount = Mathf.Clamp(_data.maxBounces + bounceOffset, 0, 3);
 
             // 子オブジェクトにある横倒しのCapsuleColliderを取得する
             _myCollider = GetComponentInChildren<Collider>();
@@ -182,7 +183,7 @@ namespace TankControllerScripts
                     Instantiate(explosionPrefab, transform.position, Quaternion.identity);
                 }
                 AudioManager.Instance.PlaySE("Explosion");
-                
+
                 Destroy(gameObject);
                 return;
             }

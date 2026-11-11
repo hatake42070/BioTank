@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections; // コルーチンに使う
 using System.Collections.Generic;
 using UnityEngine;
@@ -11,7 +11,7 @@ namespace TankControllerScripts
         private TankInputHandler _inputHandler;
         private TankMovement _tankMovement;
         private TankShooter _tankShooter;
-        private TankTurretAim  _tankTurretAim;
+        private TankTurretAim _tankTurretAim;
         [SerializeField] private TankData tankData;
 
         public TankData TankData => tankData;
@@ -26,23 +26,24 @@ namespace TankControllerScripts
 
         [HideInInspector]
         public int activeBulletCount = 0; // 現在画面にある自分の弾の数
-        
+
         [Header("無敵設定")]
         [SerializeField] private float invincibilityDuration = 1.5f; // 無敵時間
         [SerializeField] private float blinkInterval = 0.1f;         // 点滅スピード
 
         private bool _isInvincible = false; // 無敵フラグ
         private Renderer[] _renderers; // 点滅させるためのメッシュたち
-        
+
         // インスペクターから巨大化したタンク用爆発プレハブをセットする
         [SerializeField] private GameObject tankExplosionPrefab; // タンク用爆発演出
         // Stateクラスから安全に読み取れるようにプロパティとして公開する
         public GameObject ExplosionPrefab => tankExplosionPrefab;
-        
+
         // 外部から心拍数に応じて倍率を調節するパラメータ
         public float CurrentSpeedMultiplier { get; private set; } = 1.0f;
         public float CurrentFireIntervalMultiplier { get; private set; } = 1.0f;
-        
+        public int CurrentBounceOffset { get; private set; }
+
         // ステート側が参照するための「実際の移動速度」プロパティ
         public float CurrentMoveSpeed => tankData.baseMoveSpeed * CurrentSpeedMultiplier;
 
@@ -58,7 +59,7 @@ namespace TankControllerScripts
             _tankMovement = GetComponent<TankMovement>();
             _tankShooter = GetComponent<TankShooter>();
             _tankTurretAim = GetComponent<TankTurretAim>();
-            
+
             // 自分の戦車の見た目(MeshRenderer)をすべて取得しておく
             _renderers = GetComponentsInChildren<Renderer>();
 
@@ -71,10 +72,10 @@ namespace TankControllerScripts
             };
 
             _stateContext.Initialize(this, _stateDictionary[typeof(TankStateIdle)]);
-            
+
             // TankDataから最大HPを取得して、現在のHPを初期化する
             _currentHp = tankData.maxHp;
-            
+
             // 一番初め生成された瞬間は無敵にしておく（後で変えるかも）
             StartCoroutine(InvincibilityRoutine());
         }
@@ -105,7 +106,7 @@ namespace TankControllerScripts
             {
                 // 撃てる・撃てないに関わらず、入力フラグはここで絶対に下ろす
                 _inputHandler.ConsumeAttack();
-                
+
                 // その上で、撃てる状態（CDが明けているか等）なら発射処理を行う
                 if (CanFire())
                 {
@@ -126,11 +127,11 @@ namespace TankControllerScripts
         /// <returns></returns>
         private bool CanFire()
         {
-            float actualCooldown = TankData.fireCooldown * CurrentFireIntervalMultiplier;
+            float actualCooldown = TankData.fireCooldown;
             // クールダウンが完了している ＆ 弾の数が上限未満のときだけ撃てる
             bool isCooldownReady = Time.time >= _lastFireTime + actualCooldown;
             bool isUnderBulletLimit = activeBulletCount < tankData.maxActiveBullets;
-            
+
             return isCooldownReady && isUnderBulletLimit;
         }
 
@@ -163,15 +164,15 @@ namespace TankControllerScripts
         {
             // 無敵中ならダメージを無効化する
             if (_isInvincible || _currentHp <= 0) return;
-            
+
             _currentHp -= damage;
             Debug.Log($"戦車がダメージを受けた！ 残りHP: {_currentHp}");
-            
+
             AudioManager.Instance.PlaySE("Damage");
 
             // HPが変化したこを、登録されている外部のメソッドに通知する
             OnHpChanged?.Invoke(_currentHp);
-            
+
             if (_currentHp <= 0)
             {
                 // HPが0になったら、状態を「Dead（死亡）」に切り替える！
@@ -183,7 +184,7 @@ namespace TankControllerScripts
                 StartCoroutine(InvincibilityRoutine());
             }
         }
-        
+
         // 無敵時間の点滅コルーチン
         private IEnumerator InvincibilityRoutine()
         {
@@ -217,24 +218,16 @@ namespace TankControllerScripts
             }
             _tankTurretAim.AimTurret(_inputHandler.AimDirection);
         }
-        
-        /// <summary>
-        /// 外部（SessionManager等）から倍率を更新するための窓口メソッド
-        /// </summary>
-        public void SetBioMultipliers(float speedMult, float fireIntervalMult)
+
+        public void SetBioFeedback(float speedMult, int bounceOffset)
         {
-            // 万が一おかしな値が来てもゲームが壊れないように安全な範囲（0.5倍〜3.0倍など）に制限する
             CurrentSpeedMultiplier = Mathf.Clamp(speedMult, 0.5f, 3.0f);
-            CurrentFireIntervalMultiplier = Mathf.Clamp(fireIntervalMult, 0.5f, 3.0f);
+            CurrentBounceOffset = bounceOffset;
         }
 
-        /// <summary>
-        /// 倍率を初期状態（1.0倍）にリセットするメソッド（通常モード用）
-        /// </summary>
         public void ResetMultipliers()
         {
-            CurrentSpeedMultiplier = 1.0f;
-            CurrentFireIntervalMultiplier = 1.0f;
+            SetBioFeedback(1f, 0);
         }
     }
 }

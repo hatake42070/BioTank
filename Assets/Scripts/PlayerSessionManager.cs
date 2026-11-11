@@ -16,6 +16,8 @@ public class PlayerSessionManager : MonoBehaviour
     private CrosshairUI crosshairUI; // クロスヘアのPrefab
     [SerializeField]
     private TankHpUI myHpUI;
+    [SerializeField] private HeartRateMeterUI heartRateMeterPrefab;
+    private HeartRateMeterUI _myHeartRateMeter;
 
     private CrosshairUI _myCrosshairUI; // 生成した自分のクロスヘア
     private TankHpUI _myTankHpUI;
@@ -71,6 +73,11 @@ public class PlayerSessionManager : MonoBehaviour
         if (_myTankHpUI != null)
         {
             Destroy(_myTankHpUI.gameObject);
+        }
+        if (_myHeartRateMeter != null)
+        {
+            Destroy(_myHeartRateMeter.gameObject);
+            _myHeartRateMeter = null;
         }
 
         // 指定された座標(Vector3)に自分の戦車を生成
@@ -145,6 +152,16 @@ public class PlayerSessionManager : MonoBehaviour
             }
 
             bioFeedback.Initialize(_playerInput.playerIndex, isBioMode);
+
+            if (isBioMode && heartRateMeterPrefab != null && _myTankHpUI != null)
+            {
+                _myHeartRateMeter = Instantiate(
+                    heartRateMeterPrefab,
+                    _myTankHpUI.transform,
+                    false);
+
+                _myHeartRateMeter.Bind(bioFeedback);
+            }
         }
     }
 

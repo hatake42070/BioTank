@@ -50,6 +50,7 @@ MonoBehaviour:
   - {fileID: 580506073305369390, guid: 828954dbce8d31b4aaa816f109118f87, type: 3}
   crosshairUI: {fileID: 3903834764112125375, guid: 99a47ebaf64d60447bccc3a26e8040fd, type: 3}
   myHpUI: {fileID: -2021472346367175605, guid: eb97e37827c53214d89dbe5ceb475876, type: 3}
+  heartRateMeterPrefab: {fileID: 7218475252367686860, guid: 6d569c2a1d5c6dc49bc1556558b9fa37, type: 3}
 --- !u!114 &3957874985145161075
 MonoBehaviour:
   m_ObjectHideFlags: 0
