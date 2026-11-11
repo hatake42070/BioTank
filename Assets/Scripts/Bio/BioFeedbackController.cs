@@ -22,6 +22,16 @@ public class BioFeedbackController : MonoBehaviour
     [SerializeField] private float currentSpeedMultDisplay;
     [SerializeField] private float currentBaselineDisplay; // ベースとする心拍数
 
+    public int CurrentBpm => currentBpmDisplay;
+    public float CurrentBaseline => currentBaselineDisplay;
+    public float CurrentMoveMultiplier => _tankController.CurrentSpeedMultiplier;
+
+    public int NextBulletBounces => Mathf.Clamp(
+        _tankController.TankData.currentBullet.maxBounces
+            + _tankController.CurrentBounceOffset,
+        0,
+        3);
+
     //[Header("心拍数の基準範囲")]
     //[SerializeField] private float minBpm = 60f;  // 安静時（割合 0.0）
     //[SerializeField] private float maxBpm = 130f; // 最大興奮時（割合 1.0）
@@ -36,9 +46,13 @@ public class BioFeedbackController : MonoBehaviour
     [SerializeField] private float minSpeedMultiplier = 0.5f;
     [SerializeField] private float maxSpeedMultiplier = 2.0f;
 
-    [Header("発射間隔倍率")]
-    [SerializeField] private float minFireIntervalMultiplier = 0.5f;
-    [SerializeField] private float maxFireIntervalMultiplier = 2.0f;
+    [Header("弾の反射回数")]
+    [Min(1f)]
+    [SerializeField] private float bpmPerBounce = 5f;
+
+    //[Header("発射間隔倍率")]
+    //[SerializeField] private float minFireIntervalMultiplier = 0.5f;
+    //[SerializeField] private float maxFireIntervalMultiplier = 2.0f;
 
     [Header("立体メッシュパーティクル演出")]
     [SerializeField] private GameObject auraParticlePrefab;
@@ -182,36 +196,25 @@ public class BioFeedbackController : MonoBehaviour
         }
         currentBaselineDisplay = currentBaseline;
 
-        // --- ベースラインからのずれで性能を変化させる計算ロジック ---
-        float speedMult = 1.0f;
-        float fireIntervalMult = 1.0f;
-
-        // 基準値からの「ズレ（差分）」を計算する
         float diff = currentBpm - currentBaseline;
+        float speedMult;
 
-        if (diff < 0)
+        if (diff < 0f)
         {
-            // ① ベースラインより低い場合（落ち着いている時）
-            // lowerThreshold（-15）に対して、今どれくらい下がっているかの割合 (0.0 ~ 1.0)
             float t = Mathf.Clamp01(diff / lowerThreshold);
-
-            // 1.0(等倍) から 0.5(最小) へ向かって変化させる
-            speedMult = Mathf.Lerp(1.0f, minSpeedMultiplier, t);
-            fireIntervalMult = Mathf.Lerp(1.0f, minFireIntervalMultiplier, t);
+            speedMult = Mathf.Lerp(1f, minSpeedMultiplier, t);
         }
         else
         {
-            // ② ベースライン以上の場合（焦っている時）
-            // upperThreshold（+15）に対して、今どれくらい上がっているかの割合 (0.0 ~ 1.0)
             float t = Mathf.Clamp01(diff / upperThreshold);
-
-            // 1.0(等倍) から 2.0(最大) へ向かって変化させる
-            speedMult = Mathf.Lerp(1.0f, maxSpeedMultiplier, t);
-            fireIntervalMult = Mathf.Lerp(1.0f, maxFireIntervalMultiplier, t);
+            speedMult = Mathf.Lerp(1f, maxSpeedMultiplier, t);
         }
 
+        // 0方向に丸めるので、基準との差が5 BPM未満なら補正は0。
+        int bounceOffset = (int)(-diff / Mathf.Max(1f, bpmPerBounce));
+
         currentSpeedMultDisplay = speedMult;
-        _tankController.SetBioMultipliers(speedMult, fireIntervalMult);
+        _tankController.SetBioFeedback(speedMult, bounceOffset);
         UpdateParticleVisuals(speedMult);
 
         //float t = Mathf.InverseLerp(minBpm, maxBpm, currentBpm);

@@ -1,6 +1,6 @@
-﻿using System;
-using Assets.Scripts.Log;
+﻿using Assets.Scripts.Log;
 using Cysharp.Threading.Tasks;
+using System;
 using TMPro;
 using UnityEngine;
 using UnityEngine.EventSystems;
@@ -47,7 +47,7 @@ public class TitleManager : MonoBehaviour
     private Slider bgmSlider;
     [SerializeField]
     private Slider seSlider;
-    
+
     [Header("心拍数など")]
     [SerializeField]
     private TextMeshProUGUI player1HRText;
@@ -63,7 +63,7 @@ public class TitleManager : MonoBehaviour
     [Header("選択状態を示す枠（ハイライト）の画像")]
     [SerializeField] private GameObject[] bioModeHighlights; // 0:Normal, 1:Real, 2:Fake
     [SerializeField] private GameObject[] logModeHighlights; // 0:LogON, 1:LogOFF
-    [FormerlySerializedAs("CalibrationModeHighlights")] [SerializeField] private GameObject[] calibrationModeHighlights; // 0:Static, 1:Dynamic
+    [FormerlySerializedAs("CalibrationModeHighlights")][SerializeField] private GameObject[] calibrationModeHighlights; // 0:Static, 1:Dynamic
 
     private bool _isHRVisible = true; // 最初は表示状態にしておく
 
@@ -292,6 +292,15 @@ public class TitleManager : MonoBehaviour
         EventSystem.current.SetSelectedGameObject(targetData.firstSelectedButton);
     }
 
+    public void ExitGame()
+    {
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
+    }
+
     /// <summary>
     /// 現在開いているサブパネルを閉じて、左側のボタン（GameやSound）にフォーカスを戻す
     /// </summary>
@@ -419,7 +428,7 @@ public class TitleManager : MonoBehaviour
         {
             p1CalibrationLogText.gameObject.SetActive(true);
             p1CalibrationLogText.text = "計測中";
-            
+
             await BioSignalManager.Instance.CalibrateStaticBaselineAsync(0, 60);
             float resultBpm = BioSignalManager.Instance.staticBaselines[0];
             p1CalibrationLogText.text = $"{resultBpm:F1}BPM";
@@ -440,7 +449,7 @@ public class TitleManager : MonoBehaviour
         {
             p2CalibrationLogText.gameObject.SetActive(true);
             p2CalibrationLogText.text = "計測中";
-            
+
             await BioSignalManager.Instance.CalibrateStaticBaselineAsync(1, 60);
             float resultBpm = BioSignalManager.Instance.staticBaselines[1];
             p2CalibrationLogText.text = $"{resultBpm:F1} BPM";
