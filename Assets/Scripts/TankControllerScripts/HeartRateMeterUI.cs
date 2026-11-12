@@ -46,9 +46,6 @@ public class HeartRateMeterUI : MonoBehaviour
         fill.offsetMin = Vector2.zero;
         fill.offsetMax = Vector2.zero;
 
-        statusText.text =
-            $"{source.CurrentBpm} BPM（基準 {source.CurrentBaseline:0.#}）\n" +
-            $"移動 ×{source.CurrentMoveMultiplier:0.00}   " +
-            $"次弾の反射 {source.NextBulletBounces}回";
+        statusText.text = $"反射 {source.NextBulletBounces}回";
     }
 }
