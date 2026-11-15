@@ -365,13 +365,11 @@ public class TitleManager : MonoBehaviour
             {
                 GameManager.Instance.currentSettings.isLog = true;
 
-                // ONにした瞬間に、ベースラインの計測を確実にスタートさせる
-                if (ExperimentLogger.Instance != null)
+                if (modeIndex == 0)
                 {
-                    ExperimentLogger.Instance.StartLogging("Phase0_Baseline");
+                    GameManager.Instance.currentSettings.isLog = true;
+                    Debug.Log("ゲームモードをLogありに変更しました！");
                 }
-
-                Debug.Log($"ゲームモードをLogありに変更しました！");
             }
             else
             {
