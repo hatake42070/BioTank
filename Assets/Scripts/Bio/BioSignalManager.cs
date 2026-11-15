@@ -15,6 +15,10 @@ public class BioSignalManager : MonoBehaviour
 {
     public static BioSignalManager Instance { get; private set; }
 
+    // プレイヤーの疑似心拍CSV
+    [SerializeField] private TextAsset playerOneFakeCsv;
+    [SerializeField] private TextAsset playerTwoFakeCsv;
+
     // --- 1. C++ (DLL) の関数をUnityにインポート ---
     [DllImport("BlePlugin")]
     private static extern bool StartHeartRateScan();
@@ -209,7 +213,7 @@ public class BioSignalManager : MonoBehaviour
         if (mode == BioGameMode.BioFake)
         {
             // --- ここでプロバイダーを切り替えてテストする ---
-            currentProvider = new SinWaveFakeProvider();
+            currentProvider = new CsvHeartRateProvider(playerOneFakeCsv, playerTwoFakeCsv);
         }
         else
         {

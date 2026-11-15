@@ -135,8 +135,13 @@ public class PlayerSessionManager : MonoBehaviour
             // HPが変化した時、Session側の CurrentHp も一緒に更新する
             tankController.OnHpChanged += (hp) =>
             {
-                CurrentHp = hp; // Sessionの記憶を更新
-                _myTankHpUI.UpdateHpDisplay(hp); // UIの表示も更新
+                if (hp < CurrentHp && MainSceneManager.Instance != null)
+                {
+                    MainSceneManager.Instance.LogTankHit(this, hp);
+                }
+
+                CurrentHp = hp;
+                _myTankHpUI.UpdateHpDisplay(hp);
             };
         }
         // BioFeedbackController の初期化

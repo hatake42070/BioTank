@@ -23,6 +23,11 @@ MonoBehaviour:
     tileName: Rock
     editorColor: {r: 0.9056604, g: 0.88348466, b: 0.46564615, a: 0}
     role: 0
+  - tileID: 3
+    prefab: {fileID: 4521396678824596563, guid: cf669deab401e43ee821645f9bd3403f, type: 3}
+    tileName: Stone
+    editorColor: {r: 0.47912958, g: 0.9150943, b: 0.83753633, a: 0}
+    role: 0
   placeableObjects:
   - objectID: 1
     prefab: {fileID: 0}
@@ -57,7 +62,7 @@ MonoBehaviour:
   - objectID: 7
     prefab: {fileID: 4000223362346477663, guid: 2351b41e5563c444aa0bb83b25407bdb, type: 3}
     objectName: Rock1
-    editorColor: {r: 0.4811321, g: 0.4811321, b: 0.4811321, a: 0}
+    editorColor: {r: 0.23584908, g: 0.23473659, b: 0.23473659, a: 0}
     role: 1
   - objectID: 8
     prefab: {fileID: 4000223362346477663, guid: c985d0d1325c9f64baf65afdba54b05e, type: 3}
@@ -68,4 +73,14 @@ MonoBehaviour:
     prefab: {fileID: 4000223362346477663, guid: 3b63ebfad63b4124ea4a0d0f18c48200, type: 3}
     objectName: Sand
     editorColor: {r: 0.02683338, g: 0.6320754, b: 0.08854437, a: 0}
+    role: 1
+  - objectID: 10
+    prefab: {fileID: 4000223362346477663, guid: b3ee7c129b78d3a4ba639f5c3c87c2de, type: 3}
+    objectName: Leaf
+    editorColor: {r: 0, g: 0.19978654, b: 1, a: 0}
+    role: 2
+  - objectID: 11
+    prefab: {fileID: 4000223362346477663, guid: 8e69fe871fc4daa49a310efd08ae2ed8, type: 3}
+    objectName: Brick
+    editorColor: {r: 1, g: 0.18952484, b: 0, a: 0}
     role: 1
