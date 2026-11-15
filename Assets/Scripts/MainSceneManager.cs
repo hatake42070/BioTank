@@ -1,4 +1,5 @@
-﻿using Cysharp.Threading.Tasks;
+﻿using Assets.Scripts.Log;
+using Cysharp.Threading.Tasks;
 using MapEditorSystem.Runtime;
 using System;
 using System.Collections.Generic;
@@ -133,6 +134,11 @@ public class MainSceneManager : MonoBehaviour
         int hp1 = _playerSessions[0].CurrentHp;
         int hp2 = _playerSessions[1].CurrentHp;
 
+        string roundResult = hp1 > hp2 ? "P1Win" : hp2 > hp1 ? "P2Win" : "Draw";
+
+        ExperimentLogger.Instance?.LogEvent(
+            $"Round{_currentMapIndexInSequence + 1}_End_{roundResult}");
+
         // 勝敗判定
         if (hp1 > hp2)
         {
@@ -174,6 +180,7 @@ public class MainSceneManager : MonoBehaviour
 
     public void ChangePhaseLobby()
     {
+        if (CurrentPhase == GamePhase.MapSelect) ExperimentLogger.Instance?.LogEvent("StageSelectCancelled");
         CurrentPhase = GamePhase.Lobby;
 
         if (MapSelectManager.Instance != null)
@@ -248,6 +255,7 @@ public class MainSceneManager : MonoBehaviour
 
         _currentMapIndexInSequence = 0; // 1戦目にリセット
 
+        ExperimentLogger.Instance?.LogEvent("StageSelectConfirmed");
         CurrentPhase = GamePhase.Battle; // 状態をバトル中へ
 
         // マップ生成・出撃時にロビーのUI（キャンバス）を丸ごと非表示にする
@@ -320,6 +328,13 @@ public class MainSceneManager : MonoBehaviour
             // 古い戦車の破棄はSessionManager内部で自動的にやってくれる
             _playerSessions[i].SpawnMyTank(targetSpawnPos);
         }
+
+        if (_currentMapIndexInSequence == 0 && GameManager.Instance != null && GameManager.Instance.CurrentBioMode == BioGameMode.BioFake)
+        {
+            BioSignalManager.Instance?.UpdateProvider();
+        }
+
+        ExperimentLogger.Instance?.LogEvent($"Round{_currentMapIndexInSequence + 1}_Start");
     }
 
     // 次のマップ（ラウンド）へ進む処理
@@ -346,6 +361,10 @@ public class MainSceneManager : MonoBehaviour
     {
         string finalMessage = "";
 
+        string matchResult = _score1P > _score2P ? "P1Win" : _score2P > _score1P ? "P2Win" : "Draw";
+
+        ExperimentLogger.Instance?.LogEvent($"MatchEnd_{matchResult}");
+
         if (_score1P > _score2P) finalMessage = "FINAL WINNER: <color=blue>1P</color> !!";
         else if (_score2P > _score1P) finalMessage = "FINAL WINNER: <color=red>2P</color> !!";
         else finalMessage = "FINAL RESULT: DRAW";
@@ -361,6 +380,7 @@ public class MainSceneManager : MonoBehaviour
 
         // タイトルへ戻る
         Cursor.visible = true; // マウスカーソルを戻しておく
+        ExperimentLogger.Instance?.StopLogging();
         SceneManager.LoadScene("TitleScene");
     }
 
@@ -380,6 +400,7 @@ public class MainSceneManager : MonoBehaviour
 
         if (isAllReady)
         {
+            ExperimentLogger.Instance?.LogEvent("StageSelectStart");
             Debug.Log("2人揃って準備完了！マップ選択に移行します。");
             CurrentPhase = GamePhase.MapSelect; // 状態を移行！
 
@@ -403,6 +424,7 @@ public class MainSceneManager : MonoBehaviour
         switch (CurrentPhase)
         {
             case GamePhase.Lobby:
+                ExperimentLogger.Instance?.StopLogging();
                 // ロビー画面で戻るボタンを押した場合、タイトル画面に戻る処理を呼ぶ
                 SceneManager.LoadScene("TitleScene");
                 break;
@@ -416,6 +438,20 @@ public class MainSceneManager : MonoBehaviour
                 Debug.Log("戦闘中は戻れません！");
                 break;
         }
+    }
+
+    public void LogTankHit(PlayerSessionManager session, int remainingHp)
+    {
+        if (CurrentPhase != GamePhase.Battle || !_isMatchActive) return;
+
+        int playerIndex = _playerSessions.IndexOf(session);
+        if (playerIndex < 0) return;
+
+        int round = _currentMapIndexInSequence + 1;
+        int hp = Mathf.Max(0, remainingHp);
+
+        ExperimentLogger.Instance?.LogEvent(
+            $"Round{round}_P{playerIndex + 1}_Hit_HP{hp}");
     }
 
     // デバック用

@@ -44,3 +44,16 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 000376c44e4ca4caf8eea5c7a6753870, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::BioSignalManager
+  playerOneFakeCsv: {fileID: 4900000, guid: f6e3b64a34cf5b0418cfa438e1983285, type: 3}
+  playerTwoFakeCsv: {fileID: 4900000, guid: 6f13cfef8d8f3dc408c545c757752afe, type: 3}
+  currentBaselineMode: 1
+  staticBaselines:
+  - 0
+  - 0
+  baselineHistorySize: 15
+  dynamicBpmBaselineDisplay:
+  - 0
+  - 0
+  staticBpmBaselineDisplay:
+  - 0
+  - 0

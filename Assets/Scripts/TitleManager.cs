@@ -88,9 +88,6 @@ public class TitleManager : MonoBehaviour
 
         // セーブデータをUI(モード選択の枠)に反映させる
         IsEnableMode();
-
-        // 最初の計測開始(test)
-        ExperimentLogger.Instance.StartLogging("Phase0_Baseline");
     }
 
     /// <summary>
@@ -218,10 +215,15 @@ public class TitleManager : MonoBehaviour
     public void OnClickVersusMode()
     {
         GameSetting.IsSoloMode = false;
-        SceneManager.LoadScene("MainScene");
 
-        // 今までのファイルを閉じて、自動的に0秒から新しいファイルを作り直す
-        ExperimentLogger.Instance.SwitchNextPhase("Phase1_BioReal");
+        var gameManager = GameManager.Instance;
+        if (gameManager != null && gameManager.currentSettings.isLog)
+        {
+            ExperimentLogger.Instance?.StartLogging(
+                gameManager.CurrentBioMode.ToString());
+        }
+
+        SceneManager.LoadScene("MainScene");
     }
 
     // ソロモードへの遷移

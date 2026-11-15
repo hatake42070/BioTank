@@ -260,3 +260,99 @@ MonoBehaviour:
     gridPos: {x: 4, y: 3}
   - objectID: 2
     gridPos: {x: 19, y: 3}
+  - objectID: 7
+    gridPos: {x: 4, y: 10}
+  - objectID: 7
+    gridPos: {x: 4, y: 9}
+  - objectID: 7
+    gridPos: {x: 5, y: 9}
+  - objectID: 7
+    gridPos: {x: 5, y: 10}
+  - objectID: 7
+    gridPos: {x: 10, y: 10}
+  - objectID: 7
+    gridPos: {x: 11, y: 10}
+  - objectID: 7
+    gridPos: {x: 11, y: 9}
+  - objectID: 7
+    gridPos: {x: 10, y: 9}
+  - objectID: 10
+    gridPos: {x: 7, y: 9}
+  - objectID: 10
+    gridPos: {x: 8, y: 9}
+  - objectID: 10
+    gridPos: {x: 8, y: 10}
+  - objectID: 10
+    gridPos: {x: 7, y: 11}
+  - objectID: 7
+    gridPos: {x: 4, y: 11}
+  - objectID: 7
+    gridPos: {x: 5, y: 11}
+  - objectID: 7
+    gridPos: {x: 10, y: 11}
+  - objectID: 7
+    gridPos: {x: 11, y: 11}
+  - objectID: 10
+    gridPos: {x: 6, y: 11}
+  - objectID: 10
+    gridPos: {x: 7, y: 10}
+  - objectID: 10
+    gridPos: {x: 6, y: 10}
+  - objectID: 10
+    gridPos: {x: 6, y: 9}
+  - objectID: 10
+    gridPos: {x: 8, y: 11}
+  - objectID: 10
+    gridPos: {x: 9, y: 11}
+  - objectID: 10
+    gridPos: {x: 9, y: 10}
+  - objectID: 10
+    gridPos: {x: 9, y: 9}
+  - objectID: 10
+    gridPos: {x: 20, y: 9}
+  - objectID: 10
+    gridPos: {x: 21, y: 9}
+  - objectID: 10
+    gridPos: {x: 22, y: 9}
+  - objectID: 10
+    gridPos: {x: 23, y: 9}
+  - objectID: 10
+    gridPos: {x: 23, y: 10}
+  - objectID: 10
+    gridPos: {x: 23, y: 11}
+  - objectID: 10
+    gridPos: {x: 22, y: 11}
+  - objectID: 10
+    gridPos: {x: 21, y: 11}
+  - objectID: 10
+    gridPos: {x: 20, y: 11}
+  - objectID: 10
+    gridPos: {x: 20, y: 10}
+  - objectID: 10
+    gridPos: {x: 21, y: 10}
+  - objectID: 10
+    gridPos: {x: 22, y: 10}
+  - objectID: 7
+    gridPos: {x: 19, y: 11}
+  - objectID: 7
+    gridPos: {x: 18, y: 11}
+  - objectID: 7
+    gridPos: {x: 18, y: 10}
+  - objectID: 7
+    gridPos: {x: 18, y: 9}
+  - objectID: 7
+    gridPos: {x: 19, y: 9}
+  - objectID: 7
+    gridPos: {x: 19, y: 10}
+  - objectID: 7
+    gridPos: {x: 24, y: 11}
+  - objectID: 7
+    gridPos: {x: 24, y: 10}
+  - objectID: 7
+    gridPos: {x: 24, y: 9}
+  - objectID: 7
+    gridPos: {x: 25, y: 9}
+  - objectID: 7
+    gridPos: {x: 25, y: 10}
+  - objectID: 7
+    gridPos: {x: 25, y: 11}
